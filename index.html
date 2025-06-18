@@ -444,7 +444,10 @@
     const tasks=[]; let done=0;
     function upd(){done++; splashBar.style.width=`${(done/tasks.length)*100}%`;}    
     tasks.push(new Promise(r=>{ if(SR) new SR(); r(); }).then(upd));
-    tasks.push(navigator.mediaDevices.getUserMedia({video:true,audio:false})
+    tasks.push(navigator.mediaDevices.getUserMedia({
+      video: {facingMode: {ideal: 'environment'}},
+      audio: false
+    })
       .then(s=>video.srcObject=s)
       .catch(()=>fallbackCam.classList.add('show'))
       .finally(upd));
