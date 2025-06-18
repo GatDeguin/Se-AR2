@@ -396,6 +396,7 @@
       <button id="themeToggle" class="control-btn" aria-label="Cambiar tema"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg></button>
       <button id="pauseBtn" class="control-btn" aria-label="Pausar reproducción"><svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg></button>
       <button id="snapshotBtn" class="control-btn" aria-label="Capturar foto"><svg viewBox="0 0 24 24"><path d="M20 5h-3.17l-1.84-2H8.99L7.15 5H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-8 3a5 5 0 100 10 5 5 0 000-10z"/></svg></button>
+      <button id="switchCamBtn" class="control-btn" aria-label="Cambiar cámara"><svg viewBox="0 0 24 24"><path d="M20 4h-3.17l-1.84-2H8.99L7.15 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V6h3.17L8.99 4h6.02l1.84 2H20v12zM9 15l3 3 3-3H9zm6-6l-3-3-3 3h6z"/></svg></button>
       <button id="restartBtn" class="control-btn" aria-label="Reiniciar video"><svg viewBox="0 0 24 24"><path d="M12 5V1l-4 4 4 4V6c3.86 0 7 3.14 7 7s-3.14 7-7 7-7-3.14-7-7H3c0 4.97 4.03 9 9 9s9-4.03 9-9-4.03-9-9-9z"/></svg></button>
     </div>
 
@@ -433,22 +434,38 @@
     const pauseBtn = document.getElementById('pauseBtn');
     const snapshotBtn = document.getElementById('snapshotBtn');
     const restartBtn = document.getElementById('restartBtn');
+    const switchCamBtn = document.getElementById("switchCamBtn");
     const micBtn = document.getElementById('micBtn');
     const captionContainer = document.getElementById('captionContainer');
     const captionText = document.getElementById('captionText');
     const progress = document.getElementById('progress');
     const fpsBadge = document.getElementById('fpsBadge');
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let camStream;
+    let videoDevices=[];
+    let currentDevice=0;
 
+    async function startStream(id){
+      try{
+        const c={video:id?{deviceId:{exact:id}}:true,audio:false};
+        const s=await navigator.mediaDevices.getUserMedia(c);
+        if(camStream) camStream.getTracks().forEach(t=>t.stop());
+        camStream=s;
+        video.srcObject=s;
+        fallbackCam.classList.remove("show");
+      }catch(e){
+        fallbackCam.classList.add("show");
+      }
+    }
     /* ---------- Splash preload ---------- */
     const tasks=[]; let done=0;
     function upd(){done++; splashBar.style.width=`${(done/tasks.length)*100}%`;}    
     tasks.push(new Promise(r=>{ if(SR) new SR(); r(); }).then(upd));
-    tasks.push(navigator.mediaDevices.getUserMedia({video:true,audio:false})
-      .then(s=>video.srcObject=s)
-      .catch(()=>fallbackCam.classList.add('show'))
-      .finally(upd));
-    Promise.all(tasks).then(()=>{ splash.classList.add('fade-out'); setTimeout(()=>splash.remove(),500); if(!localStorage.getItem('tourSeen')) startTour(); });
+    tasks.push(navigator.mediaDevices.enumerateDevices().then(d=>{
+      videoDevices=d.filter(v=>v.kind==="videoinput");
+      return startStream(videoDevices[0]?.deviceId);
+    }).finally(upd));
+    Promise.all(tasks).then(()=>{ splash.classList.add("fade-out"); setTimeout(()=>splash.remove(),500); if(!localStorage.getItem("tourSeen")) startTour(); });
 
     /* ---------- Guided tour ---------- */
     const steps=[{el:'#settingsBtn',text:'Accede a configuraciones.'},{el:'#themeToggle',text:'Cambia tema.'},{el:'#pauseBtn',text:'Pausa/reanuda.'},{el:'#snapshotBtn',text:'Captura pantalla.'},{el:'#restartBtn',text:'Reinicia.'},{el:'#micBtn',text:'Activa voz.'}];
@@ -544,6 +561,14 @@
       l.click();
     };
     restartBtn.onclick=()=>location.reload();
+    switchCamBtn.onclick=e=>{
+      ripple(e,switchCamBtn);
+      navigator.vibrate?.(20);
+      if(videoDevices.length>1){
+        currentDevice=(currentDevice+1)%videoDevices.length;
+        startStream(videoDevices[currentDevice].deviceId);
+      }
+    };
 
     /* ---------- FPS badge ---------- */
     let lt=performance.now(),fr=0;
