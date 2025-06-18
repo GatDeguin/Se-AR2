@@ -31,6 +31,17 @@ python3 -m http.server 8000
 
 Then navigate to <http://localhost:8000/> or the appropriate HTTPS address.
 
+## Running Tests
+
+Install Node.js dependencies once using `npm install` and then execute:
+
+```bash
+npm test
+```
+
+This runs the Jest test suite which verifies that `index.html` loads and key
+elements such as the video and canvas are present.
+
 ## Dependencias e instalación
 
 La página hace uso de varias bibliotecas externas que se cargan desde

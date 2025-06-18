@@ -1,0 +1,22 @@
+{
+  "name": "se-ar2",
+  "version": "1.0.0",
+  "description": "A minimal prototype (MVP) of the SeñAR app. This single page web application provides sign language recognition features and audio transcription directly in the browser.",
+  "main": "app.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "jest": "^30.0.0",
+    "jest-environment-jsdom": "^30.0.0"
+  },
+  "jest": {
+    "testEnvironment": "jsdom"
+  }
+}
