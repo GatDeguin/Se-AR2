@@ -53,10 +53,32 @@ CDN:
   navegador.
 
 No se requiere una instalación compleja; basta con servir los archivos
-estáticos a través de un servidor local como se muestra arriba. Si se
-desea utilizar las funcionalidades sin conexión, los modelos de la
-sección *Offline Models* pueden descargarse previamente y modificarse
-las rutas de las librerías para que apunten a ficheros locales.
+estáticos a través de un servidor local como se muestra arriba.
+
+### Offline Models
+
+Para ejecutar la demo sin conexión:
+
+1. Cree una carpeta `libs/` en la raíz del proyecto.
+2. Descargue de jsDelivr los archivos `hands.js`, `face_mesh.js` y `drawing_utils.js`
+   de **MediaPipe** y guárdelos en `libs/`.
+3. Obtenga `transformers.min.js` desde el paquete de **Transformers** (versión 3.5.2)
+   y colóquelo en la misma carpeta.
+4. Modifique las etiquetas `<script>` de `index.html` para que apunten a los
+   archivos locales, por ejemplo:
+   ```html
+   <script src="libs/hands.js"></script>
+   <script src="libs/face_mesh.js"></script>
+   <script src="libs/drawing_utils.js"></script>
+   ```
+5. En `app.js` cambie la importación de Transformers a
+   ```javascript
+   import { pipeline } from './libs/transformers.min.js';
+   ```
+   y actualice las opciones `locateFile` de MediaPipe para que devuelvan
+   `'libs/' + f`.
+6. Reserve alrededor de **80 MB** de espacio libre para los modelos y
+   asegúrese de que los archivos se sirvan también mediante **HTTPS**.
 
 ## Recommended Browsers
 
