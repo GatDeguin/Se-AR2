@@ -1,6 +1,4 @@
     // References
-    const splash = document.getElementById('splashScreen');
-    const splashBar = document.querySelector('.splash-progress .progress-inner');
     const tourOverlay = document.getElementById('tourOverlay');
     const tourTooltip = document.getElementById('tourTooltip');
     const tourNext = document.getElementById('tourNext');
@@ -53,8 +51,14 @@
       }
     }
     /* ---------- Splash preload ---------- */
-    const tasks=[]; let done=0;
-    function upd(){done++; splashBar.style.width=`${(done/tasks.length)*100}%`;}    
+    const tasks=[];
+    function upd(){}
+    let tasksFinished = false;
+    let splashFinished = false;
+    function maybeStartTour(){
+      if(tasksFinished && splashFinished && !localStorage.getItem("tourSeen")) startTour();
+    }
+    window.addEventListener("splashDone",()=>{ splashFinished = true; maybeStartTour(); });
     tasks.push(new Promise(r=>{ if(SR) new SR(); r(); }).then(upd));
 tasks.push(
   navigator.mediaDevices.enumerateDevices()
@@ -78,9 +82,8 @@ tasks.push(
 );
 
 Promise.all(tasks).then(() => {
-  splash.classList.add('fade-out');
-  setTimeout(() => splash.remove(), 500);
-  if (!localStorage.getItem('tourSeen')) startTour();
+  tasksFinished = true;
+  maybeStartTour();
 });
 
 
