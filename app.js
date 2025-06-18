@@ -174,12 +174,23 @@ Promise.all(tasks).then(() => {
       l.click();
     };
     restartBtn.onclick=()=>location.reload();
-    switchCamBtn.onclick=e=>{
+    switchCamBtn.onclick=async e=>{
       ripple(e,switchCamBtn);
       navigator.vibrate?.(20);
-      if(videoDevices.length>1){
-        currentDevice=(currentDevice+1)%videoDevices.length;
-        startStream(videoDevices[currentDevice].deviceId);
+      try{
+        const devices=await navigator.mediaDevices.enumerateDevices();
+        videoDevices=devices.filter(d=>d.kind==='videoinput');
+        if(videoDevices.length>1){
+          currentDevice=(currentDevice+1)%videoDevices.length;
+          await startStream(videoDevices[currentDevice].deviceId);
+        }else{
+          const facing=currentDevice%2?'user':'environment';
+          currentDevice++;
+          await startStream({facingMode:{exact:facing}});
+        }
+      }catch(err){
+        fallbackCam.textContent=`\ud83d\udcf7 ${err.message}`;
+        fallbackCam.classList.add('show');
       }
     };
 
