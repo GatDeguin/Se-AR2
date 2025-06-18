@@ -263,13 +263,11 @@ Promise.all(tasks).then(() => {
         captionContainer.classList.remove('drop');
       });
     })();
-    import { pipeline } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.5.2/dist/transformers.min.js';
-    const device = navigator.gpu ? 'webgpu' : 'wasm';
-    const transcriberP = pipeline('automatic-speech-recognition','Xenova/whisper-tiny',{quantized:true,device});
-    const micBtn=document.getElementById('micBtn');
-    const captionContainer=document.getElementById('captionContainer');
-    const captionText=document.getElementById('captionText');
-    const progressBar=document.getElementById('progress');
+import { pipeline } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.5.2/dist/transformers.min.js';
+const device = navigator.gpu ? 'webgpu' : 'wasm';
+const transcriberP = pipeline('automatic-speech-recognition', 'Xenova/whisper-tiny', { quantized: true, device });
+// Reuse existing element references defined at the top of the file
+const progressBar = document.getElementById('progress');
     let recorder,chunks=[],blob;
     async function blobToPCM(b,r=16000){
       const buf=await b.arrayBuffer();
@@ -305,7 +303,6 @@ Promise.all(tasks).then(() => {
     };
 
     /* Tracker Combinado */
-    const video=document.getElementById('video');
     const canvasTracker=document.getElementById('trackerCanvas')||(()=>{const c=document.createElement('canvas');c.id='trackerCanvas';video.parentNode.insertBefore(c,video.nextSibling);return c;})();
     const ctxTracker=canvasTracker.getContext('2d',{willReadFrequently:true});
     const hands=new Hands({locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`});
