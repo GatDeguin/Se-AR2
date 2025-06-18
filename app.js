@@ -267,7 +267,6 @@ import { pipeline } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers
 const device = navigator.gpu ? 'webgpu' : 'wasm';
 const transcriberP = pipeline('automatic-speech-recognition', 'Xenova/whisper-tiny', { quantized: true, device });
 // Reuse existing element references defined at the top of the file
-const progressBar = document.getElementById('progress');
     let recorder,chunks=[],blob;
     async function blobToPCM(b,r=16000){
       const buf=await b.arrayBuffer();
@@ -282,11 +281,11 @@ const progressBar = document.getElementById('progress');
       return res.getChannelData(0);
     }
     async function transcribe(){
-      captionText.textContent='Transcribiendo…';progressBar.style.width='35%';
+      captionText.textContent='Transcribiendo…';progress.style.width='35%';
       const pcm=await blobToPCM(blob);
       const { text }=await (await transcriberP)(pcm,{chunk_length_s:30,language:'spanish'});
-      captionText.textContent=text.trim();progressBar.style.width='100%';
-      setTimeout(()=>progressBar.style.width='0%',1000);
+      captionText.textContent=text.trim();progress.style.width='100%';
+      setTimeout(()=>progress.style.width='0%',1000);
     }
     micBtn.onclick=async e=>{
       navigator.vibrate?.(40);
@@ -298,7 +297,7 @@ const progressBar = document.getElementById('progress');
         recorder.onstop=async()=>{blob=new Blob(chunks,{type:'audio/webm'});await transcribe();micBtn.classList.remove('active');};
         recorder.start();micBtn.classList.add('active');
         captionContainer.classList.add('show');
-        captionText.textContent='Grabando…';progressBar.style.width='15%';
+        captionText.textContent='Grabando…';progress.style.width='15%';
       }else{recorder.stop();}
     };
 
