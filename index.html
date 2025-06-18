@@ -461,11 +461,41 @@
     const tasks=[]; let done=0;
     function upd(){done++; splashBar.style.width=`${(done/tasks.length)*100}%`;}    
     tasks.push(new Promise(r=>{ if(SR) new SR(); r(); }).then(upd));
-    tasks.push(navigator.mediaDevices.enumerateDevices().then(d=>{
-      videoDevices=d.filter(v=>v.kind==="videoinput");
-      return startStream(videoDevices[0]?.deviceId);
-    }).finally(upd));
-    Promise.all(tasks).then(()=>{ splash.classList.add("fade-out"); setTimeout(()=>splash.remove(),500); if(!localStorage.getItem("tourSeen")) startTour(); });
+tasks.push(
+  navigator.mediaDevices.enumerateDevices()
+    .then(devices => {
+      // Filtrar sólo inputs de vídeo
+      videoDevices = devices.filter(d => d.kind === 'videoinput');
+      // Intentar elegir cámara “back” o la primera disponible
+      const selected = videoDevices.find(d => d.label.toLowerCase().includes('back')) || videoDevices[0];
+      if (selected) {
+        return startStream(selected.deviceId);
+      }
+      return Promise.reject(new Error('No video inputs'));
+    })
+    .catch(() => 
+      // Fallback a facingMode
+      navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: 'environment' } },
+        audio: false
+      })
+      .then(stream => {
+        video.srcObject = stream;
+      })
+      .catch(() => {
+        // Si tampoco funciona, mostramos aviso
+        fallbackCam.classList.add('show');
+      })
+    )
+    .finally(upd)
+);
+
+Promise.all(tasks).then(() => {
+  splash.classList.add('fade-out');
+  setTimeout(() => splash.remove(), 500);
+  if (!localStorage.getItem('tourSeen')) startTour();
+});
+
 
     /* ---------- Guided tour ---------- */
     const steps=[{el:'#settingsBtn',text:'Accede a configuraciones.'},{el:'#themeToggle',text:'Cambia tema.'},{el:'#pauseBtn',text:'Pausa/reanuda.'},{el:'#snapshotBtn',text:'Captura pantalla.'},{el:'#restartBtn',text:'Reinicia.'},{el:'#micBtn',text:'Activa voz.'}];
