@@ -32,7 +32,14 @@
 
     async function startStream(id){
       try{
-        const c={video:id?{deviceId:{exact:id}}:true,audio:false};
+        let c;
+        if(typeof id==='string'){
+          c={video:{deviceId:{exact:id}},audio:false};
+        }else if(typeof id==='object'){
+          c={video:id,audio:false};
+        }else{
+          c={video:true,audio:false};
+        }
         const s=await navigator.mediaDevices.getUserMedia(c);
         if(camStream) camStream.getTracks().forEach(t=>t.stop());
         camStream=s;
@@ -51,26 +58,17 @@ tasks.push(
     .then(devices => {
       // Filtrar sólo inputs de vídeo
       videoDevices = devices.filter(d => d.kind === 'videoinput');
-      // Intentar elegir cámara “back” o la primera disponible
+      // Intentar elegir cámara "back" o la primera disponible
       const selected = videoDevices.find(d => d.label.toLowerCase().includes('back')) || videoDevices[0];
       if (selected) {
+        currentDevice = videoDevices.indexOf(selected);
         return startStream(selected.deviceId);
       }
-      return Promise.reject(new Error('No video inputs'));
+      return startStream({facingMode:{exact:'environment'}});
     })
-    .catch(() => 
-      // Fallback a facingMode
-      navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: 'environment' } },
-        audio: false
-      })
-      .then(stream => {
-        video.srcObject = stream;
-      })
-      .catch(() => {
-        // Si tampoco funciona, mostramos aviso
-        fallbackCam.classList.add('show');
-      })
+    .catch(() =>
+      startStream({facingMode:{ideal:'environment'}})
+        .catch(() => fallbackCam.classList.add('show'))
     )
     .finally(upd)
 );
@@ -331,6 +329,9 @@ const transcriberP = pipeline('automatic-speech-recognition', 'Xenova/whisper-ti
           let minX=1,minY=1,maxX=0,maxY=0;
           faceLandmarks.forEach(p=>{minX=Math.min(minX,p.x);minY=Math.min(minY,p.y);maxX=Math.max(maxX,p.x);maxY=Math.max(maxY,p.y);});
           ctxTracker.strokeRect(minX*vw,minY*vh,(maxX-minX)*vw,(maxY-minY)*vh);
+          drawConnectors(ctxTracker,faceLandmarks,FACEMESH_LEFT_EYE,{color:'#FFD700',lineWidth:2});
+          drawConnectors(ctxTracker,faceLandmarks,FACEMESH_RIGHT_EYE,{color:'#FFD700',lineWidth:2});
+          drawConnectors(ctxTracker,faceLandmarks,FACEMESH_LIPS,{color:'#FF69B4',lineWidth:2});
         }
       }
       requestAnimationFrame(onFrame);
