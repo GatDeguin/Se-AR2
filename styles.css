@@ -293,6 +293,11 @@
     .item-sub { font-size: 13px; color: #8e8e93; }
     .item-value { font-size: 17px; color: #8e8e93; }
     .item-control { display: flex; align-items: center; gap: 8px; }
+    .item-control select {
+      font-size: 15px;
+      padding: 4px 8px;
+      border-radius: 8px;
+    }
     .settings-button.primary { background: #007aff; color: #fff; border: none; padding: 6px 12px; border-radius: 14px; font-size: 15px; }
     .settings-button.secondary { background: #f2f2f7; color: #000; border: none; padding: 6px 12px; border-radius: 14px; font-size: 15px; }
     .badge { background: #f2f2f7; color: #8e8e93; padding: 2px 8px; border-radius: 12px; font-size: 13px; }
@@ -325,6 +330,14 @@
       .controls-left button {
         width: 40px;
         height: 40px;
+      }
+
+      .settings-content {
+        padding: var(--spacing);
+      }
+
+      .settings-item {
+        padding: 12px;
       }
 
       .caption-container {

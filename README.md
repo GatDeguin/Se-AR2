@@ -74,7 +74,9 @@ estáticos a través de un servidor local como se muestra arriba.
 Para ejecutar la demo sin conexión:
 
 1. Ejecute `npm run prepare-offline` para descargar los modelos y crear
-   la carpeta `libs/` automáticamente.
+   la carpeta `libs/` automáticamente. El script genera un archivo
+   `libs/progress.json` que actualiza el avance de cada descarga y
+   puede consultarse desde la interfaz.
 2. Modifique las etiquetas `<script>` de `index.html` para que apunten a los
    archivos locales, por ejemplo:
    ```html
@@ -91,6 +93,13 @@ Para ejecutar la demo sin conexión:
    `'libs/' + f`.
 4. Reserve alrededor de **80 MB** de espacio libre para los modelos y
    asegúrese de que los archivos se sirvan también mediante **HTTPS**.
+
+### Dialects
+
+Desde la pantalla de configuraciones ahora es posible elegir el dialecto de
+LSA a utilizar. Las opciones iniciales son **Noroeste**, **Cuyo** y
+**Noreste**. La selección se guarda en `localStorage` y se aplica al iniciar
+la aplicación.
 
 ## Recommended Browsers
 

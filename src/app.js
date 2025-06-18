@@ -10,6 +10,7 @@
     const themeValue = document.getElementById('themeValue');
     const subtitleSizeSlider = document.getElementById('subtitleSizeSlider');
     const subtitleSizeValue = document.getElementById('subtitleSizeValue');
+    const dialectSelect = document.getElementById('dialectSelect');
     const video = document.getElementById('video');
     const fallbackCam = document.getElementById('fallbackCam');
     const fallbackSpeech = document.getElementById('fallbackSpeech');
@@ -38,6 +39,11 @@ const accentRGB = rootStyles.getPropertyValue('--accent-rgb').trim() || '46,184,
       subtitleSizeSlider.value = savedSize;
       subtitleSizeValue.textContent = savedSize + ' pt';
       captionContainer.style.fontSize = savedSize + 'px';
+    }
+
+    const savedDialect = localStorage.getItem('dialect');
+    if (savedDialect && dialectSelect) {
+      dialectSelect.value = savedDialect;
     }
 
     function drawMarker(ctx,x,y,r){
@@ -139,6 +145,12 @@ Promise.all(tasks).then(() => {
       captionContainer.style.fontSize = subtitleSizeSlider.value + 'px';
       localStorage.setItem('subtitleSize', subtitleSizeSlider.value);
     };
+
+    if (dialectSelect) {
+      dialectSelect.onchange = () => {
+        localStorage.setItem('dialect', dialectSelect.value);
+      };
+    }
 
     /* ---------- Mic ---------- */
     let recog;
