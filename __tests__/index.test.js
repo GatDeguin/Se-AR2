@@ -17,6 +17,11 @@ beforeAll(() => {
     localStorage.setItem('theme', isLight ? 'light' : 'dark');
   });
 
+  const dialectSelect = document.getElementById('dialectSelect');
+  dialectSelect.addEventListener('change', () => {
+    localStorage.setItem('dialect', dialectSelect.value);
+  });
+
   const micBtn = document.getElementById('micBtn');
   global.micCalls = 0;
   micBtn.addEventListener('click', () => {
@@ -65,5 +70,13 @@ describe('index.html', () => {
     expect(localStorage.getItem('theme')).toBe('light');
     toggle.click();
     expect(localStorage.getItem('theme')).toBe('dark');
+  });
+
+  test('dialect select saves preference', () => {
+    const select = document.getElementById('dialectSelect');
+    localStorage.clear();
+    select.value = 'cuyo';
+    select.dispatchEvent(new Event('change'));
+    expect(localStorage.getItem('dialect')).toBe('cuyo');
   });
 });
