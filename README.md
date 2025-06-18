@@ -74,9 +74,21 @@ estáticos a través de un servidor local como se muestra arriba.
 Para ejecutar la demo sin conexión:
 
 1. Ejecute `npm run prepare-offline` para descargar los modelos y crear
-   la carpeta `libs/` automáticamente. El script genera un archivo
-   `libs/progress.json` que actualiza el avance de cada descarga y
-   puede consultarse desde la interfaz.
+   la carpeta `libs/` automáticamente. El script mantiene un archivo
+   `libs/progress.json` que registra cuántos bytes se han descargado de
+   cada archivo. Si la descarga se interrumpe, al volver a ejecutar el
+   comando la operación se reanuda a partir del progreso guardado.
+   Un ejemplo simplificado del archivo es:
+
+   ```json
+   {
+     "hands.js": { "downloaded": 3145728, "total": 7340032 },
+     "pose.js": { "downloaded": 7340032, "total": 7340032 }
+   }
+   ```
+
+   Para realizar pruebas sin conectar a Internet utilice `DRY_RUN=1 npm run prepare-offline`,
+   lo que genera entradas de progreso sin realizar descargas reales.
 2. Modifique las etiquetas `<script>` de `index.html` para que apunten a los
    archivos locales, por ejemplo:
    ```html
