@@ -24,6 +24,9 @@
     const captionText = document.getElementById('captionText');
     const progress = document.getElementById('progress');
     const fpsBadge = document.getElementById('fpsBadge');
+    const rootStyles = getComputedStyle(document.documentElement);
+    const accent = rootStyles.getPropertyValue('--accent').trim() || '#2EB8A3';
+    const accentRGB = rootStyles.getPropertyValue('--accent-rgb').trim() || '46,184,163';
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     let camStream;
     let videoDevices=[];
@@ -348,12 +351,24 @@ const transcriberP = pipeline('automatic-speech-recognition', 'Xenova/whisper-ti
         ctxTracker.clearRect(0,0,vw,vh);
         ctxTracker.lineWidth=2;
         handLandmarks.forEach(lm=>{
-          ctxTracker.strokeStyle='#00FF00';
+          let minX=1,minY=1,maxX=0,maxY=0;
+          lm.forEach(p=>{minX=Math.min(minX,p.x);minY=Math.min(minY,p.y);maxX=Math.max(maxX,p.x);maxY=Math.max(maxY,p.y);});
+          const pad=0.02;
+          const x=Math.max(0,minX-pad),y=Math.max(0,minY-pad);
+          const w=Math.min(1,maxX+pad)-x,h=Math.min(1,maxY+pad)-y;
+          ctxTracker.fillStyle=`rgba(${accentRGB},0.15)`;
+          ctxTracker.fillRect(x*vw,y*vh,w*vw,h*vh);
+
+          ctxTracker.strokeStyle=accent;
           HAND_CONNECTIONS.forEach(([i,j])=>{
             const p1=lm[i],p2=lm[j];
-            ctxTracker.beginPath();ctxTracker.moveTo(p1.x*vw,p1.y*vh);ctxTracker.lineTo(p2.x*vw,p2.y*vh);ctxTracker.stroke();
+            ctxTracker.beginPath();
+            ctxTracker.moveTo(p1.x*vw,p1.y*vh);
+            ctxTracker.lineTo(p2.x*vw,p2.y*vh);
+            ctxTracker.stroke();
           });
-          lm.forEach(p=>{ctxTracker.fillStyle='#FF0000';ctxTracker.beginPath();ctxTracker.arc(p.x*vw,p.y*vh,4,0,Math.PI*2);ctxTracker.fill();});
+          ctxTracker.fillStyle=accent;
+          lm.forEach(p=>{ctxTracker.beginPath();ctxTracker.arc(p.x*vw,p.y*vh,4,0,Math.PI*2);ctxTracker.fill();});
         });
         if(faceLandmarks){
           ctxTracker.strokeStyle='#00FFFF';
