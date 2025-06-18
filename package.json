@@ -6,7 +6,7 @@
   "scripts": {
     "test": "jest",
     "start": "npx http-server . -p 8000",
-    "lint": "eslint -c .eslintrc app.js __tests__/index.test.js"
+    "lint": "eslint -c .eslintrc.json app.js __tests__/index.test.js"
   },
   "keywords": [],
   "author": "",

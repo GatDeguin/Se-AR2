@@ -219,7 +219,7 @@ Promise.all(tasks).then(() => {
     captionContainer.classList.add('draggable');
 
     (function(){
-      let dragging=false, startX=0, startY=0, offsetX=0, offsetY=0;
+      let dragging=false, offsetX=0, offsetY=0;
 
       captionContainer.addEventListener('pointerdown', startDrag);
       captionContainer.addEventListener('pointermove', onDrag);
@@ -300,7 +300,7 @@ const transcriberP = pipeline('automatic-speech-recognition', 'Xenova/whisper-ti
       captionText.textContent=text.trim();progress.style.width='100%';
       setTimeout(()=>progress.style.width='0%',1000);
     }
-    function recordHandler(e){
+    function recordHandler(){
       (async()=>{
         try{
           navigator.vibrate?.(40);
@@ -330,12 +330,19 @@ const transcriberP = pipeline('automatic-speech-recognition', 'Xenova/whisper-ti
     hands.setOptions({maxNumHands:2,modelComplexity:1,minDetectionConfidence:0.7,minTrackingConfidence:0.7});
     const faceMesh=new FaceMesh({locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${f}`});
     faceMesh.setOptions({maxNumFaces:1,refineLandmarks:true,minDetectionConfidence:0.7,minTrackingConfidence:0.7});
-    let handLandmarks=[],faceLandmarks=null;
+    const pose=new Pose({locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/pose/${f}`});
+    pose.setOptions({modelComplexity:1,enableSegmentation:false,minDetectionConfidence:0.7,minTrackingConfidence:0.7});
+    let handLandmarks=[],faceLandmarks=null,poseLandmarks=null;
     hands.onResults(r=>handLandmarks=r.multiHandLandmarks||[]);
     faceMesh.onResults(r=>faceLandmarks=r.multiFaceLandmarks?.[0]||null);
+    pose.onResults(r=>poseLandmarks=r.poseLandmarks||null);
     async function onFrame(){
       if(video.readyState>=2){
-        await Promise.all([hands.send({image:video}),faceMesh.send({image:video})]);
+        await Promise.all([
+          hands.send({image:video}),
+          faceMesh.send({image:video}),
+          pose.send({image:video})
+        ]);
         const vw=video.videoWidth,vh=video.videoHeight;
         canvasTracker.width=vw;canvasTracker.height=vh;
         ctxTracker.clearRect(0,0,vw,vh);
@@ -356,6 +363,10 @@ const transcriberP = pipeline('automatic-speech-recognition', 'Xenova/whisper-ti
           drawConnectors(ctxTracker,faceLandmarks,FACEMESH_LEFT_EYE,{color:'#FFD700',lineWidth:2});
           drawConnectors(ctxTracker,faceLandmarks,FACEMESH_RIGHT_EYE,{color:'#FFD700',lineWidth:2});
           drawConnectors(ctxTracker,faceLandmarks,FACEMESH_LIPS,{color:'#FF69B4',lineWidth:2});
+        }
+        if(poseLandmarks){
+          drawConnectors(ctxTracker, poseLandmarks, POSE_CONNECTIONS, {color:'#ADFF2F', lineWidth:2});
+          poseLandmarks.forEach(p=>{ctxTracker.fillStyle='#0000FF';ctxTracker.beginPath();ctxTracker.arc(p.x*vw,p.y*vh,3,0,Math.PI*2);ctxTracker.fill();});
         }
       }
       requestAnimationFrame(onFrame);

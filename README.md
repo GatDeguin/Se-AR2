@@ -6,7 +6,7 @@ transcription directly in the browser.
 
 ## Funcionalidades principales
 
-* Seguimiento de manos y rostro en tiempo real mediante **MediaPipe**.
+* Seguimiento de manos, rostro y postura corporal (brazos, hombros) en tiempo real mediante **MediaPipe**.
 * Transcripción de voz a texto usando la API Web Speech o el modelo
   **Whisper tiny** a través de **Transformers**.
 * Interfaz con subtítulos arrastrables, cambio de tema y recorrido guiado.
@@ -73,7 +73,7 @@ estáticos a través de un servidor local como se muestra arriba.
 Para ejecutar la demo sin conexión:
 
 1. Cree una carpeta `libs/` en la raíz del proyecto.
-2. Descargue de jsDelivr los archivos `hands.js`, `face_mesh.js` y `drawing_utils.js`
+2. Descargue de jsDelivr los archivos `hands.js`, `face_mesh.js`, `pose.js` y `drawing_utils.js`
    de **MediaPipe** y guárdelos en `libs/`.
 3. Obtenga `transformers.min.js` desde el paquete de **Transformers** (versión 3.5.2)
    y colóquelo en la misma carpeta.
@@ -83,6 +83,7 @@ Para ejecutar la demo sin conexión:
    <script src="libs/hands.js"></script>
    <script src="libs/face_mesh.js"></script>
    <script src="libs/drawing_utils.js"></script>
+   <script src="libs/pose.js"></script>
    ```
 5. En `app.js` cambie la importación de Transformers a
    ```javascript
