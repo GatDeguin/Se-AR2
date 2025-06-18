@@ -1,4 +1,4 @@
-# Se-AR2
+# SeñAR v 0.9
 
 A minimal prototype (MVP) of the SeñAR app. This single page web
 application provides sign language recognition features and audio
