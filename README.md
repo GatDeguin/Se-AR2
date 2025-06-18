@@ -91,8 +91,20 @@ Para ejecutar la demo sin conexión:
    ```
    y actualice las opciones `locateFile` de MediaPipe para que devuelvan
    `'libs/' + f`.
-4. Reserve alrededor de **80 MB** de espacio libre para los modelos y
-   asegúrese de que los archivos se sirvan también mediante **HTTPS**.
+  4. Reserve alrededor de **80 MB** de espacio libre para los modelos y
+     asegúrese de que los archivos se sirvan también mediante **HTTPS**.
+
+### PWA Installation
+
+Al abrir la aplicación en navegadores compatibles se mostrará un aviso para
+instalarla como **PWA**. Tras la primera carga los archivos esenciales se
+almacenan con un *service worker* y la página funciona sin conexión.
+
+### Accessibility
+
+En la sección de configuraciones se incluye la opción **Alto contraste**. Al
+activarla la interfaz usa un esquema de colores con mayor contraste apto para
+lectores de pantalla. La preferencia se guarda en `localStorage`.
 
 ### Dialects
 
