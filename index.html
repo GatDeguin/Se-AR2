@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SeñAR Web App Pixel‑Perfect</title>
+  <style>
+    :root {
+      /* Themes & Colors */
+      --bg-dark: #000;
+      --bg-light: #f5f5f5;
+      --bg-overlay: rgba(30,30,30,0.7);
+      --control-bg: rgba(32,32,32,0.75);
+      --accent: #2EB8A3;
+      --accent-dark: #0D7660;
+      --accent-rgb: 46,184,163;
+      --error: #E74C3C;
+      --error-dark: #C0392B;
+      --text-light: #FFF;
+      --text-dark: #000;
+      --font-family: 'Helvetica Neue', sans-serif;
+      --font-base: 16px;
+      --font-lg: 18px;
+      --radius: 16px;
+      --spacing: 8px;
+      --transition: 0.3s ease;
+    }
+    body.light {
+      --bg-dark: var(--bg-light);
+      --bg-overlay: rgba(255,255,255,0.8);
+      --control-bg: rgba(255,255,255,0.9);
+      --text-light: var(--text-dark);
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body {
+      margin: 0; padding: 0;
+      width: 100%; height: 100%;
+      overflow: hidden;
+      background: var(--bg-dark);
+      font-family: var(--font-family);
+    }
+    /* Video */
+    #video {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+    /* Splash Screen */
+    .splash-screen {
+      position: absolute; inset: 0;
+      background: var(--bg-dark);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      z-index: 1000;
+      transition: opacity var(--transition);
+    }
+    .splash-screen.fade-out {
+      opacity: 0; pointer-events: none;
+    }
+    .splash-screen img {
+      max-width: 60%; height: auto;
+      margin-bottom: calc(var(--spacing)*2);
+    }
+    .splash-progress {
+      width: 200px; height: 6px;
+      background: rgba(255,255,255,0.3);
+      border-radius: 3px; overflow: hidden;
+    }
+    .splash-progress .progress-inner {
+      width: 0%; height: 100%;
+      background: var(--accent);
+      transition: width var(--transition);
+    }
+    /* Guided Tour */
+    .tour-overlay {
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 999; display: none;
+      pointer-events: auto;
+    }
+    .tour-overlay.active { display: block; }
+    .tour-tooltip {
+      position: absolute;
+      background: var(--control-bg);
+      color: var(--text-light);
+      padding: calc(var(--spacing)*2);
+      border-radius: var(--radius);
+      max-width: 240px;
+      text-align: center;
+      backdrop-filter: blur(8px);
+      z-index: 1001;
+    }
+    #tourNext, #tourClose {
+      position: absolute;
+      bottom: calc(var(--spacing)*2);
+      padding: var(--spacing);
+      border: none; border-radius: var(--radius);
+      cursor: pointer;
+      color: var(--text-light);
+      font-size: var(--font-base);
+      z-index: 1001;
+    }
+    #tourNext { right: calc(var(--spacing)*2); background: var(--accent); }
+    #tourClose { right: calc(var(--spacing)*8); background: var(--error); }
+    /* Controls Left */
+    .controls-left {
+      position: absolute; top: 5%; left: 2%;
+      display: flex; flex-direction: column; gap: var(--spacing);
+      background: var(--control-bg);
+      border-radius: var(--radius);
+      backdrop-filter: blur(12px);
+      padding: var(--spacing);
+      pointer-events: auto;
+      z-index: 300;
+    }
+    .controls-left button {
+      position: relative; width: 48px; height: 48px;
+      display: flex; align-items: center; justify-content: center;
+      background: transparent; border: none;
+      cursor: pointer;
+      transition: transform 0.2s var(--transition);
+      outline: none;
+    }
+    .controls-left button svg {
+      width: 28px; height: 28px;
+      fill: var(--text-light);
+    }
+    .controls-left button:hover { transform: scale(1.1); }
+    .controls-left button:active { transform: scale(0.9); }
+    .controls-left button:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+    /* Caption */
+    .caption-container {
+      position: absolute; bottom: 25%;
+      left: 50%; transform: translateX(-50%) translateY(10px);
+      max-width: 85%; background: var(--bg-overlay);
+      border-radius: calc(var(--radius)*1.2);
+      padding: calc(var(--spacing)*2);
+      color: var(--text-light);
+      font-size: var(--font-lg);
+      line-height: 1.4;
+      backdrop-filter: blur(12px);
+      display: flex; flex-direction: column;
+      gap: var(--spacing);
+      pointer-events: auto;
+      opacity: 0;
+      transition: opacity var(--transition), transform var(--transition);
+      /* Drag helpers */
+      touch-action: none;
+    }
+    .caption-container.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    .caption-container.draggable { cursor: grab; }
+    .caption-container.dragging {
+      cursor: grabbing;
+      box-shadow: 0 8px 24px rgba(var(--accent-rgb),0.4);
+      transform: translate(0,0) scale(1.05) !important;
+      transition: none;
+    }
+    .caption-container.drop {
+      animation: dropBounce 0.3s ease-out forwards;
+    }
+    .progress-bar {
+      width: 100%; height: 6px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 3px; overflow: hidden;
+    }
+    .progress {
+      width: 0%; height: 100%;
+      background: var(--accent);
+      transition: width 0.1s linear;
+    }
+    .caption-text-word {
+      display: inline-block; opacity: 0.6;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .caption-text-word.highlight {
+      color: var(--accent); opacity: 1;
+      transform: scale(1.05);
+    }
+    /* Controls Bottom */
+    .controls-bottom {
+      position: absolute; bottom: 6%; left: 50%;
+      transform: translateX(-50%);
+      pointer-events: auto;
+    }
+    .mic-button {
+      position: relative; width: 80px; height: 80px;
+      border-radius: 50%; background: var(--accent);
+      border: 4px solid var(--accent-dark);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      transition: transform 0.2s var(--transition), background var(--transition);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+      outline: none;
+    }
+    .mic-button:hover { transform: scale(1.05); }
+    .mic-button:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+    .mic-button.active {
+      background: var(--error); border-color: var(--error-dark);
+      animation: pulse 1.5s infinite;
+    }
+    .mic-button.starting { animation: startup 0.4s ease-out; }
+    .mic-button svg {
+      width: 36px; height: 36px;
+      fill: var(--text-light);
+    }
+    /* FPS Badge */
+    .fps-badge {
+      position: absolute; bottom: 12%; right: 4%;
+      background: var(--control-bg);
+      padding: var(--spacing) calc(var(--spacing)*1.5);
+      border-radius: var(--radius);
+      color: var(--accent);
+      font-size: var(--font-base);
+      backdrop-filter: blur(8px);
+      pointer-events: auto;
+      opacity: 0;
+      animation: fadeIn 0.5s 0.3s forwards;
+    }
+    /* Fallback */
+    .fallback {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      background: var(--error);
+      color: var(--text-light);
+      padding: calc(var(--spacing)*2) calc(var(--spacing)*3);
+      border-radius: var(--radius);
+      text-align: center;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+      pointer-events: auto;
+      opacity: 0;
+      transition: opacity var(--transition);
+    }
+    .fallback.show { opacity: 1; }
+    /* Ripples & Keyframes */
+    .ripple { position: absolute; border-radius: 50%; transform: scale(0); background-color: rgba(var(--accent-rgb),0.3); animation: ripple-animation 0.6s var(--transition); pointer-events: none; will-change: transform, opacity; }
+    @keyframes ripple-animation { to { transform: scale(4); opacity: 0; } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(var(--accent-rgb),0.6);} 70% { box-shadow: 0 0 0 20px rgba(var(--accent-rgb),0);} 100% { box-shadow: 0 0 0 0 rgba(var(--accent-rgb),0);} }
+    @keyframes startup { from { transform: rotate(-15deg); } to { transform: rotate(0deg); } }
+    @keyframes dropBounce {
+      0% { transform: scale(1.05); }
+      40% { transform: scale(0.95); }
+      60% { transform: scale(1.02); }
+      100% { transform: scale(1); }
+    }
+    /* Settings Screen */
+    .settings-screen {
+      position: absolute; inset: 0;
+      background: var(--bg-light);
+      z-index: 2000;
+      display: none;
+      flex-direction: column;
+    }
+    .settings-screen.show { display: flex; }
+    .settings-header {
+      display: flex; align-items: flex-end;
+      height: 56px;
+      padding: 0 calc(var(--spacing)*2);
+      background: var(--bg-light);
+    }
+    .back-btn {
+      border: none; background: transparent;
+      font-size: 28px;
+      margin-bottom: 4px; margin-right: 12px;
+      cursor: pointer; color: #007aff;
+    }
+    .settings-header span {
+      font-size: 34px; font-weight: bold;
+      color: #000; line-height: 40px;
+    }
+    .settings-content {
+      flex: 1; overflow-y: auto;
+      padding: calc(var(--spacing)*2);
+    }
+    .settings-section {
+      margin-bottom: calc(var(--spacing)*4);
+    }
+    .group-title {
+      font-size: 12px; text-transform: uppercase;
+      color: #6d6d72;
+      margin-bottom: var(--spacing);
+      padding-left: var(--spacing);
+    }
+    .settings-card {
+      background: #fff;
+      border-radius: 14px;
+      overflow: hidden;
+      margin: 0 calc(var(--spacing)*-1) calc(var(--spacing)*2);
+    }
+    .settings-item {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+    }
+    .settings-item:not(:last-child) {
+      border-bottom: 1px solid #c7c7cc;
+    }
+    .item-icon {
+      width: 30px; height: 30px;
+      margin-right: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+    }
+    .item-label {
+      flex: 1;
+      font-size: 17px; color: #000;
+    }
+    .item-info { flex: 1; display: flex; flex-direction: column; }
+    .item-sub { font-size: 13px; color: #8e8e93; }
+    .item-value { font-size: 17px; color: #8e8e93; }
+    .item-control { display: flex; align-items: center; gap: 8px; }
+    .settings-button.primary { background: #007aff; color: #fff; border: none; padding: 6px 12px; border-radius: 14px; font-size: 15px; }
+    .settings-button.secondary { background: #f2f2f7; color: #000; border: none; padding: 6px 12px; border-radius: 14px; font-size: 15px; }
+    .badge { background: #f2f2f7; color: #8e8e93; padding: 2px 8px; border-radius: 12px; font-size: 13px; }
+    .toggle-switch { position: relative; width: 51px; height: 31px; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-switch .slider { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #ccc; border-radius: 34px; transition: .4s; }
+    .toggle-switch .slider:before { position: absolute; content: ''; height: 23px; width: 23px; left: 4px; bottom: 4px; background: #fff; border-radius: 50%; transition: .4s; }
+    .toggle-switch input:checked + .slider { background: #007aff; }
+    .toggle-switch input:checked + .slider:before { transform: translateX(20px); }
+  </style>
+
+  <style>
+    /* Canvas overlay for Tracker Combinado */
+    canvas#trackerCanvas{
+      position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;
+    }
+  </style>
+
+  <!-- MediaPipe libraries for Tracker Combinado -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+</head>
+<body>
+  <!-- Splash Screen -->
+  <div class="splash-screen" id="splashScreen">
+    <img src="splash.png" alt="SeñAR Splash">
+    <div class="splash-progress"><div class="progress-inner"></div></div>
+  </div>
+
+  <!-- Guided Tour -->
+  <div class="tour-overlay" id="tourOverlay">
+    <div class="tour-tooltip" id="tourTooltip"></div>
+    <button id="tourNext">Siguiente</button>
+    <button id="tourClose">Omitir</button>
+  </div>
+
+  <!-- Settings Screen -->
+  <div class="settings-screen" id="settingsScreen">
+    <div class="settings-header">
+      <button id="settingsBack" class="back-btn">←</button>
+      <span>Settings</span>
+    </div>
+    <div class="settings-content">
+      <div class="settings-section">
+        <div class="group-title">General</div>
+        <div class="settings-card">
+          <div class="settings-item"><div class="item-label">Theme</div><div class="item-value" id="themeValue">Light</div></div>
+          <div class="settings-item"><div class="item-label">Subtitle size</div><div class="item-control"><input type="range" min="12" max="24" value="16" id="subtitleSizeSlider"><div class="item-value" id="subtitleSizeValue">16 pt</div></div></div>
+          <div class="settings-item"><div class="item-label">Haptics</div><label class="toggle-switch"><input type="checkbox" id="hapticsToggle" checked><span class="slider"></span></label></div>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="group-title">Offline Models</div>
+        <div class="settings-card">
+          <div class="settings-item"><div class="item-icon">💬</div><div class="item-info"><div class="item-label">Audio-STT</div><div class="item-sub">30 MB v0.3.2</div></div><button class="settings-button primary">Download</button></div>
+          <div class="settings-item"><div class="item-icon">🤟</div><div class="item-info"><div class="item-label">LSA Translation</div><div class="item-sub">48 MB v0.6.1</div></div><button class="settings-button secondary">Settings</button></div>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="group-title">Dialects</div>
+        <div class="settings-card">
+          <div class="settings-item"><div class="item-icon">🇦🇷</div><div class="item-label">Northeast</div><div class="badge">New</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main UI -->
+  <div class="overlay">
+    <video id="video" autoplay muted playsinline></video>
+<canvas id="trackerCanvas"></canvas>
+
+    <div class="controls-left">
+      <button id="settingsBtn" class="control-btn" aria-label="Configuración"><svg viewBox="0 0 24 24"><path d="M12 8a4 4 0 100 8 4 4 0 000-8zm8.94 6l1.06 2.12-2.12.94a7.01 7.01 0 01-1.52 1.52l-.94 2.12-2.12-1.06a7.007 7.007 0 01-2.56 0L9.54 19.6l-.94-2.12a7.01 7.01 0 01-1.52-1.52L3.96 14l1.06-2.12a7.01 7.01 0 010-2.56L3.96 7.32l2.12-.94c.36-.6.8-1.1 1.52-1.52l.94-2.12L11.06 4l2.12 1.06c.84-.18 1.7-.18 2.56 0L16.68 4l.94 2.12c.7.4 1.16.92 1.52 1.52l2.12.94-1.06 2.12c.18.84.18 1.7 0 2.56z"/></svg></button>
+      <button id="themeToggle" class="control-btn" aria-label="Cambiar tema"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg></button>
+      <button id="pauseBtn" class="control-btn" aria-label="Pausar reproducción"><svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg></button>
+      <button id="snapshotBtn" class="control-btn" aria-label="Capturar foto"><svg viewBox="0 0 24 24"><path d="M20 5h-3.17l-1.84-2H8.99L7.15 5H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-8 3a5 5 0 100 10 5 5 0 000-10z"/></svg></button>
+      <button id="restartBtn" class="control-btn" aria-label="Reiniciar video"><svg viewBox="0 0 24 24"><path d="M12 5V1l-4 4 4 4V6c3.86 0 7 3.14 7 7s-3.14 7-7 7-7-3.14-7-7H3c0 4.97 4.03 9 9 9s9-4.03 9-9-4.03-9-9-9z"/></svg></button>
+    </div>
+
+    <div id="captionContainer" class="caption-container" aria-live="assertive" aria-atomic="true">
+      <div class="progress-bar"><div id="progress" class="progress"></div></div>
+      <div id="captionText"></div>
+    </div>
+
+    <div class="controls-bottom"><div id="micBtn" class="mic-button" aria-label="Iniciar reconocimiento de voz"><svg viewBox="0 0 24 24"><path d="M12 14a2 2 0 002-2V6a2 2 0 10-4 0v6a2 2 0 002 2zm5-2a5 5 0 01-10 0H5a7 7 0 0014 0h-2zm-5 8a7 7 0 007-7h-2a5 5 0 01-10 0H5a7 7 0 007 7z"/></svg></div></div>
+
+    <div id="fpsBadge" class="fps-badge">0 fps</div>
+    <div id="fallbackCam" class="fallback" role="alert">📷 Cámara no disponible</div>
+    <div id="fallbackSpeech" class="fallback" role="alert">🎤 Voz no soportada</div>
+  </div>
+
+  <script>
+    // References
+    const splash = document.getElementById('splashScreen');
+    const splashBar = document.querySelector('.splash-progress .progress-inner');
+    const tourOverlay = document.getElementById('tourOverlay');
+    const tourTooltip = document.getElementById('tourTooltip');
+    const tourNext = document.getElementById('tourNext');
+    const tourClose = document.getElementById('tourClose');
+    const settingsScreen = document.getElementById('settingsScreen');
+    const settingsBtn = document.getElementById('settingsBtn');
+    const settingsBack = document.getElementById('settingsBack');
+    const themeToggle = document.getElementById('themeToggle');
+    const themeValue = document.getElementById('themeValue');
+    const subtitleSizeSlider = document.getElementById('subtitleSizeSlider');
+    const subtitleSizeValue = document.getElementById('subtitleSizeValue');
+    const hapticsToggle = document.getElementById('hapticsToggle');
+    const video = document.getElementById('video');
+    const fallbackCam = document.getElementById('fallbackCam');
+    const fallbackSpeech = document.getElementById('fallbackSpeech');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const snapshotBtn = document.getElementById('snapshotBtn');
+    const restartBtn = document.getElementById('restartBtn');
+    const micBtn = document.getElementById('micBtn');
+    const captionContainer = document.getElementById('captionContainer');
+    const captionText = document.getElementById('captionText');
+    const progress = document.getElementById('progress');
+    const fpsBadge = document.getElementById('fpsBadge');
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    /* ---------- Splash preload ---------- */
+    const tasks=[]; let done=0;
+    function upd(){done++; splashBar.style.width=`${(done/tasks.length)*100}%`;}    
+    tasks.push(new Promise(r=>{ if(SR) new SR(); r(); }).then(upd));
+    tasks.push(navigator.mediaDevices.getUserMedia({video:true,audio:false})
+      .then(s=>video.srcObject=s)
+      .catch(()=>fallbackCam.classList.add('show'))
+      .finally(upd));
+    Promise.all(tasks).then(()=>{ splash.classList.add('fade-out'); setTimeout(()=>splash.remove(),500); if(!localStorage.getItem('tourSeen')) startTour(); });
+
+    /* ---------- Guided tour ---------- */
+    const steps=[{el:'#settingsBtn',text:'Accede a configuraciones.'},{el:'#themeToggle',text:'Cambia tema.'},{el:'#pauseBtn',text:'Pausa/reanuda.'},{el:'#snapshotBtn',text:'Captura pantalla.'},{el:'#restartBtn',text:'Reinicia.'},{el:'#micBtn',text:'Activa voz.'}];
+    let idx=0;
+    function startTour(){tourOverlay.classList.add('active');show(idx);}
+    function show(i){const t=steps[i],e=document.querySelector(t.el),r=e.getBoundingClientRect();tourTooltip.textContent=t.text;tourTooltip.style.top=`${r.bottom+10}px`;tourTooltip.style.left=`${r.left}px`;}    
+    tourNext.onclick=()=>{idx++; idx<steps.length?show(idx):endTour();};
+    tourClose.onclick=endTour;
+    function endTour(){tourOverlay.classList.remove('active');localStorage.setItem('tourSeen','true');}
+
+    /* ---------- Helper ripple ---------- */
+    function ripple(e,el){const r=el.getBoundingClientRect(),s=Math.max(r.width,r.height),x=e.clientX-r.left-s/2,y=e.clientY-r.top-s/2,sp=document.createElement('span');sp.className='ripple';sp.style.width=sp.style.height=s+'px';sp.style.left=x+'px';sp.style.top=y+'px';el.appendChild(sp);sp.onanimationend=()=>sp.remove();}
+
+    /* ---------- Settings nav ---------- */
+    settingsBtn.onclick=e=>{ripple(e,settingsBtn);settingsScreen.classList.add('show');};
+    settingsBack.onclick=e=>{ripple(e,settingsBack);settingsScreen.classList.remove('show');};
+
+    /* ---------- Theme ---------- */
+    themeToggle.onclick=e=>{ripple(e,themeToggle);document.body.classList.toggle('light');themeValue.textContent=document.body.classList.contains('light')?'Light':'Dark';};
+
+    /* ---------- Subtitle size ---------- */
+    subtitleSizeSlider.oninput=()=>{subtitleSizeValue.textContent=subtitleSizeSlider.value+' pt';captionContainer.style.fontSize=subtitleSizeSlider.value+'px';};
+
+    /* ---------- Mic ---------- */
+    let recog;
+    micBtn.onclick=e=>{
+      ripple(e,micBtn);
+      navigator.vibrate?.(50);
+      if(!SR)return;
+      micBtn.classList.add('starting');
+      if(!recog){
+        recog=new SR();
+        recog.lang='es-ES';
+        recog.interimResults=true;
+        recog.continuous=true;
+        recog.onstart=()=>{
+          micBtn.classList.add('active');
+          captionContainer.classList.add('show');
+          navigator.vibrate?.([100,50,100]);
+        };
+        recog.onend=()=>{
+          micBtn.classList.remove('active');
+          captionContainer.classList.remove('show');
+          progress.style.width='0%';
+          navigator.vibrate?.(50);
+        };
+        recog.onresult=e=>{
+          let fin='',int='';
+          for(let i=e.resultIndex;i<e.results.length;i++){
+            const t=e.results[i][0].transcript;
+            e.results[i].isFinal?fin+=t+' ':int=t;
+          }
+          if(fin)animate(fin.trim());
+          else captionText.textContent=int||captionText.textContent;
+          progress.style.width=Math.min(100,captionText.textContent.length*1.2)+'%';
+        };
+      }
+      micBtn.classList.remove('starting');
+      micBtn.classList.toggle('active')?recog.start():recog.stop();
+    };
+    function animate(txt){
+      captionText.innerHTML='';
+      const w=txt.split(' ');
+      w.forEach(t=>{
+        const s=document.createElement('span');
+        s.textContent=t+' ';
+        s.className='caption-text-word';
+        captionText.appendChild(s);
+      });
+      let j=0;
+      function hl(){
+        j>0&&captionText.children[j-1].classList.remove('highlight');
+        if(j<w.length){
+          captionText.children[j].classList.add('highlight');
+          j++; setTimeout(hl,400);
+        }
+      }
+      hl();
+    }
+
+    /* ---------- Playback & snapshot ---------- */
+    [pauseBtn,snapshotBtn,restartBtn].forEach(b=>b.onclick=e=>{ripple(e,b);navigator.vibrate?.(20);});
+    pauseBtn.onclick=()=>video.paused?video.play():video.pause();
+    snapshotBtn.onclick=()=>{
+      const w=video.videoWidth,h=video.videoHeight;
+      if(!w)return;
+      const c=document.createElement('canvas');
+      c.width=w; c.height=h;
+      c.getContext('2d').drawImage(video,0,0);
+      const l=document.createElement('a');
+      l.href=c.toDataURL();
+      l.download='snapshot.png';
+      l.click();
+    };
+    restartBtn.onclick=()=>location.reload();
+
+    /* ---------- FPS badge ---------- */
+    let lt=performance.now(),fr=0;
+    function fps(now){
+      if(document.hidden){lt=now;fr=0;requestAnimationFrame(fps);return;}
+      fr++;
+      const d=now-lt;
+      if(d>=1000){fpsBadge.textContent=Math.round(fr*1000/d)+' fps';fr=0;lt=now;}
+      requestAnimationFrame(fps);
+    }
+    requestAnimationFrame(fps);
+
+    /* ---------- Fallback speech ---------- */
+    if(!SR)fallbackSpeech.classList.add('show');
+
+    /* ========================================================================
+       Drag & Drop subtítulos (+ microinteracciones) 
+    ======================================================================== */
+    captionContainer.dataset.centered='true';    // indicador de posición por defecto
+    captionContainer.classList.add('draggable');
+
+    (function(){
+      let dragging=false, startX=0, startY=0, offsetX=0, offsetY=0;
+
+      captionContainer.addEventListener('pointerdown', startDrag);
+      captionContainer.addEventListener('pointermove', onDrag);
+      captionContainer.addEventListener('pointerup', endDrag);
+      captionContainer.addEventListener('pointercancel', endDrag);
+
+      function startDrag(e){
+        if(e.button!==0) return;           // solo botón principal
+        dragging=true;
+        captionContainer.setPointerCapture(e.pointerId);
+        captionContainer.classList.add('dragging');
+
+        const rect=captionContainer.getBoundingClientRect();
+        offsetX=e.clientX-rect.left;
+        offsetY=e.clientY-rect.top;
+
+        /* Si está centrado por CSS, convertir a coordenadas absolutas */
+        if(captionContainer.dataset.centered!=='false'){
+          captionContainer.style.left=`${rect.left}px`;
+          captionContainer.style.top=`${rect.top}px`;
+          captionContainer.style.right='auto';
+          captionContainer.style.bottom='auto';
+          captionContainer.style.transform='translate(0,0)';
+          captionContainer.dataset.centered='false';
+        }
+        e.preventDefault();
+      }
+
+      function onDrag(e){
+        if(!dragging) return;
+        let x=e.clientX-offsetX;
+        let y=e.clientY-offsetY;
+
+        /* Mantener dentro de la ventana */
+        const maxX=window.innerWidth-captionContainer.offsetWidth-8;
+        const maxY=window.innerHeight-captionContainer.offsetHeight-8;
+        x=Math.max(8,Math.min(x,maxX));
+        y=Math.max(8,Math.min(y,maxY));
+
+        captionContainer.style.left=`${x}px`;
+        captionContainer.style.top=`${y}px`;
+      }
+
+      function endDrag(e){
+        if(!dragging) return;
+        dragging=false;
+        captionContainer.releasePointerCapture(e.pointerId);
+        captionContainer.classList.remove('dragging');
+        captionContainer.classList.add('drop');     // microanimación de “rebote”
+      }
+
+      /* Quitar clase drop cuando termine la animación */
+      captionContainer.addEventListener('animationend',()=>{
+        captionContainer.classList.remove('drop');
+      });
+    })();
+  </script>
+
+  <!-- Whisper tiny (q8) local + Tracker Combinado -->
+  <script type="module">
+    import { pipeline } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.5.2/dist/transformers.min.js';
+    const device = navigator.gpu ? 'webgpu' : 'wasm';
+    const transcriberP = pipeline('automatic-speech-recognition','Xenova/whisper-tiny',{quantized:true,device});
+    const micBtn=document.getElementById('micBtn');
+    const captionContainer=document.getElementById('captionContainer');
+    const captionText=document.getElementById('captionText');
+    const progressBar=document.getElementById('progress');
+    let recorder,chunks=[],blob;
+    async function blobToPCM(b,r=16000){
+      const buf=await b.arrayBuffer();
+      const ac=new AudioContext();
+      const dec=await ac.decodeAudioData(buf);
+      if(dec.sampleRate===r)return dec.getChannelData(0);
+      const frames=Math.ceil(dec.duration*r);
+      const off=new OfflineAudioContext(1,frames,r);
+      const src=off.createBufferSource();src.buffer=dec;
+      src.connect(off.destination);src.start();
+      const res=await off.startRendering();
+      return res.getChannelData(0);
+    }
+    async function transcribe(){
+      captionText.textContent='Transcribiendo…';progressBar.style.width='35%';
+      const pcm=await blobToPCM(blob);
+      const { text }=await (await transcriberP)(pcm,{chunk_length_s:30,language:'spanish'});
+      captionText.textContent=text.trim();progressBar.style.width='100%';
+      setTimeout(()=>progressBar.style.width='0%',1000);
+    }
+    micBtn.onclick=async e=>{
+      navigator.vibrate?.(40);
+      if(!recorder||recorder.state==='inactive'){
+        const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+        recorder=new MediaRecorder(stream,{mimeType:'audio/webm'});
+        chunks=[];
+        recorder.ondataavailable=ev=>chunks.push(ev.data);
+        recorder.onstop=async()=>{blob=new Blob(chunks,{type:'audio/webm'});await transcribe();micBtn.classList.remove('active');};
+        recorder.start();micBtn.classList.add('active');
+        captionContainer.classList.add('show');
+        captionText.textContent='Grabando…';progressBar.style.width='15%';
+      }else{recorder.stop();}
+    };
+
+    /* Tracker Combinado */
+    const video=document.getElementById('video');
+    const canvasTracker=document.getElementById('trackerCanvas')||(()=>{const c=document.createElement('canvas');c.id='trackerCanvas';video.parentNode.insertBefore(c,video.nextSibling);return c;})();
+    const ctxTracker=canvasTracker.getContext('2d',{willReadFrequently:true});
+    const hands=new Hands({locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`});
+    hands.setOptions({maxNumHands:2,modelComplexity:1,minDetectionConfidence:0.7,minTrackingConfidence:0.7});
+    const faceMesh=new FaceMesh({locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${f}`});
+    faceMesh.setOptions({maxNumFaces:1,refineLandmarks:true,minDetectionConfidence:0.7,minTrackingConfidence:0.7});
+    let handLandmarks=[],faceLandmarks=null;
+    hands.onResults(r=>handLandmarks=r.multiHandLandmarks||[]);
+    faceMesh.onResults(r=>faceLandmarks=r.multiFaceLandmarks?.[0]||null);
+    async function onFrame(){
+      if(video.readyState>=2){
+        await Promise.all([hands.send({image:video}),faceMesh.send({image:video})]);
+        const vw=video.videoWidth,vh=video.videoHeight;
+        canvasTracker.width=vw;canvasTracker.height=vh;
+        ctxTracker.clearRect(0,0,vw,vh);
+        ctxTracker.lineWidth=2;
+        handLandmarks.forEach(lm=>{
+          ctxTracker.strokeStyle='#00FF00';
+          HAND_CONNECTIONS.forEach(([i,j])=>{
+            const p1=lm[i],p2=lm[j];
+            ctxTracker.beginPath();ctxTracker.moveTo(p1.x*vw,p1.y*vh);ctxTracker.lineTo(p2.x*vw,p2.y*vh);ctxTracker.stroke();
+          });
+          lm.forEach(p=>{ctxTracker.fillStyle='#FF0000';ctxTracker.beginPath();ctxTracker.arc(p.x*vw,p.y*vh,4,0,Math.PI*2);ctxTracker.fill();});
+        });
+        if(faceLandmarks){
+          ctxTracker.strokeStyle='#00FFFF';
+          let minX=1,minY=1,maxX=0,maxY=0;
+          faceLandmarks.forEach(p=>{minX=Math.min(minX,p.x);minY=Math.min(minY,p.y);maxX=Math.max(maxX,p.x);maxY=Math.max(maxY,p.y);});
+          ctxTracker.strokeRect(minX*vw,minY*vh,(maxX-minX)*vw,(maxY-minY)*vh);
+        }
+      }
+      requestAnimationFrame(onFrame);
+    }
+    video.addEventListener('playing',onFrame);
+  </script>
+</body>
+</html>
+
