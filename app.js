@@ -161,9 +161,12 @@ Promise.all(tasks).then(() => {
     }
 
     /* ---------- Playback & snapshot ---------- */
-    [pauseBtn,snapshotBtn,restartBtn].forEach(b=>b.onclick=e=>{ripple(e,b);navigator.vibrate?.(20);});
-    pauseBtn.onclick=()=>video.paused?video.play():video.pause();
-    snapshotBtn.onclick=()=>{
+    [pauseBtn,snapshotBtn,restartBtn].forEach(b=>b.addEventListener('click',e=>{
+      ripple(e,b);
+      navigator.vibrate?.(20);
+    }));
+    pauseBtn.addEventListener('click',()=>video.paused?video.play():video.pause());
+    snapshotBtn.addEventListener('click',()=>{
       const w=video.videoWidth,h=video.videoHeight;
       if(!w)return;
       const c=document.createElement('canvas');
@@ -173,9 +176,9 @@ Promise.all(tasks).then(() => {
       l.href=c.toDataURL();
       l.download='snapshot.png';
       l.click();
-    };
-    restartBtn.onclick=()=>location.reload();
-    switchCamBtn.onclick=async e=>{
+    });
+    restartBtn.addEventListener('click',()=>location.reload());
+    switchCamBtn.addEventListener('click',async e=>{
       ripple(e,switchCamBtn);
       navigator.vibrate?.(20);
       try{
@@ -193,7 +196,7 @@ Promise.all(tasks).then(() => {
         fallbackCam.textContent=`\ud83d\udcf7 ${err.message}`;
         fallbackCam.classList.add('show');
       }
-    };
+    });
 
     /* ---------- FPS badge ---------- */
     let lt=performance.now(),fr=0;
