@@ -58,13 +58,14 @@ tasks.push(
     .then(devices => {
       // Filtrar sólo inputs de vídeo
       videoDevices = devices.filter(d => d.kind === 'videoinput');
-      // Intentar elegir cámara "back" o la primera disponible
-      const selected = videoDevices.find(d => d.label.toLowerCase().includes('back')) || videoDevices[0];
-      if (selected) {
-        currentDevice = videoDevices.indexOf(selected);
-        return startStream(selected.deviceId);
+      // Intentar elegir cámara "back"/"environment"/"rear" o usar modo environment
+      const backCam = videoDevices.find(d => /back|environment|rear/i.test(d.label));
+      if (backCam) {
+        currentDevice = videoDevices.indexOf(backCam);
+        return startStream(backCam.deviceId);
       }
-      return startStream({facingMode:{exact:'environment'}});
+      currentDevice = 0;
+      return startStream({facingMode:{ideal:'environment'}});
     })
     .catch(() =>
       startStream({facingMode:{ideal:'environment'}})
