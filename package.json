@@ -2,11 +2,12 @@
   "name": "se-ar2",
   "version": "1.0.0",
   "description": "A minimal prototype (MVP) of the SeñAR app. This single page web application provides sign language recognition features and audio transcription directly in the browser.",
-  "main": "app.js",
+  "main": "src/app.js",
   "scripts": {
     "test": "jest",
     "start": "npx http-server . -p 8000",
-    "lint": "eslint -c .eslintrc.cjs app.js __tests__/index.test.js"
+    "lint": "eslint -c .eslintrc.cjs src/app.js __tests__/index.test.js",
+    "prepare-offline": "node scripts/prepareOffline.js"
   },
   "keywords": [],
   "author": "",

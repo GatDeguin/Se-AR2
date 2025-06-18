@@ -10,6 +10,7 @@ transcription directly in the browser.
 * Transcripción de voz a texto usando la API Web Speech o el modelo
   **Whisper tiny** a través de **Transformers**.
 * Interfaz con subtítulos arrastrables, cambio de tema y recorrido guiado.
+* Las preferencias de tema y tamaño de subtítulos se guardan en el navegador.
 * Herramientas para capturar imágenes y alternar cámaras durante la sesión.
 
 ## Prerequisites
@@ -72,12 +73,9 @@ estáticos a través de un servidor local como se muestra arriba.
 
 Para ejecutar la demo sin conexión:
 
-1. Cree una carpeta `libs/` en la raíz del proyecto.
-2. Descargue de jsDelivr los archivos `hands.js`, `face_mesh.js`, `pose.js` y `drawing_utils.js`
-   de **MediaPipe** y guárdelos en `libs/`.
-3. Obtenga `transformers.min.js` desde el paquete de **Transformers** (versión 3.5.2)
-   y colóquelo en la misma carpeta.
-4. Modifique las etiquetas `<script>` de `index.html` para que apunten a los
+1. Ejecute `npm run prepare-offline` para descargar los modelos y crear
+   la carpeta `libs/` automáticamente.
+2. Modifique las etiquetas `<script>` de `index.html` para que apunten a los
    archivos locales, por ejemplo:
    ```html
    <script src="libs/hands.js"></script>
@@ -85,13 +83,13 @@ Para ejecutar la demo sin conexión:
    <script src="libs/drawing_utils.js"></script>
    <script src="libs/pose.js"></script>
    ```
-5. En `app.js` cambie la importación de Transformers a
+3. En `src/app.js` cambie la importación de Transformers a
    ```javascript
    import { pipeline } from './libs/transformers.min.js';
    ```
    y actualice las opciones `locateFile` de MediaPipe para que devuelvan
    `'libs/' + f`.
-6. Reserve alrededor de **80 MB** de espacio libre para los modelos y
+4. Reserve alrededor de **80 MB** de espacio libre para los modelos y
    asegúrese de que los archivos se sirvan también mediante **HTTPS**.
 
 ## Recommended Browsers
