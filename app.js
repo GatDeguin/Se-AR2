@@ -12,7 +12,6 @@
     const themeValue = document.getElementById('themeValue');
     const subtitleSizeSlider = document.getElementById('subtitleSizeSlider');
     const subtitleSizeValue = document.getElementById('subtitleSizeValue');
-    const hapticsToggle = document.getElementById('hapticsToggle');
     const video = document.getElementById('video');
     const fallbackCam = document.getElementById('fallbackCam');
     const fallbackSpeech = document.getElementById('fallbackSpeech');
@@ -46,6 +45,7 @@
         video.srcObject=s;
         fallbackCam.classList.remove("show");
       }catch(e){
+        fallbackCam.textContent = `\ud83d\udcf7 ${e.message}`;
         fallbackCam.classList.add("show");
       }
     }
@@ -286,17 +286,22 @@ const transcriberP = pipeline('automatic-speech-recognition', 'Xenova/whisper-ti
       setTimeout(()=>progress.style.width='0%',1000);
     }
     micBtn.onclick=async e=>{
-      navigator.vibrate?.(40);
-      if(!recorder||recorder.state==='inactive'){
-        const stream=await navigator.mediaDevices.getUserMedia({audio:true});
-        recorder=new MediaRecorder(stream,{mimeType:'audio/webm'});
-        chunks=[];
-        recorder.ondataavailable=ev=>chunks.push(ev.data);
-        recorder.onstop=async()=>{blob=new Blob(chunks,{type:'audio/webm'});await transcribe();micBtn.classList.remove('active');};
-        recorder.start();micBtn.classList.add('active');
-        captionContainer.classList.add('show');
-        captionText.textContent='Grabando…';progress.style.width='15%';
-      }else{recorder.stop();}
+      try{
+        navigator.vibrate?.(40);
+        if(!recorder||recorder.state==='inactive'){
+          const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+          recorder=new MediaRecorder(stream,{mimeType:'audio/webm'});
+          chunks=[];
+          recorder.ondataavailable=ev=>chunks.push(ev.data);
+          recorder.onstop=async()=>{blob=new Blob(chunks,{type:'audio/webm'});await transcribe();micBtn.classList.remove('active');};
+          recorder.start();micBtn.classList.add('active');
+          captionContainer.classList.add('show');
+          captionText.textContent='Grabando…';progress.style.width='15%';
+        }else{recorder.stop();}
+      }catch(err){
+        fallbackSpeech.textContent = `\ud83c\udf99\ufe0f ${err.message}`;
+        fallbackSpeech.classList.add('show');
+      }
     };
 
     /* Tracker Combinado */
