@@ -36,6 +36,14 @@ This command uses `http-server` to serve the project on port 8000.
 
 Then navigate to <http://localhost:8000/> or the appropriate HTTPS address.
 
+## Linting
+
+Run ESLint to verify code style:
+
+```bash
+npm run lint
+```
+
 ## Running Tests
 
 Install Node.js dependencies once using `npm install` and then execute:
