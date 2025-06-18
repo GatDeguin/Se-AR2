@@ -4,7 +4,8 @@
   "description": "A minimal prototype (MVP) of the SeñAR app. This single page web application provides sign language recognition features and audio transcription directly in the browser.",
   "main": "app.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "start": "npx http-server . -p 8000"
   },
   "keywords": [],
   "author": "",
