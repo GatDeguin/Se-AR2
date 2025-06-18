@@ -243,6 +243,7 @@
           <div class="settings-item"><div class="item-label">Theme</div><div class="item-value" id="themeValue">Light</div></div>
           <div class="settings-item"><div class="item-label">Subtitle size</div><div class="item-control"><input type="range" min="12" max="24" value="16" id="subtitleSizeSlider"><div class="item-value" id="subtitleSizeValue">16 pt</div></div></div>
           <div class="settings-item"><div class="item-label">Haptics</div><label class="toggle-switch"><input type="checkbox" id="hapticsToggle" checked><span class="slider"></span></label></div>
+          <div class="settings-item"><div class="item-label">Alto contraste</div><label class="toggle-switch"><input type="checkbox" id="contrastToggle"><span class="slider"></span></label></div>
         </div>
       </div>
       <div class="settings-section">
@@ -289,7 +290,7 @@
       <div id="captionText"></div>
     </div>
 
-    <div class="controls-bottom"><div id="micBtn" class="mic-button" aria-label="Iniciar reconocimiento de voz"><svg viewBox="0 0 24 24"><path d="M12 14a2 2 0 002-2V6a2 2 0 10-4 0v6a2 2 0 002 2zm5-2a5 5 0 01-10 0H5a7 7 0 0014 0h-2zm-5 8a7 7 0 007-7h-2a5 5 0 01-10 0H5a7 7 0 007 7z"/></svg></div></div>
+    <div class="controls-bottom"><button id="micBtn" class="mic-button" aria-label="Iniciar reconocimiento de voz"><svg viewBox="0 0 24 24"><path d="M12 14a2 2 0 002-2V6a2 2 0 10-4 0v6a2 2 0 002 2zm5-2a5 5 0 01-10 0H5a7 7 0 0014 0h-2zm-5 8a7 7 0 007-7h-2a5 5 0 01-10 0H5a7 7 0 007 7z"/></svg></button></div>
 
     <div id="fpsBadge" class="fps-badge">0 fps</div>
     <div id="fallbackCam" class="fallback" role="alert">📷 Cámara no disponible</div>
@@ -299,6 +300,7 @@
 
   <script src="src/app.js" type="module" defer></script>
   <!-- Whisper tiny (q8) local + Tracker Combinado -->
+  <script src="src/sw-register.js" type="module"></script>
 </body>
 </html>
 

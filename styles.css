@@ -24,6 +24,13 @@
       --control-bg: rgba(255,255,255,0.9);
       --text-light: var(--text-dark);
     }
+    body.high-contrast {
+      --bg-dark: #000;
+      --bg-overlay: #000;
+      --control-bg: #000;
+      --text-light: #FFF;
+      --accent: #FFD700;
+    }
     *, *::before, *::after { box-sizing: border-box; }
     html, body {
       margin: 0; padding: 0;

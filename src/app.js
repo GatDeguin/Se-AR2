@@ -1,3 +1,5 @@
+import { detectStaticSign } from './staticSigns.js';
+
     // References
     const tourOverlay = document.getElementById('tourOverlay');
     const tourTooltip = document.getElementById('tourTooltip');
@@ -8,6 +10,7 @@
     const settingsBack = document.getElementById('settingsBack');
     const themeToggle = document.getElementById('themeToggle');
     const themeValue = document.getElementById('themeValue');
+    const contrastToggle = document.getElementById('contrastToggle');
     const subtitleSizeSlider = document.getElementById('subtitleSizeSlider');
     const subtitleSizeValue = document.getElementById('subtitleSizeValue');
     const dialectSelect = document.getElementById('dialectSelect');
@@ -32,6 +35,12 @@ const accentRGB = rootStyles.getPropertyValue('--accent-rgb').trim() || '46,184,
     if (savedTheme === 'light') {
       document.body.classList.add('light');
       themeValue.textContent = 'Light';
+    }
+
+    const savedContrast = localStorage.getItem('contrast');
+    if (savedContrast === 'true') {
+      document.body.classList.add('high-contrast');
+      if (contrastToggle) contrastToggle.checked = true;
     }
 
     const savedSize = localStorage.getItem('subtitleSize');
@@ -137,6 +146,13 @@ Promise.all(tasks).then(() => {
       const isLight = document.body.classList.toggle('light');
       themeValue.textContent = isLight ? 'Light' : 'Dark';
       localStorage.setItem('theme', isLight ? 'light' : 'dark');
+    };
+
+    if (contrastToggle) contrastToggle.onclick = e => {
+      ripple(e, contrastToggle);
+      const enabled = contrastToggle.checked;
+      document.body.classList.toggle('high-contrast', enabled);
+      localStorage.setItem('contrast', enabled);
     };
 
     /* ---------- Subtitle size ---------- */
@@ -420,6 +436,13 @@ const transcriberP = pipeline('automatic-speech-recognition', 'Xenova/whisper-ti
           lm.forEach(p=>{ctxTracker.beginPath();ctxTracker.arc(p.x*vw,p.y*vh,3,0,Math.PI*2);ctxTracker.fill();});
           [0,4,8,12,16,20].forEach(i=>{const p=lm[i];if(p)drawMarker(ctxTracker,p.x*vw,p.y*vh,12);});
         });
+        if (handLandmarks[0]) {
+          const sign = detectStaticSign(handLandmarks[0]);
+          if (sign) {
+            captionContainer.classList.add('show');
+            captionText.textContent = sign;
+          }
+        }
         if(faceLandmarks){
           ctxTracker.strokeStyle='#00FFFF';
           let minX=1,minY=1,maxX=0,maxY=0;
