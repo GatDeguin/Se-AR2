@@ -23,11 +23,16 @@ transcription directly in the browser.
 ## Running the App
 
 Simply open `index.html` in a modern browser. For development you can use a
-basic HTTP server such as Python's built‑in module:
+basic HTTP server such as Python's built‑in module or the included npm script:
 
 ```bash
 python3 -m http.server 8000
 ```
+
+```bash
+npm start
+```
+This command uses `http-server` to serve the project on port 8000.
 
 Then navigate to <http://localhost:8000/> or the appropriate HTTPS address.
 
