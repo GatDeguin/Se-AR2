@@ -26,6 +26,20 @@
 const accent = rootStyles.getPropertyValue('--accent').trim() || '#2EB8A3';
 const accentRGB = rootStyles.getPropertyValue('--accent-rgb').trim() || '46,184,163';
 
+    // Load saved settings
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') {
+      document.body.classList.add('light');
+      themeValue.textContent = 'Light';
+    }
+
+    const savedSize = localStorage.getItem('subtitleSize');
+    if (savedSize) {
+      subtitleSizeSlider.value = savedSize;
+      subtitleSizeValue.textContent = savedSize + ' pt';
+      captionContainer.style.fontSize = savedSize + 'px';
+    }
+
     function drawMarker(ctx,x,y,r){
       const g=ctx.createRadialGradient(x,y,0,x,y,r);
       g.addColorStop(0,`rgba(${accentRGB},0.8)`);
@@ -54,7 +68,7 @@ const accentRGB = rootStyles.getPropertyValue('--accent-rgb').trim() || '46,184,
         video.srcObject=s;
         fallbackCam.classList.remove("show");
       }catch(e){
-        fallbackCam.textContent = `\ud83d\udcf7 ${e.message}`;
+        fallbackCam.textContent = `\ud83d\udcf7 ${e.message}. Permite el acceso a la cámara y recarga la página.`;
         fallbackCam.classList.add("show");
       }
     }
@@ -112,10 +126,19 @@ Promise.all(tasks).then(() => {
     settingsBack.onclick=e=>{ripple(e,settingsBack);settingsScreen.classList.remove('show');};
 
     /* ---------- Theme ---------- */
-    themeToggle.onclick=e=>{ripple(e,themeToggle);document.body.classList.toggle('light');themeValue.textContent=document.body.classList.contains('light')?'Light':'Dark';};
+    themeToggle.onclick=e=>{
+      ripple(e,themeToggle);
+      const isLight = document.body.classList.toggle('light');
+      themeValue.textContent = isLight ? 'Light' : 'Dark';
+      localStorage.setItem('theme', isLight ? 'light' : 'dark');
+    };
 
     /* ---------- Subtitle size ---------- */
-    subtitleSizeSlider.oninput=()=>{subtitleSizeValue.textContent=subtitleSizeSlider.value+' pt';captionContainer.style.fontSize=subtitleSizeSlider.value+'px';};
+    subtitleSizeSlider.oninput=()=>{
+      subtitleSizeValue.textContent = subtitleSizeSlider.value + ' pt';
+      captionContainer.style.fontSize = subtitleSizeSlider.value + 'px';
+      localStorage.setItem('subtitleSize', subtitleSizeSlider.value);
+    };
 
     /* ---------- Mic ---------- */
     let recog;
@@ -224,7 +247,10 @@ Promise.all(tasks).then(() => {
     requestAnimationFrame(fps);
 
     /* ---------- Fallback speech ---------- */
-    if(!SR)fallbackSpeech.classList.add('show');
+    if(!SR){
+      fallbackSpeech.textContent = '\ud83c\udf99\ufe0f Voz no soportada. Usa un navegador compatible.';
+      fallbackSpeech.classList.add('show');
+    }
 
     /* ========================================================================
        Drag & Drop subtítulos (+ microinteracciones) 
@@ -329,7 +355,7 @@ const transcriberP = pipeline('automatic-speech-recognition', 'Xenova/whisper-ti
             captionText.textContent='Grabando…';progress.style.width='15%';
           }else{recorder.stop();}
         }catch(err){
-          fallbackSpeech.textContent = `\ud83c\udf99\ufe0f ${err.message}`;
+          fallbackSpeech.textContent = `\ud83c\udf99\ufe0f ${err.message}. Verifique los permisos de micrófono.`;
           fallbackSpeech.classList.add('show');
         }
       })();

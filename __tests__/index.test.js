@@ -9,6 +9,14 @@ beforeAll(() => {
   const settingsBtn = document.getElementById('settingsBtn');
   settingsBtn.addEventListener('click', () => settingsScreen.classList.add('show'));
 
+  const themeToggle = document.getElementById('themeToggle');
+  const themeValue = document.getElementById('themeValue');
+  themeToggle.addEventListener('click', () => {
+    const isLight = document.body.classList.toggle('light');
+    themeValue.textContent = isLight ? 'Light' : 'Dark';
+    localStorage.setItem('theme', isLight ? 'light' : 'dark');
+  });
+
   const micBtn = document.getElementById('micBtn');
   global.micCalls = 0;
   micBtn.addEventListener('click', () => {
@@ -48,5 +56,14 @@ describe('index.html', () => {
     micBtn.click();
     expect(micBtn.classList.contains('active')).toBe(false);
     expect(global.micCalls).toBe(4);
+  });
+
+  test('theme toggle saves preference', () => {
+    const toggle = document.getElementById('themeToggle');
+    localStorage.clear();
+    toggle.click();
+    expect(localStorage.getItem('theme')).toBe('light');
+    toggle.click();
+    expect(localStorage.getItem('theme')).toBe('dark');
   });
 });
