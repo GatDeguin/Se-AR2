@@ -23,8 +23,16 @@
     const progress = document.getElementById('progress');
     const fpsBadge = document.getElementById('fpsBadge');
     const rootStyles = getComputedStyle(document.documentElement);
-    const accent = rootStyles.getPropertyValue('--accent').trim() || '#2EB8A3';
-    const accentRGB = rootStyles.getPropertyValue('--accent-rgb').trim() || '46,184,163';
+const accent = rootStyles.getPropertyValue('--accent').trim() || '#2EB8A3';
+const accentRGB = rootStyles.getPropertyValue('--accent-rgb').trim() || '46,184,163';
+
+    function drawMarker(ctx,x,y,r){
+      const g=ctx.createRadialGradient(x,y,0,x,y,r);
+      g.addColorStop(0,`rgba(${accentRGB},0.8)`);
+      g.addColorStop(0.7,`rgba(${accentRGB},0.3)`);
+      g.addColorStop(1,`rgba(${accentRGB},0)`);
+      ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();
+    }
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     let camStream;
     let videoDevices=[];
@@ -371,7 +379,8 @@ const transcriberP = pipeline('automatic-speech-recognition', 'Xenova/whisper-ti
             ctxTracker.stroke();
           });
           ctxTracker.fillStyle=accent;
-          lm.forEach(p=>{ctxTracker.beginPath();ctxTracker.arc(p.x*vw,p.y*vh,4,0,Math.PI*2);ctxTracker.fill();});
+          lm.forEach(p=>{ctxTracker.beginPath();ctxTracker.arc(p.x*vw,p.y*vh,3,0,Math.PI*2);ctxTracker.fill();});
+          [0,4,8,12,16,20].forEach(i=>{const p=lm[i];if(p)drawMarker(ctxTracker,p.x*vw,p.y*vh,12);});
         });
         if(faceLandmarks){
           ctxTracker.strokeStyle='#00FFFF';
