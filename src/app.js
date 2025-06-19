@@ -735,4 +735,5 @@ const transcriberP = pipeline('automatic-speech-recognition', 'Xenova/whisper-ti
       requestAnimationFrame(onFrame);
     }
     video.addEventListener('playing',onFrame);
+    if (!video.paused && video.readyState >= 2) requestAnimationFrame(onFrame);
 })();
