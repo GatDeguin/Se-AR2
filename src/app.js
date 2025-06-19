@@ -630,11 +630,8 @@ const transcriberP = pipeline('automatic-speech-recognition', 'Xenova/whisper-ti
         }
       })();
     }
-    if (SR) {
-      micBtn.addEventListener('click', speechHandler);
-    } else {
-      micBtn.addEventListener('click', recordHandler);
-    }
+    micBtn.addEventListener('click', speechHandler);
+    micBtn.addEventListener('click', recordHandler);
 
     /* Tracker Combinado */
     const canvasTracker=document.getElementById('trackerCanvas')||(()=>{const c=document.createElement('canvas');c.id='trackerCanvas';video.parentNode.insertBefore(c,video.nextSibling);return c;})();
