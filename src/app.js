@@ -104,13 +104,14 @@ if (!('arguments' in window.Module)) {
 
     async function startStream(id){
       try{
+        const baseVid={width:{ideal:640},height:{ideal:480}};
         let c;
         if(typeof id==='string'){
-          c={video:{deviceId:{exact:id}},audio:false};
+          c={video:{...baseVid,deviceId:{exact:id}},audio:false};
         }else if(typeof id==='object'){
-          c={video:id,audio:false};
+          c={video:{...baseVid,...id},audio:false};
         }else{
-          c={video:true,audio:false};
+          c={video:{...baseVid,facingMode:{ideal:'environment'}},audio:false};
         }
         const s=await navigator.mediaDevices.getUserMedia(c);
         if(camStream) camStream.getTracks().forEach(t=>t.stop());
