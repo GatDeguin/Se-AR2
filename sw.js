@@ -5,8 +5,6 @@ const ASSETS = [
   '/styles.css',
   '/src/app.js',
   '/src/sw-register.js',
-  '/three.min.js',
-  '/opencv.js',
   '/enter.mp3',
   '/done.mp3',
 ];
