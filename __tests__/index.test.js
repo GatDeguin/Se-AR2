@@ -37,6 +37,39 @@ beforeAll(() => {
     micBtn.dataset.second = 'yes';
     global.micCalls += 1;
   });
+
+  const cameraList = document.getElementById('cameraList');
+  const switchCamBtn = document.getElementById('switchCamBtn');
+  Object.defineProperty(navigator, 'mediaDevices', {
+    value: {
+      enumerateDevices: jest.fn().mockResolvedValue([
+        { kind: 'videoinput', deviceId: 'cam1', label: 'Cam 1' },
+        { kind: 'videoinput', deviceId: 'cam2', label: 'Cam 2' }
+      ])
+    },
+    configurable: true
+  });
+  global.startedDevice = null;
+  switchCamBtn.addEventListener('click', async () => {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const cams = devices.filter(d => d.kind === 'videoinput');
+    cameraList.innerHTML = '';
+    cams.forEach(d => {
+      const b = document.createElement('button');
+      b.textContent = d.label;
+      b.addEventListener('click', () => {
+        global.startedDevice = d.deviceId;
+        cameraList.classList.remove('show');
+      });
+      cameraList.appendChild(b);
+    });
+    if (cams.length) cameraList.classList.add('show');
+  });
+  document.addEventListener('click', e => {
+    if (cameraList.classList.contains('show') && !cameraList.contains(e.target) && e.target !== switchCamBtn) {
+      cameraList.classList.remove('show');
+    }
+  });
 });
 
 describe('index.html', () => {
@@ -92,5 +125,33 @@ describe('index.html', () => {
     expect(localStorage.getItem('haptics')).toBe('false');
     toggle.click();
     expect(localStorage.getItem('haptics')).toBe('true');
+  });
+
+  test('camera menu lists available cameras', async () => {
+    const btn = document.getElementById('switchCamBtn');
+    const list = document.getElementById('cameraList');
+    btn.click();
+    await Promise.resolve();
+    expect(list.classList.contains('show')).toBe(true);
+    expect(list.children.length).toBe(2);
+  });
+
+  test('selecting a camera hides the menu', async () => {
+    const btn = document.getElementById('switchCamBtn');
+    const list = document.getElementById('cameraList');
+    btn.click();
+    await Promise.resolve();
+    list.children[0].click();
+    expect(global.startedDevice).toBe('cam1');
+    expect(list.classList.contains('show')).toBe(false);
+  });
+
+  test('click outside closes camera menu', async () => {
+    const btn = document.getElementById('switchCamBtn');
+    const list = document.getElementById('cameraList');
+    btn.click();
+    await Promise.resolve();
+    document.body.click();
+    expect(list.classList.contains('show')).toBe(false);
   });
 });

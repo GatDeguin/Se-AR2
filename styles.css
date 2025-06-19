@@ -126,6 +126,33 @@ body.light {
       outline: 2px solid var(--accent);
       outline-offset: 2px;
     }
+    .camera-list {
+      position: absolute;
+      top: 5%;
+      left: 70px;
+      display: none;
+      flex-direction: column;
+      gap: var(--spacing);
+      background: var(--control-bg);
+      padding: var(--spacing);
+      border-radius: var(--radius);
+      backdrop-filter: blur(12px);
+      z-index: 350;
+    }
+    .camera-list.show { display: flex; }
+    .camera-list button {
+      background: transparent;
+      border: none;
+      color: var(--text-light);
+      padding: 4px 8px;
+      text-align: left;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: background var(--transition);
+    }
+    .camera-list button:hover {
+      background: rgba(var(--accent-rgb),0.2);
+    }
     /* Caption */
     .caption-container {
       position: absolute; bottom: 25%;
