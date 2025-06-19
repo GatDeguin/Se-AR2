@@ -17,6 +17,7 @@
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
     "eslint": "^8.57.1",
+    "esm": "^3.2.25",
     "jest": "^30.0.0",
     "jest-environment-jsdom": "^30.0.0"
   },

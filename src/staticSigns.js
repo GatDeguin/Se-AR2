@@ -14,3 +14,9 @@ export function detectStaticSign(lm) {
   if (!indexExt && !middleExt && !ringExt && !pinkExt && !thumbExt) return 'E';
   return null;
 }
+
+// Support CommonJS for tests
+if (typeof module !== 'undefined') {
+  module.exports = { detectStaticSign };
+}
+
