@@ -137,8 +137,8 @@ Promise.all(tasks).then(() => {
     let idx=0;
     function startTour(){tourOverlay.classList.add('active');show(idx);}
     function show(i){const t=steps[i],e=document.querySelector(t.el),r=e.getBoundingClientRect();tourTooltip.textContent=t.text;tourTooltip.style.top=`${r.bottom+10}px`;tourTooltip.style.left=`${r.left}px`;}    
-    tourNext.onclick=()=>{idx++; idx<steps.length?show(idx):endTour();};
-    tourClose.onclick=endTour;
+    tourNext.onclick=e=>{ripple(e,tourNext);idx++;idx<steps.length?show(idx):endTour();};
+    tourClose.onclick=e=>{ripple(e,tourClose);endTour();};
     function endTour(){tourOverlay.classList.remove('active');localStorage.setItem('tourSeen','true');}
 
     /* ---------- Helper ripple ---------- */

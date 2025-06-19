@@ -84,9 +84,12 @@ body.light {
       color: var(--text-light);
       font-size: var(--font-base);
       z-index: 1001;
+      transition: transform 0.2s var(--transition);
     }
     #tourNext { right: calc(var(--spacing)*2); background: var(--accent); }
     #tourClose { right: calc(var(--spacing)*8); background: var(--error); }
+    #tourNext:hover, #tourClose:hover { transform: scale(1.1); }
+    #tourNext:active, #tourClose:active { transform: scale(0.9); }
     /* Controls Left */
     .controls-left {
       position: absolute; top: 5%; left: 2%;
