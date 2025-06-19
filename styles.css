@@ -56,6 +56,9 @@ body.light {
       background: #F9F9FC;
       z-index: 1000;
     }
+    #splashWrapper.loading {
+      animation: pulse 1.5s infinite;
+    }
     /* Guided Tour */
     .tour-overlay {
       position: absolute;
