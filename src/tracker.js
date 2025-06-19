@@ -1,13 +1,10 @@
-import { formatSigns } from './handUtils.js';
+// Simplified tracker based on the "Tracker Combinado" demo. It draws hand
+// landmarks and basic face bounding boxes on a full screen canvas. Pose and
+// static sign detection from the previous implementation were removed.
 
 export function initTracker({
   video,
-  canvas,
-  captionContainer,
-  captionText,
-  accent = '#2EB8A3',
-  accentRGB = '46,184,163',
-  drawMarker
+  canvas
 }) {
   if (!video) return;
   const canvasEl = canvas || (() => {
@@ -18,7 +15,6 @@ export function initTracker({
   })();
   const ctx = canvasEl.getContext('2d', { willReadFrequently: true });
   ctx.lineWidth = 2;
-  let lastW = 0, lastH = 0;
 
   const mpCache = window._mpSolutions || (window._mpSolutions = {});
   const useCDN = window.USE_CDN;
@@ -38,81 +34,102 @@ export function initTracker({
       minDetectionConfidence: 0.7, minTrackingConfidence: 0.7 });
     mpCache.faceMeshInitialized = true;
   }
-  const pose = mpCache.pose || (mpCache.pose = new Pose(
-    useCDN ? {} : { locateFile: f => new URL(`../libs/${f}`, import.meta.url).href }
-  ));
-  if (!mpCache.poseInitialized) {
-    pose.setOptions({ modelComplexity: 1, enableSegmentation: false,
-      minDetectionConfidence: 0.7, minTrackingConfidence: 0.7 });
-    mpCache.poseInitialized = true;
-  }
+  let handLandmarks = [], faceResults = null;
+  hands.onResults(r => { handLandmarks = r.multiHandLandmarks || []; });
+  faceMesh.onResults(r => { faceResults = r; });
 
-  let handLandmarks = [], handedness = [], faceLandmarks = null, poseLandmarks = null;
-  hands.onResults(r => { handLandmarks = r.multiHandLandmarks || []; handedness = r.multiHandedness || []; });
-  faceMesh.onResults(r => { faceLandmarks = r.multiFaceLandmarks && r.multiFaceLandmarks[0] || null; });
-  pose.onResults(r => { poseLandmarks = r.poseLandmarks || null; });
+  const fingerColors = {
+    thumb: '#FF0000',
+    index: '#00FF00',
+    middle: '#0000FF',
+    ring: '#FFFF00',
+    pinky: '#FF00FF'
+  };
 
   async function onFrame() {
     if (video.readyState >= 2) {
-      await Promise.all([
-        hands.send({ image: video }),
-        faceMesh.send({ image: video }),
-        pose.send({ image: video })
-      ]);
-      const vw = video.videoWidth, vh = video.videoHeight;
-      if (vw !== lastW || vh !== lastH) {
-        lastW = vw; lastH = vh;
-        canvasEl.width = vw; canvasEl.height = vh;
-      }
-      ctx.clearRect(0, 0, vw, vh);
-      handLandmarks.forEach(lm => {
-        let minX = 1, minY = 1, maxX = 0, maxY = 0;
-        lm.forEach(p => { minX = Math.min(minX, p.x); minY = Math.min(minY, p.y); maxX = Math.max(maxX, p.x); maxY = Math.max(maxY, p.y); });
-        const pad = 0.02;
-        const x = Math.max(0, minX - pad), y = Math.max(0, minY - pad);
-        const w = Math.min(1, maxX + pad) - x, h = Math.min(1, maxY + pad) - y;
-        ctx.fillStyle = `rgba(${accentRGB},0.15)`;
-        ctx.fillRect(x * vw, y * vh, w * vw, h * vh);
+      await hands.send({ image: video });
+      await faceMesh.send({ image: video });
 
-        ctx.strokeStyle = accent;
+      const vw = video.videoWidth, vh = video.videoHeight;
+      const cw = canvasEl.width = window.innerWidth;
+      const ch = canvasEl.height = window.innerHeight;
+      const scale = Math.min(cw / vw, ch / vh);
+      const dw = vw * scale, dh = vh * scale;
+      const dx = (cw - dw) / 2, dy = (ch - dh) / 2;
+
+      ctx.save();
+      ctx.clearRect(0, 0, cw, ch);
+      ctx.translate(cw, 0);
+      ctx.scale(-1, 1);
+      ctx.drawImage(video, 0, 0, vw, vh, dx, dy, dw, dh);
+
+      handLandmarks.forEach(landmarks => {
+        ctx.strokeStyle = '#00FF00';
+        ctx.lineWidth = 2;
         HAND_CONNECTIONS.forEach(([i, j]) => {
-          const p1 = lm[i], p2 = lm[j];
+          const p1 = landmarks[i], p2 = landmarks[j];
           ctx.beginPath();
-          ctx.moveTo(p1.x * vw, p1.y * vh);
-          ctx.lineTo(p2.x * vw, p2.y * vh);
+          ctx.moveTo(dx + p1.x * dw, dy + p1.y * dh);
+          ctx.lineTo(dx + p2.x * dw, dy + p2.y * dh);
           ctx.stroke();
         });
-        ctx.fillStyle = accent;
-        lm.forEach(p => { ctx.beginPath(); ctx.arc(p.x * vw, p.y * vh, 3, 0, Math.PI * 2); ctx.fill(); });
-        if (drawMarker) [0,4,8,12,16,20].forEach(i => { const p = lm[i]; if (p) drawMarker(ctx, p.x * vw, p.y * vh, 12); });
-      });
-      const signText = formatSigns(handLandmarks, handedness);
-      if (signText) {
-        captionContainer.classList.add('show');
-        captionText.textContent = signText;
-      }
-      if (faceLandmarks) {
-        ctx.strokeStyle = '#00FFFF';
-        let minX = 1, minY = 1, maxX = 0, maxY = 0;
-        faceLandmarks.forEach(p => { minX = Math.min(minX, p.x); minY = Math.min(minY, p.y); maxX = Math.max(maxX, p.x); maxY = Math.max(maxY, p.y); });
-        ctx.strokeRect(minX * vw, minY * vh, (maxX - minX) * vw, (maxY - minY) * vh);
-
-        const leftEyeIdx = [33,133,159,145];
-        const rightEyeIdx = [362,263,386,374];
-        [leftEyeIdx, rightEyeIdx].forEach(arr => {
-          let exMin = 1, eyMin = 1, exMax = 0, eyMax = 0;
-          arr.forEach(i => { const p = faceLandmarks[i]; exMin = Math.min(exMin, p.x); eyMin = Math.min(eyMin, p.y); exMax = Math.max(exMax, p.x); eyMax = Math.max(eyMax, p.y); });
-          ctx.strokeStyle = '#FF0000';
-          ctx.strokeRect(exMin * vw, eyMin * vh, (exMax - exMin) * vw, (eyMax - eyMin) * vh);
+        landmarks.forEach((lm, i) => {
+          const x = dx + lm.x * dw, y = dy + lm.y * dh;
+          let color = '#FFFFFF';
+          if (i >= 1 && i <= 4) color = fingerColors.thumb;
+          if (i >= 5 && i <= 8) color = fingerColors.index;
+          if (i >= 9 && i <= 12) color = fingerColors.middle;
+          if (i >= 13 && i <= 16) color = fingerColors.ring;
+          if (i >= 17 && i <= 20) color = fingerColors.pinky;
+          ctx.beginPath();
+          ctx.arc(x, y, 6, 0, Math.PI * 2);
+          ctx.fillStyle = color;
+          ctx.fill();
         });
-        drawConnectors(ctx, faceLandmarks, FACEMESH_LEFT_EYE, { color: '#FFD700', lineWidth: 2 });
-        drawConnectors(ctx, faceLandmarks, FACEMESH_RIGHT_EYE, { color: '#FFD700', lineWidth: 2 });
-        drawConnectors(ctx, faceLandmarks, FACEMESH_LIPS, { color: '#FF69B4', lineWidth: 2 });
+      });
+
+      if (faceResults && faceResults.multiFaceLandmarks.length) {
+        const lm = faceResults.multiFaceLandmarks[0];
+        let minX = 1, minY = 1, maxX = 0, maxY = 0;
+        lm.forEach(p => {
+          minX = Math.min(minX, p.x);
+          minY = Math.min(minY, p.y);
+          maxX = Math.max(maxX, p.x);
+          maxY = Math.max(maxY, p.y);
+        });
+        ctx.strokeStyle = '#00FF00';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(
+          dx + minX * dw,
+          dy + minY * dh,
+          (maxX - minX) * dw,
+          (maxY - minY) * dh
+        );
+
+        const leftEyeIdx = [33, 133, 159, 145];
+        const rightEyeIdx = [362, 263, 386, 374];
+        [leftEyeIdx, rightEyeIdx].forEach(indices => {
+          let exMin = 1, eyMin = 1, exMax = 0, eyMax = 0;
+          indices.forEach(i => {
+            const p = lm[i];
+            exMin = Math.min(exMin, p.x);
+            eyMin = Math.min(eyMin, p.y);
+            exMax = Math.max(exMax, p.x);
+            eyMax = Math.max(eyMax, p.y);
+          });
+          ctx.strokeStyle = '#FF0000';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(
+            dx + exMin * dw,
+            dy + eyMin * dh,
+            (exMax - exMin) * dw,
+            (eyMax - eyMin) * dh
+          );
+        });
       }
-      if (poseLandmarks) {
-        drawConnectors(ctx, poseLandmarks, POSE_CONNECTIONS, { color: '#ADFF2F', lineWidth: 2 });
-        poseLandmarks.forEach(p => { ctx.fillStyle = '#0000FF'; ctx.beginPath(); ctx.arc(p.x * vw, p.y * vh, 3, 0, Math.PI * 2); ctx.fill(); });
-      }
+
+      ctx.restore();
     }
     requestAnimationFrame(onFrame);
   }
