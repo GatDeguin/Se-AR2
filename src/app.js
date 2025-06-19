@@ -500,7 +500,7 @@ Promise.all(tasks).then(() => {
       });
     })();
 async function ensureLibs() {
-  const res = await fetch('libs/hands.js', { method: 'HEAD' }).catch(() => null);
+  const res = await fetch(new URL('../libs/hands.js', import.meta.url), { method: 'HEAD' }).catch(() => null);
   if (!res || !res.ok) {
     const msg = document.createElement('div');
     msg.id = 'fallbackLibs';
@@ -524,7 +524,7 @@ async function ensureLibs() {
     }
     return import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.5.2/dist/transformers.min.js');
   }
-  return import('../libs/transformers.min.js');
+  return import(new URL('../libs/transformers.min.js', import.meta.url));
 }
 
 (async ()=>{
@@ -579,11 +579,11 @@ const transcriberP = pipeline('automatic-speech-recognition', 'Xenova/whisper-ti
     /* Tracker Combinado */
     const canvasTracker=document.getElementById('trackerCanvas')||(()=>{const c=document.createElement('canvas');c.id='trackerCanvas';video.parentNode.insertBefore(c,video.nextSibling);return c;})();
     const ctxTracker=canvasTracker.getContext('2d',{willReadFrequently:true});
-    const hands=new Hands({locateFile:f=>`libs/${f}`});
+    const hands=new Hands({locateFile:f=>new URL(`../libs/${f}`, import.meta.url).href});
     hands.setOptions({maxNumHands:2,modelComplexity:1,minDetectionConfidence:0.7,minTrackingConfidence:0.7});
-    const faceMesh=new FaceMesh({locateFile:f=>`libs/${f}`});
+    const faceMesh=new FaceMesh({locateFile:f=>new URL(`../libs/${f}`, import.meta.url).href});
     faceMesh.setOptions({maxNumFaces:1,refineLandmarks:true,minDetectionConfidence:0.7,minTrackingConfidence:0.7});
-    const pose=new Pose({locateFile:f=>`libs/${f}`});
+    const pose=new Pose({locateFile:f=>new URL(`../libs/${f}`, import.meta.url).href});
     pose.setOptions({modelComplexity:1,enableSegmentation:false,minDetectionConfidence:0.7,minTrackingConfidence:0.7});
     let handLandmarks=[],faceLandmarks=null,poseLandmarks=null;
     hands.onResults(r=>handLandmarks=r.multiHandLandmarks||[]);
