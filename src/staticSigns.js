@@ -19,3 +19,4 @@ export function detectStaticSign(lm) {
 if (typeof module !== 'undefined') {
   module.exports = { detectStaticSign };
 }
+
