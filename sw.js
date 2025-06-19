@@ -7,11 +7,6 @@ const ASSETS = [
   '/src/sw-register.js',
   '/three.min.js',
   '/opencv.js',
-  '/libs/drawing_utils.js',
-  '/libs/face_mesh.js',
-  '/libs/hands.js',
-  '/libs/pose.js',
-  '/libs/transformers.min.js',
   '/enter.mp3',
   '/done.mp3',
 ];
