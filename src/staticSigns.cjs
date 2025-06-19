@@ -14,8 +14,9 @@ function detectStaticSign(lm) {
   if (indexExt && thumbExt && !middleExt && !ringExt && !pinkExt) return 'G';
   if (indexExt && middleExt && thumbExt && !ringExt && !pinkExt) return 'H';
   if (!indexExt && !middleExt && !ringExt && pinkExt && !thumbExt) return 'I';
-  // J is normally dynamic, tracing a curve with the pinky. We assume the final
-  // pose where the pinky and thumb are extended.
+
+  // J is normally dynamic; assume final pose with thumb and pinky extended
+
   if (!indexExt && !middleExt && !ringExt && pinkExt && thumbExt) return 'J';
 
   if (!indexExt && !middleExt && !ringExt && !pinkExt && thumbExt) return 'A';

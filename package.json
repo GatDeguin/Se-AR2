@@ -22,7 +22,8 @@
     "eslint": "^8.57.1",
     "esm": "^3.2.25",
     "jest": "^30.0.0",
-    "jest-environment-jsdom": "^30.0.0"
+    "jest-environment-jsdom": "^30.0.0",
+    "esm": "^3.2.25"
   },
   "jest": {
     "testEnvironment": "jsdom"
