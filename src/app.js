@@ -140,6 +140,7 @@ let hapticsEnabled = true;
         if(camStream) camStream.getTracks().forEach(t=>t.stop());
         camStream=s;
         video.srcObject=s;
+        await video.play().catch(()=>{});
         fallbackCam.classList.remove("show");
       }catch(e){
         fallbackCam.textContent = `\ud83d\udcf7 ${e.message}. Permite el acceso a la cámara y recarga la página.`;
