@@ -309,7 +309,7 @@ body.light {
     }
     /* FPS Badge */
     .fps-badge {
-      position: absolute; bottom: 12%; right: 4%;
+      position: absolute; bottom: 12%; right: 2%;
       background: var(--control-bg);
       padding: var(--spacing) calc(var(--spacing)*1.5);
       border-radius: var(--radius);
@@ -319,6 +319,45 @@ body.light {
       pointer-events: auto;
       opacity: 0;
       animation: fadeIn 0.5s 0.3s forwards;
+      z-index: 305;
+    }
+    .help-btn {
+      position: absolute; bottom: 2%; right: 2%;
+      width: 32px; height: 32px;
+      background: var(--control-bg);
+      border: none;
+      border-radius: 50%;
+      color: var(--icon-color);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      transition: transform 0.2s var(--transition);
+      z-index: 310;
+    }
+    .help-btn svg { width: 24px; height: 24px; fill: currentColor; }
+    .help-btn:hover { transform: scale(1.1); }
+    .help-btn:active { transform: scale(0.9); }
+    .help-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    .help-panel {
+      position: absolute; bottom: 12%; right: 2%;
+      max-width: 280px;
+      background: var(--control-bg);
+      color: var(--text-light);
+      padding: calc(var(--spacing)*2);
+      border-radius: var(--radius);
+      font-size: var(--font-base);
+      backdrop-filter: blur(12px);
+      opacity: 0; pointer-events: none;
+      transform: translateY(10px);
+      transition: opacity var(--transition), transform var(--transition);
+      z-index: 320;
+    }
+    .help-panel.show { opacity: 1; pointer-events: auto; transform: translateY(0); }
+    .help-panel h3 { margin-top: 0; }
+    .help-panel .close-btn {
+      position: absolute; top: 8px; right: 8px;
+      background: transparent; border: none;
+      color: inherit; font-size: 20px; cursor: pointer;
     }
     /* Fallback */
     .fallback {
@@ -498,11 +537,22 @@ body.light {
       }
 
   .fps-badge {
-        bottom: 16%;
-        right: 2%;
-        font-size: 12px;
-      }
+      bottom: 16%;
+      right: 2%;
+      font-size: 12px;
+      z-index: 305;
     }
+  .help-btn {
+      bottom: 8%;
+      right: 2%;
+      width: 32px;
+      height: 32px;
+    }
+  .help-panel {
+      bottom: 20%;
+      right: 2%;
+    }
+}
 
     /* Orientation overrides */
     @media (orientation: landscape) {

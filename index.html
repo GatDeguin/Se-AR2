@@ -124,6 +124,22 @@
     <div class="controls-bottom"><button id="micBtn" class="mic-button" aria-label="Iniciar reconocimiento de voz"><svg viewBox="0 0 24 24"><path d="M12 14a2 2 0 002-2V6a2 2 0 10-4 0v6a2 2 0 002 2zm5-2a5 5 0 01-10 0H5a7 7 0 0014 0h-2zm-5 8a7 7 0 007-7h-2a5 5 0 01-10 0H5a7 7 0 007 7z"/></svg></button></div>
 
     <div id="fpsBadge" class="fps-badge">0 fps</div>
+    <button id="helpBtn" class="help-btn" aria-label="FAQ y tips" aria-expanded="false">
+      <svg viewBox="0 0 24 24">
+        <path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 15h1v1h-2v-1h1zm1-3h-2v-.5c0-1 .45-1.75 1.17-2.45l.9-.92c.57-.57.93-1.37.93-2.25a3 3 0 10-6 0H8a4 4 0 118 0c0 1.17-.47 2.27-1.26 3.07l-.9.93c-.41.42-.84.86-.84 1.67V14z"/>
+      </svg>
+    </button>
+    <div id="helpPanel" class="help-panel" role="dialog" aria-hidden="true">
+      <button id="helpClose" class="close-btn" aria-label="Cerrar ayuda">&times;</button>
+      <h3>FAQ y Tips</h3>
+      <ul>
+        <li>Si la app se traba o se vuelve lenta, toca <strong>Reiniciar</strong>.</li>
+        <li>Arrastra los subt&iacute;tulos para moverlos donde prefieras.</li>
+        <li>Activa la voz con el icono de micr&oacute;fono.</li>
+        <li>Cambia de c&aacute;mara o micr&oacute;fono desde <strong>Ajustes</strong>.</li>
+        <li>Para repetir el tour guiado, abre <strong>Ajustes</strong> y elige &quot;Repetir tour&quot;.</li>
+      </ul>
+    </div>
     <div id="fallbackCam" class="fallback" role="alert">📷 Cámara no disponible</div>
     <div id="fallbackSpeech" class="fallback" role="alert">🎤 Voz no soportada</div>
   </div>
