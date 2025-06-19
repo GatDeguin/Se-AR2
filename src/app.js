@@ -3,7 +3,13 @@ import { formatSigns } from './handUtils.js';
 
 // Prepare global Module for MediaPipe WASM loaders
 if (!window.Module) {
-  window.Module = { arguments_: [] };
+  window.Module = {};
+}
+if (!('arguments_' in window.Module)) {
+  window.Module.arguments_ = [];
+}
+if (!('arguments' in window.Module)) {
+  window.Module.arguments = window.Module.arguments_;
 }
 
     // References
