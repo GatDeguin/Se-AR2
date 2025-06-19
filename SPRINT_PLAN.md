@@ -60,7 +60,7 @@ En este sprint se refuerzan las funcionalidades introducidas y se optimiza el re
    - Optimizar ciclos de renderizado y el uso de WebGL para subir los fps.
 
 3. **Como usuaria quiero utilizar más letras del alfabeto sin conexión.**
-   - Añadir detección de las letras F–J y dos gestos dinámicos básicos.
+   - Añadir detección de las letras F–J (completado) y dos gestos dinámicos básicos pendientes.
 
 4. **Como usuaria quiero que la aplicación maneje mejor los cortes de red.**
    - Implementar una página offline y reintentos automáticos en descargas interrumpidas.
@@ -71,7 +71,7 @@ En este sprint se refuerzan las funcionalidades introducidas y se optimiza el re
 ## Tareas
 - [ ] Mejorar el service worker para detectar actualizaciones y mostrar aviso de recarga.
 - [ ] Refactorizar `src/app.js` para reducir cálculos redundantes y usar `requestAnimationFrame` de forma más eficiente.
-- [ ] Extender `staticSigns.js` con las letras F–J y un ejemplo de gesto dinámico.
+- [x] Extender `staticSigns.js` con las letras F–J; queda pendiente el gesto dinámico.
 - [ ] Añadir manejo de errores y reintentos en `prepareOffline.js`.
 - [ ] Crear `docs/architecture.md` documentando los principales módulos y flujos.
 - [ ] Escribir pruebas Jest para la nueva detección y para el flujo de actualización del service worker.
