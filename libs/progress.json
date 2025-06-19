@@ -24,8 +24,8 @@
     "total": 0
   },
   "hands_solution_packed_assets.data": {
-    "downloaded": 0,
-    "total": 0
+    "downloaded": 4326731,
+    "total": 4326731
   },
   "hands_solution_wasm_bin.js": {
     "downloaded": 276474,
@@ -36,12 +36,12 @@
     "total": 0
   },
   "hands_solution_wasm_bin.wasm": {
-    "downloaded": 0,
-    "total": 0
+    "downloaded": 5917209,
+    "total": 5917209
   },
   "hands_solution_simd_wasm_bin.wasm": {
-    "downloaded": 0,
-    "total": 0
+    "downloaded": 6026259,
+    "total": 6026259
   },
   "hand_landmark_full.tflite": {
     "downloaded": 5478688,
@@ -60,8 +60,8 @@
     "total": 0
   },
   "face_mesh_solution_packed_assets.data": {
-    "downloaded": 0,
-    "total": 0
+    "downloaded": 3986256,
+    "total": 3986256
   },
   "face_mesh_solution_wasm_bin.js": {
     "downloaded": 330161,
@@ -72,12 +72,12 @@
     "total": 0
   },
   "face_mesh_solution_wasm_bin.wasm": {
-    "downloaded": 0,
-    "total": 0
+    "downloaded": 6084312,
+    "total": 6084312
   },
   "face_mesh_solution_simd_wasm_bin.wasm": {
-    "downloaded": 0,
-    "total": 0
+    "downloaded": 6161697,
+    "total": 6161697
   },
   "face_mesh.binarypb": {
     "downloaded": 939,
@@ -88,8 +88,8 @@
     "total": 0
   },
   "pose_solution_packed_assets.data": {
-    "downloaded": 0,
-    "total": 0
+    "downloaded": 2962288,
+    "total": 2962288
   },
   "pose_solution_wasm_bin.js": {
     "downloaded": 276473,
@@ -100,12 +100,12 @@
     "total": 0
   },
   "pose_solution_wasm_bin.wasm": {
-    "downloaded": 0,
-    "total": 0
+    "downloaded": 5994571,
+    "total": 5994571
   },
   "pose_solution_simd_wasm_bin.wasm": {
-    "downloaded": 0,
-    "total": 0
+    "downloaded": 6104372,
+    "total": 6104372
   },
   "pose_landmark_full.tflite": {
     "downloaded": 6440512,
