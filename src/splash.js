@@ -85,12 +85,23 @@ export function initSplash(canvas) {
     }
   }
 
-  function drawLogo(x, y, size, glow, scale = 1, opacity = 1) {
+  function drawLogo(
+    x,
+    y,
+    size,
+    glow,
+    scale = 1,
+    opacity = 1,
+    rotation = 0,
+    blur = 0
+  ) {
     ctx.save();
     ctx.translate(x, y);
     ctx.scale(scale, scale);
+    ctx.rotate(rotation);
     ctx.translate(-x, -y);
     ctx.globalAlpha = opacity;
+    if (blur > 0) ctx.filter = `blur(${blur}px)`;
 
     const radius = 36;
     drawRoundedRect(x - size/2, y - size/2, size, size, radius);
@@ -108,7 +119,7 @@ export function initSplash(canvas) {
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText('SeñAR', x, y);
-
+    ctx.filter = 'none';
     ctx.restore();
   }
 
@@ -180,7 +191,12 @@ export function initSplash(canvas) {
 
     const entryProgress = Math.min(elapsed / 600, 1);
     const scale = 0.8 + 0.2 * easeOutBack(entryProgress);
-    drawLogo(centerX, centerY, LOGO_SIZE, glowAlpha, scale, splashOpacity);
+    let rotation = 0, blur = 0;
+    if (entryProgress < 1) {
+      rotation = (1 - entryProgress) * (15 * Math.PI / 180);
+      blur = 8 * (1 - entryProgress);
+    }
+    drawLogo(centerX, centerY, LOGO_SIZE, glowAlpha, scale, splashOpacity, rotation, blur);
     drawLoader(centerX, centerY + LOGO_SIZE / 2 + 32, LOADER_WIDTH, LOADER_HEIGHT, loaderProgress, splashOpacity);
 
     drawStatusText(centerX, centerY + LOGO_SIZE / 2 + 56, statusText, splashOpacity);
