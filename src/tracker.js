@@ -60,11 +60,13 @@ export function initTracker({
     return { accent, icon };
   }
 
-  async function onFrame() {
-    if (video.readyState >= 2) {
-      const { accent, icon } = getAppColors();
-      await hands.send({ image: video });
-      await faceMesh.send({ image: video });
+    async function onFrame() {
+      if (video.readyState >= 2) {
+        const { accent, icon } = getAppColors();
+        await Promise.all([
+          hands.send({ image: video }),
+          faceMesh.send({ image: video })
+        ]);
 
       const vw = video.videoWidth, vh = video.videoHeight;
       const cw = canvasEl.width = video.clientWidth || window.innerWidth;
