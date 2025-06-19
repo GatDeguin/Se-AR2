@@ -298,6 +298,7 @@ Promise.all(tasks).then(() => {
 
     /* ---------- Mic ---------- */
     let recog;
+    let recogActive = false;
     function speechHandler(e){
       ripple(e,micBtn);
       vibrate(50);
@@ -309,11 +310,13 @@ Promise.all(tasks).then(() => {
         recog.interimResults=true;
         recog.continuous=true;
         recog.onstart=()=>{
+          recogActive = true;
           micBtn.classList.add('active');
           captionContainer.classList.add('show');
           vibrate([100,50,100]);
         };
         recog.onend=()=>{
+          recogActive = false;
           micBtn.classList.remove('active');
           captionContainer.classList.remove('show');
           progress.style.width='0%';
@@ -331,7 +334,12 @@ Promise.all(tasks).then(() => {
         };
       }
       micBtn.classList.remove('starting');
-      micBtn.classList.toggle('active')?recog.start():recog.stop();
+      const shouldStart = micBtn.classList.toggle('active');
+      if(shouldStart){
+        if(!recogActive) recog.start();
+      }else{
+        if(recogActive) recog.stop();
+      }
     }
     function animate(txt){
       captionText.innerHTML='';
