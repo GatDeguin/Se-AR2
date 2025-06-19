@@ -1,7 +1,13 @@
 export let updateProgress = () => {};
+import { ripple } from './app.js';
 export function initSplash(canvas) {
   const ctx = canvas.getContext('2d');
   const dpr = window.devicePixelRatio || 1;
+
+  function onPointerDown(evt) {
+    ripple(evt, canvas);
+  }
+  canvas.addEventListener('pointerdown', onPointerDown);
 
   const WIDTH = () => window.innerWidth;
   const HEIGHT = () => window.innerHeight;
@@ -152,6 +158,7 @@ export function initSplash(canvas) {
       splashOpacity = Math.max(0, 1 - (fadeElapsed / FADE_OUT_MS));
       if (splashOpacity <= 0) {
         canvas.style.display = 'none';
+        canvas.removeEventListener('pointerdown', onPointerDown);
         window.dispatchEvent(new Event('splashDone'));
         return;
       }
