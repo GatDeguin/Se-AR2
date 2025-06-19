@@ -703,6 +703,17 @@ const transcriberP = pipeline('automatic-speech-recognition', 'Xenova/whisper-ti
           let minX=1,minY=1,maxX=0,maxY=0;
           faceLandmarks.forEach(p=>{minX=Math.min(minX,p.x);minY=Math.min(minY,p.y);maxX=Math.max(maxX,p.x);maxY=Math.max(maxY,p.y);});
           ctxTracker.strokeRect(minX*vw,minY*vh,(maxX-minX)*vw,(maxY-minY)*vh);
+
+          // bounding boxes for eyes
+          const leftEyeIdx=[33,133,159,145];
+          const rightEyeIdx=[362,263,386,374];
+          [leftEyeIdx,rightEyeIdx].forEach(idxArr=>{
+            let exMin=1,eyMin=1,exMax=0,eyMax=0;
+            idxArr.forEach(i=>{const p=faceLandmarks[i];exMin=Math.min(exMin,p.x);eyMin=Math.min(eyMin,p.y);exMax=Math.max(exMax,p.x);eyMax=Math.max(eyMax,p.y);});
+            ctxTracker.strokeStyle='#FF0000';
+            ctxTracker.strokeRect(exMin*vw,eyMin*vh,(exMax-exMin)*vw,(eyMax-eyMin)*vh);
+          });
+
           drawConnectors(ctxTracker,faceLandmarks,FACEMESH_LEFT_EYE,{color:'#FFD700',lineWidth:2});
           drawConnectors(ctxTracker,faceLandmarks,FACEMESH_RIGHT_EYE,{color:'#FFD700',lineWidth:2});
           drawConnectors(ctxTracker,faceLandmarks,FACEMESH_LIPS,{color:'#FF69B4',lineWidth:2});
