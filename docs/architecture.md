@@ -19,8 +19,9 @@ interact with each other.
   works offline. It responds to `fetch` events with cached resources when
   available.
 - **`scripts/prepareOffline.js`** – Node script that downloads the MediaPipe and
-  Whisper scripts into `libs/` for offline usage. The service worker then caches
-  these files on install.
+  Whisper scripts into `libs/` for offline usage, storing a progress file so
+  downloads can be resumed. The service worker then caches these files on
+  install.
 
 ## Interaction overview
 
@@ -42,28 +43,7 @@ The HTML page loads `app.js` along with MediaPipe and other scripts located in
 without network connectivity. `app.js` processes camera frames and formats
 recognized hand shapes through `staticSigns.js` and `handUtils.js`. The optional
 `prepareOffline.js` script downloads the required models ahead of time so they
-are available for the service worker to cache.
-
-# Architecture
-
-This document explains how the SeñAR demo is organized.
-
-## Components
-
-- **index.html** – Container for the entire UI and entry point for the modules.
-- **src/app.js** – Main logic that connects MediaPipe trackers, gesture
-  recognition and speech transcription.
-- **src/staticSigns.js** – Detects static letters of the alphabet for offline
-  sign recognition.
-- **sw.js** – Service worker caching core assets so the page works as a PWA.
-- **scripts/prepareOffline.js** – Node script that downloads the MediaPipe
-  libraries and stores a progress file to allow resumable downloads.
-
-## Offline model storage
-
-Models downloaded with `prepare-offline` or via the settings screen are saved in
-`libs/` and cached under the `offline-models` cache. The service worker loads
-these files from cache when available so the app can run without network
-connectivity.
-
+are available for the service worker to cache. These models are saved in
+`libs/` and cached under the `offline-models` cache, allowing the service worker
+to load them when offline.
 
