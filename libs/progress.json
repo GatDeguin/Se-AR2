@@ -18,5 +18,73 @@
   "transformers.min.js": {
     "downloaded": 849533,
     "total": 849533
+  },
+  "hands_solution_packed_assets_loader.js": {
+    "downloaded": 8327,
+    "total": 0
+  },
+  "hands_solution_wasm_bin.js": {
+    "downloaded": 276474,
+    "total": 0
+  },
+  "hands_solution_simd_wasm_bin.js": {
+    "downloaded": 276479,
+    "total": 0
+  },
+  "hand_landmark_full.tflite": {
+    "downloaded": 5478688,
+    "total": 5478688
+  },
+  "hand_landmark_lite.tflite": {
+    "downloaded": 2071408,
+    "total": 2071408
+  },
+  "hands.binarypb": {
+    "downloaded": 550,
+    "total": 550
+  },
+  "face_mesh_solution_packed_assets_loader.js": {
+    "downloaded": 8928,
+    "total": 0
+  },
+  "face_mesh_solution_wasm_bin.js": {
+    "downloaded": 330161,
+    "total": 0
+  },
+  "face_mesh_solution_simd_wasm_bin.js": {
+    "downloaded": 330166,
+    "total": 0
+  },
+  "face_mesh.binarypb": {
+    "downloaded": 939,
+    "total": 939
+  },
+  "pose_solution_packed_assets_loader.js": {
+    "downloaded": 8002,
+    "total": 0
+  },
+  "pose_solution_wasm_bin.js": {
+    "downloaded": 276473,
+    "total": 0
+  },
+  "pose_solution_simd_wasm_bin.js": {
+    "downloaded": 276478,
+    "total": 0
+  },
+  "pose_landmark_full.tflite": {
+    "downloaded": 6440512,
+    "total": 6440512
+  },
+  "pose_landmark_heavy.tflite": {
+    "downloaded": 27709200,
+    "total": 0
+  },
+  "pose_landmark_lite.tflite": {
+    "downloaded": 2819824,
+    "total": 2819824
+  },
+  "pose_web.binarypb": {
+    "downloaded": 1007,
+    "total": 1007
   }
 }
