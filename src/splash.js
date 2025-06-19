@@ -15,10 +15,12 @@ export function initSplash(canvas) {
   const HEIGHT = () => window.innerHeight;
 
   function resize() {
-    canvas.width = WIDTH() * dpr;
-    canvas.height = HEIGHT() * dpr;
-    canvas.style.width = WIDTH() + 'px';
-    canvas.style.height = HEIGHT() + 'px';
+    const w = WIDTH();
+    const h = HEIGHT();
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.scale(dpr, dpr);
   }
@@ -74,10 +76,12 @@ export function initSplash(canvas) {
   function drawTextureNoise(alpha = 0.04) {
     const density = 0.6;
     const amount = 100;
+    const w = WIDTH();
+    const h = HEIGHT();
     ctx.fillStyle = `rgba(0,0,0,${alpha})`;
     for (let i = 0; i < amount; i++) {
-      const x = Math.random() * WIDTH();
-      const y = Math.random() * HEIGHT();
+      const x = Math.random() * w;
+      const y = Math.random() * h;
       const size = Math.random() * 1.2;
       ctx.beginPath();
       ctx.arc(x, y, size, 0, Math.PI * 2);
@@ -152,8 +156,10 @@ export function initSplash(canvas) {
 
   function animate(ts) {
     const elapsed = ts - startTime;
-    const centerX = WIDTH() / 2;
-    const centerY = HEIGHT() / 2 - 40;
+    const width = WIDTH();
+    const height = HEIGHT();
+    const centerX = width / 2;
+    const centerY = height / 2 - 40;
 
     if (!entrySoundPlayed && elapsed > 200) {
       enterSound.play().catch(() => {});
@@ -186,7 +192,7 @@ export function initSplash(canvas) {
     ctx.save();
     ctx.globalAlpha = splashOpacity;
     ctx.fillStyle = BG_COLOR;
-    ctx.fillRect(0, 0, WIDTH(), HEIGHT());
+    ctx.fillRect(0, 0, width, height);
     drawTextureNoise(0.02);
 
     const entryProgress = Math.min(elapsed / 600, 1);
