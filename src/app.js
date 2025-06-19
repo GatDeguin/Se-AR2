@@ -1,4 +1,3 @@
-import { detectStaticSign } from './staticSigns.js';
 import { updateProgress } from './splash.js';
 import { formatSigns } from './handUtils.js';
 
