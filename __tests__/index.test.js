@@ -22,6 +22,11 @@ beforeAll(() => {
     localStorage.setItem('dialect', dialectSelect.value);
   });
 
+  const hapticsToggle = document.getElementById('hapticsToggle');
+  hapticsToggle.addEventListener('click', () => {
+    localStorage.setItem('haptics', hapticsToggle.checked.toString());
+  });
+
   const micBtn = document.getElementById('micBtn');
   global.micCalls = 0;
   micBtn.addEventListener('click', () => {
@@ -78,5 +83,14 @@ describe('index.html', () => {
     select.value = 'cuyo';
     select.dispatchEvent(new Event('change'));
     expect(localStorage.getItem('dialect')).toBe('cuyo');
+  });
+
+  test('haptics toggle saves preference', () => {
+    const toggle = document.getElementById('hapticsToggle');
+    localStorage.clear();
+    toggle.click();
+    expect(localStorage.getItem('haptics')).toBe('false');
+    toggle.click();
+    expect(localStorage.getItem('haptics')).toBe('true');
   });
 });

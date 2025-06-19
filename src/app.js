@@ -14,6 +14,7 @@ import { detectStaticSign } from './staticSigns.js';
     const subtitleSizeSlider = document.getElementById('subtitleSizeSlider');
     const subtitleSizeValue = document.getElementById('subtitleSizeValue');
     const dialectSelect = document.getElementById('dialectSelect');
+    const hapticsToggle = document.getElementById('hapticsToggle');
     const video = document.getElementById('video');
     const fallbackCam = document.getElementById('fallbackCam');
     const fallbackSpeech = document.getElementById('fallbackSpeech');
@@ -29,6 +30,7 @@ import { detectStaticSign } from './staticSigns.js';
     const rootStyles = getComputedStyle(document.documentElement);
 const accent = rootStyles.getPropertyValue('--accent').trim() || '#2EB8A3';
 const accentRGB = rootStyles.getPropertyValue('--accent-rgb').trim() || '46,184,163';
+let hapticsEnabled = true;
 
     // Load saved settings
     const savedTheme = localStorage.getItem('theme');
@@ -50,10 +52,16 @@ const accentRGB = rootStyles.getPropertyValue('--accent-rgb').trim() || '46,184,
       captionContainer.style.fontSize = savedSize + 'px';
     }
 
-    const savedDialect = localStorage.getItem('dialect');
-    if (savedDialect && dialectSelect) {
-      dialectSelect.value = savedDialect;
-    }
+      const savedDialect = localStorage.getItem('dialect');
+      if (savedDialect && dialectSelect) {
+        dialectSelect.value = savedDialect;
+      }
+
+      const savedHaptics = localStorage.getItem('haptics');
+      if (savedHaptics === 'false') {
+        hapticsEnabled = false;
+        if (hapticsToggle) hapticsToggle.checked = false;
+      }
 
     function drawMarker(ctx,x,y,r){
       const g=ctx.createRadialGradient(x,y,0,x,y,r);
@@ -136,6 +144,10 @@ Promise.all(tasks).then(() => {
     /* ---------- Helper ripple ---------- */
     function ripple(e,el){const r=el.getBoundingClientRect(),s=Math.max(r.width,r.height),x=e.clientX-r.left-s/2,y=e.clientY-r.top-s/2,sp=document.createElement('span');sp.className='ripple';sp.style.width=sp.style.height=s+'px';sp.style.left=x+'px';sp.style.top=y+'px';el.appendChild(sp);sp.onanimationend=()=>sp.remove();}
 
+    function vibrate(pattern){
+      if(hapticsEnabled) navigator.vibrate?.(pattern);
+    }
+
     /* ---------- Settings nav ---------- */
     settingsBtn.onclick=e=>{ripple(e,settingsBtn);settingsScreen.classList.add('show');};
     settingsBack.onclick=e=>{ripple(e,settingsBack);settingsScreen.classList.remove('show');};
@@ -155,6 +167,12 @@ Promise.all(tasks).then(() => {
       localStorage.setItem('contrast', enabled);
     };
 
+    if (hapticsToggle) hapticsToggle.onclick = e => {
+      ripple(e, hapticsToggle);
+      hapticsEnabled = hapticsToggle.checked;
+      localStorage.setItem('haptics', hapticsEnabled);
+    };
+
     /* ---------- Subtitle size ---------- */
     subtitleSizeSlider.oninput=()=>{
       subtitleSizeValue.textContent = subtitleSizeSlider.value + ' pt';
@@ -172,7 +190,7 @@ Promise.all(tasks).then(() => {
     let recog;
     function speechHandler(e){
       ripple(e,micBtn);
-      navigator.vibrate?.(50);
+      vibrate(50);
       if(!SR)return;
       micBtn.classList.add('starting');
       if(!recog){
@@ -183,13 +201,13 @@ Promise.all(tasks).then(() => {
         recog.onstart=()=>{
           micBtn.classList.add('active');
           captionContainer.classList.add('show');
-          navigator.vibrate?.([100,50,100]);
+          vibrate([100,50,100]);
         };
         recog.onend=()=>{
           micBtn.classList.remove('active');
           captionContainer.classList.remove('show');
           progress.style.width='0%';
-          navigator.vibrate?.(50);
+          vibrate(50);
         };
         recog.onresult=e=>{
           let fin='',int='';
@@ -228,7 +246,7 @@ Promise.all(tasks).then(() => {
     /* ---------- Playback & snapshot ---------- */
     [pauseBtn,snapshotBtn,restartBtn].forEach(b=>b.addEventListener('click',e=>{
       ripple(e,b);
-      navigator.vibrate?.(20);
+      vibrate(20);
     }));
     pauseBtn.addEventListener('click',()=>video.paused?video.play():video.pause());
     snapshotBtn.addEventListener('click',()=>{
@@ -245,7 +263,7 @@ Promise.all(tasks).then(() => {
     restartBtn.addEventListener('click',()=>location.reload());
     switchCamBtn.addEventListener('click',async e=>{
       ripple(e,switchCamBtn);
-      navigator.vibrate?.(20);
+      vibrate(20);
       try{
         const devices=await navigator.mediaDevices.enumerateDevices();
         videoDevices=devices.filter(d=>d.kind==='videoinput');
@@ -371,7 +389,7 @@ const transcriberP = pipeline('automatic-speech-recognition', 'Xenova/whisper-ti
     function recordHandler(){
       (async()=>{
         try{
-          navigator.vibrate?.(40);
+          vibrate(40);
           if(!recorder||recorder.state==='inactive'){
             const stream=await navigator.mediaDevices.getUserMedia({audio:true});
             recorder=new MediaRecorder(stream,{mimeType:'audio/webm'});
