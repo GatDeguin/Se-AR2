@@ -217,6 +217,7 @@ Promise.all(tasks).then(() => {
       const isLight = document.body.classList.toggle('light');
       themeValue.textContent = isLight ? 'Claro' : 'Oscuro';
       localStorage.setItem('theme', isLight ? 'light' : 'dark');
+      window.dispatchEvent(new Event('themechange'));
     };
 
     if (contrastToggle) contrastToggle.onclick = e => {
@@ -224,6 +225,7 @@ Promise.all(tasks).then(() => {
       const enabled = contrastToggle.checked;
       document.body.classList.toggle('high-contrast', enabled);
       localStorage.setItem('contrast', enabled);
+      window.dispatchEvent(new Event('themechange'));
     };
 
     if (hapticsToggle) hapticsToggle.onclick = e => {
