@@ -1,6 +1,8 @@
 export let updateProgress = () => {};
 import { ripple } from './app.js';
 export function initSplash(canvas) {
+  const wrapper = canvas.parentElement;
+  if (wrapper) wrapper.classList.add('loading');
   const ctx = canvas.getContext('2d');
   const dpr = window.devicePixelRatio || 1;
 
@@ -44,6 +46,10 @@ export function initSplash(canvas) {
 
   updateProgress = function(pct, text = '') {
     loaderProgress = Math.max(0, Math.min(1, pct));
+    if (wrapper) {
+      if (loaderProgress < 1) wrapper.classList.add('loading');
+      else wrapper.classList.remove('loading');
+    }
     if (text) statusText = text;
     if (loaderProgress >= 1 && !fadeOutStart) {
       fadeOutStart = performance.now();
