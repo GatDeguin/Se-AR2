@@ -47,10 +47,7 @@ if (!('arguments' in window.Module)) {
     const captionText = document.getElementById('captionText');
     const progress = document.getElementById('progress');
     const fpsBadge = document.getElementById('fpsBadge');
-    const rootStyles = getComputedStyle(document.documentElement);
-const accent = rootStyles.getPropertyValue('--accent').trim() || '#2EB8A3';
-const accentRGB = rootStyles.getPropertyValue('--accent-rgb').trim() || '46,184,163';
-let hapticsEnabled = true;
+    let hapticsEnabled = true;
 
     // Load saved settings
     const savedTheme = localStorage.getItem('theme');
@@ -98,29 +95,6 @@ let hapticsEnabled = true;
         if (hapticsToggle) hapticsToggle.checked = false;
       }
 
-    function drawMarker(ctx,x,y,r){
-      ctx.save();
-      ctx.lineWidth=2;
-      ctx.strokeStyle=accent;
-      ctx.beginPath();
-      ctx.arc(x,y,r,0,Math.PI*2);
-      ctx.stroke();
-      const g=ctx.createRadialGradient(x,y,0,x,y,r);
-      g.addColorStop(0,`rgba(${accentRGB},0.9)`);
-      g.addColorStop(0.4,`rgba(${accentRGB},0.4)`);
-      g.addColorStop(1,`rgba(${accentRGB},0)`);
-      ctx.fillStyle=g;
-      ctx.beginPath();
-      ctx.arc(x,y,r,0,Math.PI*2);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.moveTo(x-r*0.6,y);
-      ctx.lineTo(x+r*0.6,y);
-      ctx.moveTo(x,y-r*0.6);
-      ctx.lineTo(x,y+r*0.6);
-      ctx.stroke();
-      ctx.restore();
-    }
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     let camStream;
     let videoDevices=[];
