@@ -97,7 +97,6 @@ let hapticsEnabled = true;
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     let camStream;
     let videoDevices=[];
-    let currentDevice=0;
 
     async function startStream(id){
       try{
@@ -158,10 +157,8 @@ tasks.push(
       // Intentar elegir cámara "back"/"environment"/"rear" o usar modo environment
       const camToUse = savedCamera ? videoDevices.find(d=>d.deviceId===savedCamera) : videoDevices.find(d => /back|environment|rear/i.test(d.label));
       if (camToUse) {
-        currentDevice = videoDevices.indexOf(camToUse);
         return startStream(camToUse.deviceId);
       }
-      currentDevice = 0;
       return startStream({facingMode:{ideal:'environment'}});
     })
     .catch(() =>
@@ -276,6 +273,7 @@ Promise.all(tasks).then(() => {
         const length = +res.headers.get('content-length') || 0;
         let received = 0;
         const chunks = [];
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
@@ -390,7 +388,6 @@ Promise.all(tasks).then(() => {
           btn.onclick=async()=>{
             try{
               await startStream(d.deviceId);
-              currentDevice=i;
               localStorage.setItem('cameraId',d.deviceId);
             }catch(err){
               fallbackCam.textContent=`\ud83d\udcf7 ${err.message}`;
@@ -494,7 +491,36 @@ Promise.all(tasks).then(() => {
         captionContainer.classList.remove('drop');
       });
     })();
-import { pipeline } from './libs/transformers.min.js';
+async function ensureLibs() {
+  const res = await fetch('libs/hands.js', { method: 'HEAD' }).catch(() => null);
+  if (!res || !res.ok) {
+    const msg = document.createElement('div');
+    msg.id = 'fallbackLibs';
+    msg.className = 'fallback show';
+    msg.textContent = '⚠️ Falta libs. Ejecuta "npm run prepare-offline" o se usarán las URLs del CDN.';
+    document.body.appendChild(msg);
+    const cdn = [
+      'https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js',
+      'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js',
+      'https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js',
+      'https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js'
+    ];
+    for (const src of cdn) {
+      await new Promise(r => {
+        const s = document.createElement('script');
+        s.src = src;
+        s.onload = r;
+        s.onerror = r;
+        document.head.appendChild(s);
+      });
+    }
+    return import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.5.2/dist/transformers.min.js');
+  }
+  return import('./libs/transformers.min.js');
+}
+
+(async ()=>{
+const { pipeline } = await ensureLibs();
 const device = navigator.gpu ? 'webgpu' : 'wasm';
 const transcriberP = pipeline('automatic-speech-recognition', 'Xenova/whisper-tiny', { quantized: true, device });
 // Reuse existing element references defined at the top of the file
@@ -611,3 +637,4 @@ const transcriberP = pipeline('automatic-speech-recognition', 'Xenova/whisper-ti
       requestAnimationFrame(onFrame);
     }
     video.addEventListener('playing',onFrame);
+})();
