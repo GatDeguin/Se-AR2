@@ -14,22 +14,31 @@ const files = {
   // Additional assets required by the MediaPipe solutions
   // Hands
   'hands_solution_packed_assets_loader.js': 'https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands_solution_packed_assets_loader.js',
+  'hands_solution_packed_assets.data': 'https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands_solution_packed_assets.data',
   'hands_solution_wasm_bin.js': 'https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands_solution_wasm_bin.js',
   'hands_solution_simd_wasm_bin.js': 'https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands_solution_simd_wasm_bin.js',
+  'hands_solution_wasm_bin.wasm': 'https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands_solution_wasm_bin.wasm',
+  'hands_solution_simd_wasm_bin.wasm': 'https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands_solution_simd_wasm_bin.wasm',
   'hand_landmark_full.tflite': 'https://cdn.jsdelivr.net/npm/@mediapipe/hands/hand_landmark_full.tflite',
   'hand_landmark_lite.tflite': 'https://cdn.jsdelivr.net/npm/@mediapipe/hands/hand_landmark_lite.tflite',
   'hands.binarypb': 'https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.binarypb',
 
   // Face Mesh
   'face_mesh_solution_packed_assets_loader.js': 'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh_solution_packed_assets_loader.js',
+  'face_mesh_solution_packed_assets.data': 'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh_solution_packed_assets.data',
   'face_mesh_solution_wasm_bin.js': 'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh_solution_wasm_bin.js',
   'face_mesh_solution_simd_wasm_bin.js': 'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh_solution_simd_wasm_bin.js',
+  'face_mesh_solution_wasm_bin.wasm': 'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh_solution_wasm_bin.wasm',
+  'face_mesh_solution_simd_wasm_bin.wasm': 'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh_solution_simd_wasm_bin.wasm',
   'face_mesh.binarypb': 'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.binarypb',
 
   // Pose
   'pose_solution_packed_assets_loader.js': 'https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose_solution_packed_assets_loader.js',
+  'pose_solution_packed_assets.data': 'https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose_solution_packed_assets.data',
   'pose_solution_wasm_bin.js': 'https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose_solution_wasm_bin.js',
   'pose_solution_simd_wasm_bin.js': 'https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose_solution_simd_wasm_bin.js',
+  'pose_solution_wasm_bin.wasm': 'https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose_solution_wasm_bin.wasm',
+  'pose_solution_simd_wasm_bin.wasm': 'https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose_solution_simd_wasm_bin.wasm',
   'pose_landmark_full.tflite': 'https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose_landmark_full.tflite',
   'pose_landmark_heavy.tflite': 'https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose_landmark_heavy.tflite',
   'pose_landmark_lite.tflite': 'https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose_landmark_lite.tflite',
