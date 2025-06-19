@@ -117,6 +117,17 @@ Para ejecutar la demo sin conexión:
   `progress.json` sin realizar descargas.
 3. Reserve alrededor de **80 MB** de espacio libre para los modelos y asegúrese
    de que los archivos se sirvan también mediante **HTTPS**.
+4. El script también descarga archivos `.wasm` y `.data` necesarios para las
+   soluciones de MediaPipe:
+   - `hands_solution_packed_assets.data` (~4&nbsp;MB)
+   - `hands_solution_wasm_bin.wasm` (~5.6&nbsp;MB)
+   - `hands_solution_simd_wasm_bin.wasm` (~5.7&nbsp;MB)
+   - `face_mesh_solution_packed_assets.data` (~3.8&nbsp;MB)
+   - `face_mesh_solution_wasm_bin.wasm` (~5.8&nbsp;MB)
+   - `face_mesh_solution_simd_wasm_bin.wasm` (~5.9&nbsp;MB)
+   - `pose_solution_packed_assets.data` (~2.8&nbsp;MB)
+   - `pose_solution_wasm_bin.wasm` (~5.7&nbsp;MB)
+   - `pose_solution_simd_wasm_bin.wasm` (~5.8&nbsp;MB)
 
 Dentro de la pantalla de configuraciones se incluye un botón para descargar el
 modelo de transcripción de audio directamente al caché del navegador. El
