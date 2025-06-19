@@ -97,7 +97,6 @@ let hapticsEnabled = true;
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     let camStream;
     let videoDevices=[];
-    let currentDevice=0;
 
     async function startStream(id){
       try{
@@ -158,10 +157,8 @@ tasks.push(
       // Intentar elegir cámara "back"/"environment"/"rear" o usar modo environment
       const camToUse = savedCamera ? videoDevices.find(d=>d.deviceId===savedCamera) : videoDevices.find(d => /back|environment|rear/i.test(d.label));
       if (camToUse) {
-        currentDevice = videoDevices.indexOf(camToUse);
         return startStream(camToUse.deviceId);
       }
-      currentDevice = 0;
       return startStream({facingMode:{ideal:'environment'}});
     })
     .catch(() =>
@@ -276,6 +273,7 @@ Promise.all(tasks).then(() => {
         const length = +res.headers.get('content-length') || 0;
         let received = 0;
         const chunks = [];
+        // eslint-disable-next-line no-constant-condition
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
@@ -300,6 +298,7 @@ Promise.all(tasks).then(() => {
 
     /* ---------- Mic ---------- */
     let recog;
+    let recogActive = false;
     function speechHandler(e){
       ripple(e,micBtn);
       vibrate(50);
@@ -311,11 +310,13 @@ Promise.all(tasks).then(() => {
         recog.interimResults=true;
         recog.continuous=true;
         recog.onstart=()=>{
+          recogActive = true;
           micBtn.classList.add('active');
           captionContainer.classList.add('show');
           vibrate([100,50,100]);
         };
         recog.onend=()=>{
+          recogActive = false;
           micBtn.classList.remove('active');
           captionContainer.classList.remove('show');
           progress.style.width='0%';
@@ -333,7 +334,12 @@ Promise.all(tasks).then(() => {
         };
       }
       micBtn.classList.remove('starting');
-      micBtn.classList.toggle('active')?recog.start():recog.stop();
+      const shouldStart = micBtn.classList.toggle('active');
+      if(shouldStart){
+        if(!recogActive) recog.start();
+      }else{
+        if(recogActive) recog.stop();
+      }
     }
     function animate(txt){
       captionText.innerHTML='';
@@ -390,7 +396,6 @@ Promise.all(tasks).then(() => {
           btn.onclick=async()=>{
             try{
               await startStream(d.deviceId);
-              currentDevice=i;
               localStorage.setItem('cameraId',d.deviceId);
             }catch(err){
               fallbackCam.textContent=`\ud83d\udcf7 ${err.message}`;
