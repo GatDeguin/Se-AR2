@@ -8,7 +8,7 @@ export function initTour({ tourOverlay, tourTooltip, tourNext, tourClose }){
     {el:'#snapshotBtn',text:'Captura pantalla.'},
     {el:'#switchCamBtn',text:'Cambia cámara.'},
     {el:'#restartBtn',text:'Reinicia.'},
-    {el:'#micBtn',text:'Activa voz.'}
+    {el:'#micBtn',text:'Activa subtitulos automáticos.'}
   ];
   let idx=0;
   let highlightEl=null;
