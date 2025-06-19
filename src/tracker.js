@@ -30,6 +30,9 @@ export function updateTrackerColors() {
 // Update colors whenever the theme changes
 window.addEventListener('themechange', updateTrackerColors);
 
+const FRAME_INTERVAL = 1000 / 15;
+const CAN_USE_WORKER = typeof OffscreenCanvas !== 'undefined' && typeof Worker !== 'undefined' && typeof createImageBitmap !== 'undefined';
+
 export async function initTracker({
   video,
   canvas
@@ -44,52 +47,85 @@ export async function initTracker({
   const ctx = canvasEl.getContext('2d', { willReadFrequently: true });
   ctx.lineWidth = 2;
 
-  const mpCache = window._mpSolutions || (window._mpSolutions = {});
-  const useCDN = window.USE_CDN;
-  const hands = mpCache.hands || (mpCache.hands = new Hands(
-    useCDN ? {} : { locateFile: f => new URL(`../libs/${f}`, import.meta.url).href }
-  ));
-  if (!mpCache.handsInitialized) {
-    hands.setOptions({ maxNumHands: 2, modelComplexity: 1,
-      minDetectionConfidence: 0.7, minTrackingConfidence: 0.7 });
-    await hands.initialize();
-    mpCache.handsInitialized = true;
-  }
-  const faceMesh = mpCache.faceMesh || (mpCache.faceMesh = new FaceMesh(
-    useCDN ? {} : { locateFile: f => new URL(`../libs/${f}`, import.meta.url).href }
-  ));
-  if (!mpCache.faceMeshInitialized) {
-    faceMesh.setOptions({ maxNumFaces: 1, refineLandmarks: true,
-      minDetectionConfidence: 0.7, minTrackingConfidence: 0.7 });
-    await faceMesh.initialize();
-    mpCache.faceMeshInitialized = true;
-  }
+  let worker = null;
+  let lastTime = 0;
+  let processing = false;
+
+  let hands, faceMesh;
   let handLandmarks = [], faceResults = null;
   let faceBox = null, eyeBoxes = [];
-  hands.onResults(r => {
-    handLandmarks = r.multiHandLandmarks || [];
-    trackerState.handLandmarks = handLandmarks;
-  });
-  faceMesh.onResults(r => { faceResults = r; });
 
-    async function onFrame() {
+  if (!CAN_USE_WORKER) {
+    const mpCache = window._mpSolutions || (window._mpSolutions = {});
+    const useCDN = window.USE_CDN;
+    hands = mpCache.hands || (mpCache.hands = new Hands(
+      useCDN ? {} : { locateFile: f => new URL(`../libs/${f}`, import.meta.url).href }
+    ));
+    if (!mpCache.handsInitialized) {
+      hands.setOptions({ maxNumHands: 2, modelComplexity: 1,
+        minDetectionConfidence: 0.7, minTrackingConfidence: 0.7 });
+      await hands.initialize();
+      mpCache.handsInitialized = true;
+    }
+    faceMesh = mpCache.faceMesh || (mpCache.faceMesh = new FaceMesh(
+      useCDN ? {} : { locateFile: f => new URL(`../libs/${f}`, import.meta.url).href }
+    ));
+    if (!mpCache.faceMeshInitialized) {
+      faceMesh.setOptions({ maxNumFaces: 1, refineLandmarks: true,
+        minDetectionConfidence: 0.7, minTrackingConfidence: 0.7 });
+      await faceMesh.initialize();
+      mpCache.faceMeshInitialized = true;
+    }
+    hands.onResults(r => {
+      handLandmarks = r.multiHandLandmarks || [];
+      trackerState.handLandmarks = handLandmarks;
+    });
+    faceMesh.onResults(r => { faceResults = r; });
+  } else {
+    const off = canvasEl.transferControlToOffscreen();
+    worker = new Worker(new URL('./trackerWorker.js', import.meta.url), { type: 'module' });
+    worker.postMessage({ canvas: off }, [off]);
+    worker.onmessage = e => {
+      handLandmarks = e.data.handLandmarks;
+      faceResults = e.data.faceLandmarks ? { multiFaceLandmarks: [e.data.faceLandmarks] } : null;
+      trackerState.handLandmarks = handLandmarks;
+      trackerState.faceLandmarks = e.data.faceLandmarks;
+    };
+  }
+
+    async function onFrame(now) {
+      if (now - lastTime < FRAME_INTERVAL) { requestAnimationFrame(onFrame); return; }
+      lastTime = now;
       if (video.readyState >= 2) {
+        const vw = video.videoWidth, vh = video.videoHeight;
+        const cw = canvasEl.width = video.clientWidth || window.innerWidth;
+        const ch = canvasEl.height = video.clientHeight || window.innerHeight;
+
+        if (CAN_USE_WORKER) {
+          if (!processing) {
+            processing = true;
+            createImageBitmap(video).then(bitmap => {
+              worker.postMessage({ frame: bitmap, width: vw, height: vh, accent: currentColors.accent, icon: currentColors.icon }, [bitmap]);
+              processing = false;
+            });
+          }
+          requestAnimationFrame(onFrame);
+          return;
+        }
+
         const { accent, icon } = currentColors;
         await Promise.all([
           hands.send({ image: video }),
           faceMesh.send({ image: video })
         ]);
 
-      const vw = video.videoWidth, vh = video.videoHeight;
-      const cw = canvasEl.width = video.clientWidth || window.innerWidth;
-      const ch = canvasEl.height = video.clientHeight || window.innerHeight;
-      const scale = Math.max(cw / vw, ch / vh);
-      const dw = vw * scale, dh = vh * scale;
-      const dx = (cw - dw) / 2, dy = (ch - dh) / 2;
+        const scale = Math.max(cw / vw, ch / vh);
+        const dw = vw * scale, dh = vh * scale;
+        const dx = (cw - dw) / 2, dy = (ch - dh) / 2;
 
-      ctx.save();
-      ctx.clearRect(0, 0, cw, ch);
-      // Overlay only, video element remains visible underneath
+        ctx.save();
+        ctx.clearRect(0, 0, cw, ch);
+        // Overlay only, video element remains visible underneath
 
       handLandmarks.forEach(landmarks => {
         ctx.strokeStyle = accent;
@@ -150,10 +186,10 @@ export async function initTracker({
         trackerState.eyeBoxes = eyeBoxes;
       }
 
-      ctx.restore();
+        ctx.restore();
+      }
+      requestAnimationFrame(onFrame);
     }
-    requestAnimationFrame(onFrame);
-  }
   video.addEventListener('playing', onFrame);
   if (!video.paused && video.readyState >= 2) requestAnimationFrame(onFrame);
   return trackerState;
