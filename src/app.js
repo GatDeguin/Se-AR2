@@ -57,7 +57,7 @@ let hapticsEnabled = true;
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'light') {
       document.body.classList.add('light');
-      themeValue.textContent = 'Light';
+      themeValue.textContent = 'Claro';
     }
 
     const savedContrast = localStorage.getItem('contrast');
@@ -242,7 +242,7 @@ Promise.all(tasks).then(() => {
     themeToggle.onclick=e=>{
       ripple(e,themeToggle);
       const isLight = document.body.classList.toggle('light');
-      themeValue.textContent = isLight ? 'Light' : 'Dark';
+      themeValue.textContent = isLight ? 'Claro' : 'Oscuro';
       localStorage.setItem('theme', isLight ? 'light' : 'dark');
     };
 
@@ -300,7 +300,7 @@ Promise.all(tasks).then(() => {
 
     if (resetPrefsBtn) resetPrefsBtn.onclick = e => {
       ripple(e, resetPrefsBtn);
-      if (confirm('Reset all preferences?')) {
+      if (confirm('¿Restablecer todas las preferencias?')) {
         localStorage.clear();
         location.reload();
       }
@@ -329,15 +329,15 @@ Promise.all(tasks).then(() => {
         const response = new Response(blob);
         const cache = await caches.open('offline-models');
         await cache.put(url, response);
-        downloadSttBtn.textContent = 'Downloaded ✓';
+        downloadSttBtn.textContent = 'Descargado ✓';
       } catch (err) {
-        downloadSttBtn.textContent = 'Failed';
+        downloadSttBtn.textContent = 'Error';
       }
     };
 
     if (lsaSettingsBtn) lsaSettingsBtn.onclick = e => {
       ripple(e, lsaSettingsBtn);
-      alert('Coming soon');
+      alert('Próximamente');
     };
 
     /* ---------- Mic ---------- */
