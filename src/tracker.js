@@ -13,6 +13,23 @@ export const trackerState = {
 export const LEFT_EYE_IDX = [33, 133, 159, 145];
 export const RIGHT_EYE_IDX = [362, 263, 386, 374];
 
+// Retrieve theme colors once and update when a theme change is detected
+function getAppColors() {
+  const styles = getComputedStyle(document.documentElement);
+  const accent = styles.getPropertyValue('--accent').trim() || '#2EB8A3';
+  const icon = styles.getPropertyValue('--icon-color').trim() || '#FFFFFF';
+  return { accent, icon };
+}
+
+let currentColors = getAppColors();
+
+export function updateTrackerColors() {
+  currentColors = getAppColors();
+}
+
+// Update colors whenever the theme changes
+window.addEventListener('themechange', updateTrackerColors);
+
 export async function initTracker({
   video,
   canvas
@@ -55,16 +72,9 @@ export async function initTracker({
   });
   faceMesh.onResults(r => { faceResults = r; });
 
-  function getAppColors() {
-    const styles = getComputedStyle(document.documentElement);
-    const accent = styles.getPropertyValue('--accent').trim() || '#2EB8A3';
-    const icon = styles.getPropertyValue('--icon-color').trim() || '#FFFFFF';
-    return { accent, icon };
-  }
-
     async function onFrame() {
       if (video.readyState >= 2) {
-        const { accent, icon } = getAppColors();
+        const { accent, icon } = currentColors;
         await Promise.all([
           hands.send({ image: video }),
           faceMesh.send({ image: video })
