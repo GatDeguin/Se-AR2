@@ -635,11 +635,6 @@ const transcriberP = pipeline('automatic-speech-recognition', 'Xenova/whisper-ti
     const { initTracker } = await import('./tracker.js');
     initTracker({
       video,
-      canvas: document.getElementById('trackerCanvas'),
-      captionContainer,
-      captionText,
-      accent,
-      accentRGB,
-      drawMarker
+      canvas: document.getElementById('trackerCanvas')
     });
 })();
