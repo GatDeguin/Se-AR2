@@ -8,6 +8,11 @@
   <link rel="icon" href="favicon.ico">
 
   <!-- MediaPipe libraries for Tracker Combinado -->
+  <script>
+    window.Module = window.Module || {};
+    if (!('arguments_' in Module)) Module.arguments_ = [];
+    if (!('arguments' in Module)) Module.arguments = Module.arguments_;
+  </script>
   <script src="libs/hands.js"></script>
   <script src="libs/face_mesh.js"></script>
   <script src="libs/drawing_utils.js"></script>
