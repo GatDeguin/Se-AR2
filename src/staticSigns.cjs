@@ -1,4 +1,4 @@
-export function detectStaticSign(lm) {
+function detectStaticSign(lm) {
   if (!lm || lm.length < 21) return null;
   const ext = i => lm[i].y < lm[i - 2].y;
   const thumbExt = lm[4].x < lm[3].x;
@@ -15,4 +15,4 @@ export function detectStaticSign(lm) {
   return null;
 }
 
-
+module.exports = { detectStaticSign };
