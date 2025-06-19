@@ -608,7 +608,7 @@ const transcriberP = pipeline('automatic-speech-recognition', 'Xenova/whisper-ti
     micBtn.addEventListener('click', recordHandler);
 
     const { initTracker } = await import('./tracker.js');
-    initTracker({
+    await initTracker({
       video,
       canvas: document.getElementById('trackerCanvas')
     });

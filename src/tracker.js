@@ -13,7 +13,7 @@ export const trackerState = {
 export const LEFT_EYE_IDX = [33, 133, 159, 145];
 export const RIGHT_EYE_IDX = [362, 263, 386, 374];
 
-export function initTracker({
+export async function initTracker({
   video,
   canvas
 }) {
@@ -35,6 +35,7 @@ export function initTracker({
   if (!mpCache.handsInitialized) {
     hands.setOptions({ maxNumHands: 2, modelComplexity: 1,
       minDetectionConfidence: 0.7, minTrackingConfidence: 0.7 });
+    await hands.initialize();
     mpCache.handsInitialized = true;
   }
   const faceMesh = mpCache.faceMesh || (mpCache.faceMesh = new FaceMesh(
@@ -43,6 +44,7 @@ export function initTracker({
   if (!mpCache.faceMeshInitialized) {
     faceMesh.setOptions({ maxNumFaces: 1, refineLandmarks: true,
       minDetectionConfidence: 0.7, minTrackingConfidence: 0.7 });
+    await faceMesh.initialize();
     mpCache.faceMeshInitialized = true;
   }
   let handLandmarks = [], faceResults = null;
