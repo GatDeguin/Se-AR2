@@ -524,7 +524,7 @@ async function ensureLibs() {
     }
     return import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.5.2/dist/transformers.min.js');
   }
-  return import('./libs/transformers.min.js');
+  return import('../libs/transformers.min.js');
 }
 
 (async ()=>{
