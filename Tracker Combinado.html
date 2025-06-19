@@ -1,93 +1,177 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tracker Combinado</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* Estilos para el contenedor de subtítulos */
+    .caption-container {
+      position: absolute;
+      bottom: 20px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 10;
+    }
+    #captionText {
+      background: rgba(var(--accent-rgb), 0.8);
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 1rem;
+      max-width: 80%;
+      text-align: center;
+      word-wrap: break-word;
+    }
+  </style>
   <script>
+    // Configuración de carga de módulos y CDN fallback
     window.Module = window.Module || {};
     if (!('arguments_' in Module)) Module.arguments_ = [];
     if (!('arguments' in Module)) Module.arguments = Module.arguments_;
     window.USE_CDN = false;
   </script>
-  <script src="libs/hands.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js';window.USE_CDN=true;"></script>
-  <script src="libs/face_mesh.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js';window.USE_CDN=true;"></script>
-  <script src="libs/drawing_utils.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js';window.USE_CDN=true;"></script>
-  <script src="libs/pose.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js';window.USE_CDN=true;"></script>
+  <script src="libs/hands.js"
+          onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js';window.USE_CDN=true;">
+  </script>
+  <script src="libs/face_mesh.js"
+          onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js';window.USE_CDN=true;">
+  </script>
+  <script src="libs/drawing_utils.js"
+          onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js';window.USE_CDN=true;">
+  </script>
+  <script src="libs/pose.js"
+          onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js';window.USE_CDN=true;">
+  </script>
 </head>
 <body>
-  <video id="video" autoplay muted playsinline></video>
-  <canvas id="trackerCanvas"></canvas>
-  <script>
-    const style = getComputedStyle(document.documentElement);
-    const accent = style.getPropertyValue('--accent').trim() || '#2EB8A3';
+  <video id="video" autoplay muted playsinline style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;"></video>
+  <canvas id="trackerCanvas" style="position:absolute;top:0;left:0;"></canvas>
+  <div id="captionContainer" class="caption-container">
+    <div id="captionText"></div>
+  </div>
 
-    const video = document.getElementById('video');
-    const canvas = document.getElementById('trackerCanvas');
-    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+  <script>
+    /**
+     * Inicializa y ejecuta el tracker combinado de manos, rostro y pose.
+     * @param {Object} opts
+     * @param {HTMLVideoElement} opts.video
+     * @param {HTMLCanvasElement} opts.canvas
+     * @param {HTMLElement} opts.captionContainer
+     * @param {HTMLElement} opts.captionText
+     * @param {string} opts.accent
+     * @param {string} opts.accentRGB
+     */
+    function initTracker({ video, canvas, captionContainer, captionText, accent, accentRGB }) {
+      const ctx = canvas.getContext('2d', { willReadFrequently: true });
+      let handLandmarks = [];
+      let faceLandmarks = null;
+      let poseLandmarks = null;
+
+      // Configurar Mediapipe Hands
+      const hands = new Hands({ locateFile: f => window.USE_CDN ? f : `libs/${f}` });
+      hands.setOptions({ maxNumHands: 2, modelComplexity: 1, minDetectionConfidence: 0.7, minTrackingConfidence: 0.7 });
+      hands.onResults(results => { handLandmarks = results.multiHandLandmarks || []; });
+
+      // Configurar Mediapipe FaceMesh
+      const faceMesh = new FaceMesh({ locateFile: f => window.USE_CDN ? f : `libs/${f}` });
+      faceMesh.setOptions({ maxNumFaces: 1, refineLandmarks: true, minDetectionConfidence: 0.7, minTrackingConfidence: 0.7 });
+      faceMesh.onResults(results => { faceLandmarks = results.multiFaceLandmarks?.[0] || null; });
+
+      // Configurar Mediapipe Pose
+      const pose = new Pose({ locateFile: f => window.USE_CDN ? f : `libs/${f}` });
+      pose.setOptions({ modelComplexity: 1, enableSegmentation: false, minDetectionConfidence: 0.7, minTrackingConfidence: 0.7 });
+      pose.onResults(results => { poseLandmarks = results.poseLandmarks || null; });
+
+      // Bucle de procesado por fotograma
+      async function onFrame() {
+        if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+          await Promise.all([
+            hands.send({ image: video }),
+            faceMesh.send({ image: video }),
+            pose.send({ image: video })
+          ]);
+
+          const vw = video.videoWidth;
+          const vh = video.videoHeight;
+          if (canvas.width !== vw || canvas.height !== vh) {
+            canvas.width = vw;
+            canvas.height = vh;
+          }
+          ctx.clearRect(0, 0, vw, vh);
+
+          // Dibujar manos
+          handLandmarks.forEach(lm => {
+            ctx.strokeStyle = accent;
+            ctx.lineWidth = 2;
+            HAND_CONNECTIONS.forEach(([i, j]) => {
+              const p1 = lm[i], p2 = lm[j];
+              ctx.beginPath();
+              ctx.moveTo(p1.x * vw, p1.y * vh);
+              ctx.lineTo(p2.x * vw, p2.y * vh);
+              ctx.stroke();
+            });
+            ctx.fillStyle = accent;
+            lm.forEach(p => {
+              ctx.beginPath();
+              ctx.arc(p.x * vw, p.y * vh, 4, 0, Math.PI * 2);
+              ctx.fill();
+            });
+          });
+
+          // Dibujar ojos y labios del rostro
+          if (faceLandmarks) {
+            drawConnectors(ctx, faceLandmarks, FACEMESH_LEFT_EYE, { color: accent, lineWidth: 2 });
+            drawConnectors(ctx, faceLandmarks, FACEMESH_RIGHT_EYE, { color: accent, lineWidth: 2 });
+            drawConnectors(ctx, faceLandmarks, FACEMESH_LIPS, { color: accent, lineWidth: 2 });
+          }
+
+          // Dibujar pose
+          if (poseLandmarks) {
+            drawConnectors(ctx, poseLandmarks, POSE_CONNECTIONS, { color: accent, lineWidth: 2 });
+            ctx.fillStyle = accent;
+            poseLandmarks.forEach(p => {
+              ctx.beginPath();
+              ctx.arc(p.x * vw, p.y * vh, 3, 0, Math.PI * 2);
+              ctx.fill();
+            });
+          }
+
+          // Actualizar subtítulos (placeholder)
+          const anyTracking = handLandmarks.length || faceLandmarks || poseLandmarks;
+          captionText.innerText = anyTracking ? 'Tracking activo' : '';
+          captionContainer.style.display = anyTracking ? 'flex' : 'none';
+        }
+        requestAnimationFrame(onFrame);
+      }
+
+      video.addEventListener('playing', onFrame);
+    }
+
+    // Solicitar cámara y arrancar
+    const videoEl = document.getElementById('video');
+    const canvasEl = document.getElementById('trackerCanvas');
+    const capContainer = document.getElementById('captionContainer');
+    const capText = document.getElementById('captionText');
+    const style = getComputedStyle(document.documentElement);
+    const accentColor = style.getPropertyValue('--accent').trim() || '#2EB8A3';
+    const accentRGB = style.getPropertyValue('--accent-rgb').trim() || '46,184,163';
 
     navigator.mediaDevices.getUserMedia({ video: true })
-      .then(s => video.srcObject = s)
+      .then(stream => { videoEl.srcObject = stream; })
       .catch(err => alert('No se pudo acceder a la cámara: ' + err));
 
-    const hands = new Hands(window.USE_CDN ? {} : { locateFile: f => `libs/${f}` });
-    hands.setOptions({ maxNumHands: 2, modelComplexity: 1, minDetectionConfidence: 0.7, minTrackingConfidence: 0.7 });
-    let handLandmarks = [];
-    hands.onResults(r => { handLandmarks = r.multiHandLandmarks || []; });
-
-    const faceMesh = new FaceMesh(window.USE_CDN ? {} : { locateFile: f => `libs/${f}` });
-    faceMesh.setOptions({ maxNumFaces: 1, refineLandmarks: true, minDetectionConfidence: 0.7, minTrackingConfidence: 0.7 });
-    let faceLandmarks = null;
-    faceMesh.onResults(r => { faceLandmarks = r.multiFaceLandmarks && r.multiFaceLandmarks[0] || null; });
-
-    const pose = new Pose(window.USE_CDN ? {} : { locateFile: f => `libs/${f}` });
-    pose.setOptions({ modelComplexity: 1, enableSegmentation: false, minDetectionConfidence: 0.7, minTrackingConfidence: 0.7 });
-    let poseLandmarks = null;
-    pose.onResults(r => { poseLandmarks = r.poseLandmarks || null; });
-
-    async function onFrame() {
-      if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
-        await Promise.all([
-          hands.send({ image: video }),
-          faceMesh.send({ image: video }),
-          pose.send({ image: video })
-        ]);
-        const vw = video.videoWidth, vh = video.videoHeight;
-        if (canvas.width !== vw || canvas.height !== vh) { canvas.width = vw; canvas.height = vh; }
-        ctx.clearRect(0, 0, vw, vh);
-
-        handLandmarks.forEach(lm => {
-          ctx.strokeStyle = accent;
-          ctx.lineWidth = 2;
-          HAND_CONNECTIONS.forEach(([i,j]) => {
-            const p1 = lm[i], p2 = lm[j];
-            ctx.beginPath();
-            ctx.moveTo(p1.x * vw, p1.y * vh);
-            ctx.lineTo(p2.x * vw, p2.y * vh);
-            ctx.stroke();
-          });
-          ctx.fillStyle = accent;
-          lm.forEach(p => { ctx.beginPath(); ctx.arc(p.x * vw, p.y * vh, 4, 0, Math.PI*2); ctx.fill(); });
-        });
-
-        if (faceLandmarks) {
-          ctx.strokeStyle = accent;
-          ctx.lineWidth = 2;
-          drawConnectors(ctx, faceLandmarks, FACEMESH_LEFT_EYE, { color: accent, lineWidth: 2 });
-          drawConnectors(ctx, faceLandmarks, FACEMESH_RIGHT_EYE, { color: accent, lineWidth: 2 });
-          drawConnectors(ctx, faceLandmarks, FACEMESH_LIPS, { color: accent, lineWidth: 2 });
-        }
-
-        if (poseLandmarks) {
-          drawConnectors(ctx, poseLandmarks, POSE_CONNECTIONS, { color: accent, lineWidth: 2 });
-          ctx.fillStyle = accent;
-          poseLandmarks.forEach(p => { ctx.beginPath(); ctx.arc(p.x * vw, p.y * vh, 3, 0, Math.PI*2); ctx.fill(); });
-        }
-      }
-      requestAnimationFrame(onFrame);
-    }
-    video.addEventListener('playing', onFrame);
+    initTracker({
+      video: videoEl,
+      canvas: canvasEl,
+      captionContainer: capContainer,
+      captionText: capText,
+      accent: accentColor,
+      accentRGB: accentRGB
+    });
   </script>
 </body>
 </html>
