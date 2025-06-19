@@ -443,9 +443,62 @@ body.light {
         height: 60px;
       }
 
-      .fps-badge {
+  .fps-badge {
         bottom: 16%;
         right: 2%;
         font-size: 12px;
+      }
+    }
+
+    /* Orientation overrides */
+    @media (orientation: landscape) {
+      #video, canvas#trackerCanvas {
+        width: 100vw;
+        height: 100vh;
+        object-fit: cover;
+      }
+      .controls-left {
+        top: 50%;
+        left: 2%;
+        transform: translateY(-50%);
+        flex-direction: column;
+      }
+      .controls-bottom {
+        top: 50%;
+        right: 2%;
+        left: auto;
+        transform: translateY(-50%);
+      }
+      .caption-container {
+        bottom: 5%;
+        left: 50%;
+        transform: translateX(-50%);
+        max-width: 60%;
+      }
+    }
+
+    @media (orientation: portrait) {
+      #video, canvas#trackerCanvas {
+        width: 100vw;
+        height: 100vh;
+        object-fit: cover;
+      }
+      .controls-left {
+        top: 2%;
+        left: 50%;
+        transform: translateX(-50%);
+        flex-direction: row;
+      }
+      .controls-bottom {
+        bottom: 6%;
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+      }
+      .caption-container {
+        bottom: 20%;
+        left: 50%;
+        transform: translateX(-50%);
+        max-width: 95%;
       }
     }
