@@ -175,7 +175,15 @@ Promise.all(tasks).then(() => {
 
 
     /* ---------- Guided tour ---------- */
-    const steps=[{el:'#settingsBtn',text:'Accede a configuraciones.'},{el:'#themeToggle',text:'Cambia tema.'},{el:'#pauseBtn',text:'Pausa/reanuda.'},{el:'#snapshotBtn',text:'Captura pantalla.'},{el:'#restartBtn',text:'Reinicia.'},{el:'#micBtn',text:'Activa voz.'}];
+    const steps=[
+      {el:'#settingsBtn',text:'Accede a configuraciones.'},
+      {el:'#themeToggle',text:'Cambia tema.'},
+      {el:'#pauseBtn',text:'Pausa/reanuda.'},
+      {el:'#snapshotBtn',text:'Captura pantalla.'},
+      {el:'#switchCamBtn',text:'Cambia cámara.'},
+      {el:'#restartBtn',text:'Reinicia.'},
+      {el:'#micBtn',text:'Activa voz.'}
+    ];
     let idx=0;
     function startTour(){tourOverlay.classList.add('active');show(idx);}
     function show(i){const t=steps[i],e=document.querySelector(t.el),r=e.getBoundingClientRect();tourTooltip.textContent=t.text;tourTooltip.style.top=`${r.bottom+10}px`;tourTooltip.style.left=`${r.left}px`;}    
