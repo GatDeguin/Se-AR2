@@ -1,5 +1,7 @@
 const fs = require('fs');
 const path = require('path');
+jest.mock('../src/splash.js', () => ({ __esModule: true, updateProgress: jest.fn() }));
+const { updateProgress } = require('../src/splash.js');
 
 beforeAll(() => {
   const html = fs.readFileSync(path.resolve(__dirname, '../index.html'), 'utf8');
@@ -171,5 +173,15 @@ describe('index.html', () => {
     const saved = localStorage.getItem('haptics');
     if (saved === 'false') newToggle.checked = false;
     expect(newToggle.checked).toBe(false);
+  });
+
+  test('splash progress updates after init tasks', async () => {
+    updateProgress.mockClear();
+    const tasks = [Promise.resolve(), Promise.resolve(), Promise.resolve()];
+    const total = tasks.length;
+    let done = 0;
+    tasks.forEach(p => p.then(() => updateProgress(++done / total)));
+    await Promise.all(tasks);
+    expect(updateProgress).toHaveBeenLastCalledWith(1);
   });
 });

@@ -1,3 +1,4 @@
+export let updateProgress = () => {};
 export function initSplash(canvas) {
   const ctx = canvas.getContext('2d');
   const dpr = window.devicePixelRatio || 1;
@@ -23,16 +24,26 @@ export function initSplash(canvas) {
   const LOADER_WIDTH = 240;
   const LOADER_HEIGHT = 6;
   const FADE_OUT_MS = 1000;
-  const TOTAL_DURATION = 4500;
 
   let glowAlpha = 0, glowUp = true;
   let splashOpacity = 0, entrySoundPlayed = false;
   let fadeOutStart = null;
   let showError = false;
+  let loaderProgress = 0;
+  let statusText = '';
   const startTime = performance.now();
 
   const enterSound = document.getElementById('enter-sound');
   const doneSound = document.getElementById('done-sound');
+
+  updateProgress = function(pct, text = '') {
+    loaderProgress = Math.max(0, Math.min(1, pct));
+    if (text) statusText = text;
+    if (loaderProgress >= 1 && !fadeOutStart) {
+      fadeOutStart = performance.now();
+      doneSound.play().catch(() => {});
+    }
+  };
 
   function drawRoundedRect(x, y, w, h, r) {
     ctx.beginPath();
@@ -118,7 +129,6 @@ export function initSplash(canvas) {
 
   function animate(ts) {
     const elapsed = ts - startTime;
-    const loaderProgress = Math.min(elapsed / (TOTAL_DURATION - FADE_OUT_MS), 1);
     const centerX = WIDTH() / 2;
     const centerY = HEIGHT() / 2 - 40;
 
@@ -127,10 +137,7 @@ export function initSplash(canvas) {
       entrySoundPlayed = true;
     }
 
-    if (elapsed >= TOTAL_DURATION && !fadeOutStart) {
-      fadeOutStart = ts;
-      doneSound.play().catch(() => {});
-    }
+
 
     if (glowUp) {
       glowAlpha += 0.01;
@@ -163,8 +170,7 @@ export function initSplash(canvas) {
     drawLogo(centerX, centerY, LOGO_SIZE, glowAlpha, scale, splashOpacity);
     drawLoader(centerX, centerY + LOGO_SIZE / 2 + 32, LOADER_WIDTH, LOADER_HEIGHT, loaderProgress, splashOpacity);
 
-    const status = loaderProgress < 0.33 ? 'Cargando reconocimiento...' : loaderProgress < 0.66 ? 'Inicializando cámara...' : 'Listo';
-    drawStatusText(centerX, centerY + LOGO_SIZE / 2 + 56, status, splashOpacity);
+    drawStatusText(centerX, centerY + LOGO_SIZE / 2 + 56, statusText, splashOpacity);
 
     ctx.restore();
     requestAnimationFrame(animate);
@@ -196,6 +202,7 @@ export function initSplash(canvas) {
       return this;
     };
   }
+
 
   requestAnimationFrame(animate);
 }

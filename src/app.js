@@ -1,4 +1,5 @@
 import { detectStaticSign } from './staticSigns.js';
+import { updateProgress } from './splash.js';
 
     // References
     const tourOverlay = document.getElementById('tourOverlay');
@@ -120,14 +121,19 @@ let hapticsEnabled = true;
     }
     /* ---------- Splash preload ---------- */
     const tasks=[];
-    function upd(){}
+    const totalTasks = 3;
+    let completedTasks = 0;
+    function upd(text){
+      completedTasks++;
+      updateProgress(completedTasks/totalTasks, text);
+    }
     let tasksFinished = false;
     let splashFinished = false;
     function maybeStartTour(){
       if(tasksFinished && splashFinished && !localStorage.getItem("tourSeen")) startTour();
     }
     window.addEventListener("splashDone",()=>{ splashFinished = true; maybeStartTour(); });
-    tasks.push(new Promise(r=>{ if(SR) new SR(); r(); }).then(upd));
+    tasks.push(new Promise(r=>{ if(SR) new SR(); r(); }).then(() => upd('Reconocimiento')));
 tasks.push(
   navigator.mediaDevices.enumerateDevices()
     .then(devices => {
@@ -165,11 +171,12 @@ tasks.push(
       startStream({facingMode:{ideal:'environment'}})
         .catch(() => fallbackCam.classList.add('show'))
     )
-    .finally(upd)
+    .finally(() => upd('Dispositivos'))
 );
 
 Promise.all(tasks).then(() => {
   tasksFinished = true;
+  updateProgress(1, 'Listo');
   maybeStartTour();
 });
 
@@ -196,7 +203,7 @@ Promise.all(tasks).then(() => {
     function ripple(e,el){const r=el.getBoundingClientRect(),s=Math.max(r.width,r.height);let x=e&&e.clientX,y=e&&e.clientY;if(!x&&!y){x=r.left+r.width/2;y=r.top+r.height/2;}x-=r.left+s/2;y-=r.top+s/2;const sp=document.createElement('span');sp.className='ripple';sp.style.width=sp.style.height=s+'px';sp.style.left=x+'px';sp.style.top=y+'px';el.appendChild(sp);sp.onanimationend=()=>sp.remove();}
 
     function vibrate(pattern){
-      if(hapticsEnabled) navigator.vibrate?.(pattern);
+      if(hapticsEnabled && navigator.vibrate) navigator.vibrate(pattern);
     }
 
     /* ---------- Settings nav ---------- */
@@ -549,8 +556,11 @@ async function ensureLibs() {
   return import(new URL('../libs/transformers.min.js', import.meta.url));
 }
 
+const libsPromise = ensureLibs();
+tasks.push(libsPromise.then(() => upd('Librer\xEDas')));
+
 (async ()=>{
-const { pipeline } = await ensureLibs();
+const { pipeline } = await libsPromise;
 const device = navigator.gpu ? 'webgpu' : 'wasm';
 const transcriberP = pipeline('automatic-speech-recognition', 'Xenova/whisper-tiny', { quantized: true, device });
 // Reuse existing element references defined at the top of the file
@@ -609,7 +619,7 @@ const transcriberP = pipeline('automatic-speech-recognition', 'Xenova/whisper-ti
     pose.setOptions({modelComplexity:1,enableSegmentation:false,minDetectionConfidence:0.7,minTrackingConfidence:0.7});
     let handLandmarks=[],faceLandmarks=null,poseLandmarks=null;
     hands.onResults(r=>handLandmarks=r.multiHandLandmarks||[]);
-    faceMesh.onResults(r=>faceLandmarks=r.multiFaceLandmarks?.[0]||null);
+    faceMesh.onResults(r=>faceLandmarks=r.multiFaceLandmarks && r.multiFaceLandmarks[0] || null);
     pose.onResults(r=>poseLandmarks=r.poseLandmarks||null);
     async function onFrame(){
       if(video.readyState>=2){
