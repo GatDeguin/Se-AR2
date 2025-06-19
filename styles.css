@@ -82,21 +82,27 @@ body.light {
       backdrop-filter: blur(8px);
       z-index: 1001;
     }
-    #tourNext, #tourClose {
+    .tour-buttons {
       position: absolute;
       bottom: calc(var(--spacing)*2);
+      right: calc(var(--spacing)*2);
+      display: flex;
+      gap: calc(var(--spacing)*2);
+      z-index: 1001;
+    }
+    .tour-buttons button {
       padding: var(--spacing);
-      border: none; border-radius: var(--radius);
+      border: none;
+      border-radius: var(--radius);
       cursor: pointer;
       color: var(--text-light);
       font-size: var(--font-base);
-      z-index: 1001;
       transition: transform 0.2s var(--transition);
     }
-    #tourNext { right: calc(var(--spacing)*2); background: var(--accent); }
-    #tourClose { right: calc(var(--spacing)*8); background: var(--error); }
-    #tourNext:hover, #tourClose:hover { transform: scale(1.1); }
-    #tourNext:active, #tourClose:active { transform: scale(0.9); }
+    #tourNext { background: var(--accent); }
+    #tourClose { background: var(--error); }
+    .tour-buttons button:hover { transform: scale(1.1); }
+    .tour-buttons button:active { transform: scale(0.9); }
     /* Controls Left */
     .controls-left {
       position: absolute; top: 5%; left: 2%;
