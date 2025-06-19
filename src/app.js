@@ -338,7 +338,7 @@ Promise.all(tasks).then(() => {
           recogActive = false;
           micBtn.classList.remove('active');
           captionContainer.classList.remove('show');
-          progress.style.width='0%';
+          setProgress(0);
           vibrate(50);
         };
         recog.onresult=e=>{
@@ -349,7 +349,7 @@ Promise.all(tasks).then(() => {
           }
           if(fin)animate(fin.trim());
           else captionText.textContent=int||captionText.textContent;
-          progress.style.width=Math.min(100,captionText.textContent.length*1.2)+'%';
+          setProgress(Math.min(100,captionText.textContent.length*1.2));
         };
       }
       micBtn.classList.remove('starting');
@@ -559,31 +559,54 @@ async function ensureLibs() {
 const libsPromise = ensureLibs();
 tasks.push(libsPromise.then(() => upd('Librer\xEDas')));
 
+let progressFrame = null;
+function setProgress(value) {
+  if (progressFrame) cancelAnimationFrame(progressFrame);
+  progressFrame = requestAnimationFrame(() => {
+    progress.style.width = value + '%';
+  });
+}
+
 (async ()=>{
 const { pipeline } = await libsPromise;
 const device = navigator.gpu ? 'webgpu' : 'wasm';
 const transcriberP = pipeline('automatic-speech-recognition', 'Xenova/whisper-tiny', { quantized: true, device });
 // Reuse existing element references defined at the top of the file
     let recorder,chunks=[],blob;
-    const ac=new AudioContext();
-    let off;
+    const worker = window.Worker ? new Worker(new URL('./transcribeWorker.js', import.meta.url), { type: 'module' }) : null;
     async function blobToPCM(b,r=16000){
-      const buf=await b.arrayBuffer();
-      const dec=await ac.decodeAudioData(buf);
-      if(dec.sampleRate===r)return dec.getChannelData(0);
-      const frames=Math.ceil(dec.duration*r);
-      off=new OfflineAudioContext(1,frames,r);
-      const src=off.createBufferSource();src.buffer=dec;
-      src.connect(off.destination);src.start();
-      const res=await off.startRendering();
-      return res.getChannelData(0);
+      const ac=new AudioContext();
+      let off;
+      try{
+        const buf=await b.arrayBuffer();
+        const dec=await ac.decodeAudioData(buf);
+        if(dec.sampleRate===r){
+          return dec.getChannelData(0).slice();
+        }
+        const frames=Math.ceil(dec.duration*r);
+        off=new OfflineAudioContext(1,frames,r);
+        const src=off.createBufferSource();src.buffer=dec;
+        src.connect(off.destination);src.start();
+        const res=await off.startRendering();
+        off.close&&off.close();
+        return res.getChannelData(0).slice();
+      }finally{
+        ac.close();
+      }
     }
-    async function transcribe(){
-      captionText.textContent='Transcribiendo…';progress.style.width='35%';
-      const pcm=await blobToPCM(blob);
+    async function transcribe(pcm){
+      captionText.textContent='Transcribiendo…';setProgress(35);
+      if(worker){
+        const p=new Promise(r=>{worker.onmessage=e=>r(e.data);});
+        worker.postMessage(pcm.buffer,[pcm.buffer]);
+        const text=await p;
+        captionText.textContent=text;setProgress(100);
+        setTimeout(()=>setProgress(0),1000);
+        return;
+      }
       const { text }=await (await transcriberP)(pcm,{chunk_length_s:30,language:'spanish'});
-      captionText.textContent=text.trim();progress.style.width='100%';
-      setTimeout(()=>progress.style.width='0%',1000);
+      captionText.textContent=text.trim();setProgress(100);
+      setTimeout(()=>setProgress(0),1000);
     }
     function recordHandler(){
       (async()=>{
@@ -595,10 +618,10 @@ const transcriberP = pipeline('automatic-speech-recognition', 'Xenova/whisper-ti
             recorder=new MediaRecorder(stream,{mimeType:'audio/webm'});
             chunks=[];
             recorder.ondataavailable=ev=>chunks.push(ev.data);
-            recorder.onstop=async()=>{blob=new Blob(chunks,{type:'audio/webm'});await transcribe();micBtn.classList.remove('active');};
+            recorder.onstop=async()=>{blob=new Blob(chunks,{type:'audio/webm'});const pcm=await blobToPCM(blob);await transcribe(pcm);micBtn.classList.remove('active');};
             recorder.start();micBtn.classList.add('active');
             captionContainer.classList.add('show');
-            captionText.textContent='Grabando…';progress.style.width='15%';
+            captionText.textContent='Grabando…';setProgress(15);
           }else{recorder.stop();}
         }catch(err){
           fallbackSpeech.textContent = `\ud83c\udf99\ufe0f ${err.message}. Verifique los permisos de micrófono.`;
