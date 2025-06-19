@@ -375,7 +375,20 @@ Promise.all(tasks).then(() => {
       ripple(e,b);
       vibrate(20);
     }));
+
+    function updatePauseButton(){
+      if(video.paused){
+        pauseBtn.innerHTML='<svg viewBox="0 0 24 24"><polygon points="6,4 19,12 6,20"/></svg>';
+        pauseBtn.setAttribute('aria-label','Reanudar reproducción');
+      }else{
+        pauseBtn.innerHTML='<svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>';
+        pauseBtn.setAttribute('aria-label','Pausar reproducción');
+      }
+    }
     pauseBtn.addEventListener('click',()=>video.paused?video.play():video.pause());
+    video.addEventListener('play',updatePauseButton);
+    video.addEventListener('pause',updatePauseButton);
+    updatePauseButton();
     snapshotBtn.addEventListener('click',()=>{
       const w=video.videoWidth,h=video.videoHeight;
       if(!w)return;
