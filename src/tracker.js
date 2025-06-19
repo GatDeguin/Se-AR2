@@ -2,6 +2,13 @@
 // landmarks and basic face bounding boxes on a full screen canvas. Pose and
 // static sign detection from the previous implementation were removed.
 
+export const trackerState = {
+  handLandmarks: [],
+  faceLandmarks: null,
+  faceBox: null,
+  eyeBoxes: []
+};
+
 export function initTracker({
   video,
   canvas
@@ -35,7 +42,11 @@ export function initTracker({
     mpCache.faceMeshInitialized = true;
   }
   let handLandmarks = [], faceResults = null;
-  hands.onResults(r => { handLandmarks = r.multiHandLandmarks || []; });
+  let faceBox = null, eyeBoxes = [];
+  hands.onResults(r => {
+    handLandmarks = r.multiHandLandmarks || [];
+    trackerState.handLandmarks = handLandmarks;
+  });
   faceMesh.onResults(r => { faceResults = r; });
 
   const fingerColors = {
@@ -89,6 +100,7 @@ export function initTracker({
 
       if (faceResults && faceResults.multiFaceLandmarks.length) {
         const lm = faceResults.multiFaceLandmarks[0];
+        trackerState.faceLandmarks = lm;
         let minX = 1, minY = 1, maxX = 0, maxY = 0;
         lm.forEach(p => {
           minX = Math.min(minX, p.x);
@@ -96,18 +108,17 @@ export function initTracker({
           maxX = Math.max(maxX, p.x);
           maxY = Math.max(maxY, p.y);
         });
-        ctx.strokeStyle = '#00FF00';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(
-          dx + minX * dw,
-          dy + minY * dh,
-          (maxX - minX) * dw,
-          (maxY - minY) * dh
-        );
+        faceBox = {
+          x: dx + minX * dw,
+          y: dy + minY * dh,
+          width: (maxX - minX) * dw,
+          height: (maxY - minY) * dh
+        };
+        trackerState.faceBox = faceBox;
 
         const leftEyeIdx = [33, 133, 159, 145];
         const rightEyeIdx = [362, 263, 386, 374];
-        [leftEyeIdx, rightEyeIdx].forEach(indices => {
+        eyeBoxes = [leftEyeIdx, rightEyeIdx].map(indices => {
           let exMin = 1, eyMin = 1, exMax = 0, eyMax = 0;
           indices.forEach(i => {
             const p = lm[i];
@@ -116,15 +127,14 @@ export function initTracker({
             exMax = Math.max(exMax, p.x);
             eyMax = Math.max(eyMax, p.y);
           });
-          ctx.strokeStyle = '#FF0000';
-          ctx.lineWidth = 2;
-          ctx.strokeRect(
-            dx + exMin * dw,
-            dy + eyMin * dh,
-            (exMax - exMin) * dw,
-            (eyMax - eyMin) * dh
-          );
+          return {
+            x: dx + exMin * dw,
+            y: dy + eyMin * dh,
+            width: (exMax - exMin) * dw,
+            height: (eyMax - eyMin) * dh
+          };
         });
+        trackerState.eyeBoxes = eyeBoxes;
       }
 
       ctx.restore();
@@ -133,4 +143,5 @@ export function initTracker({
   }
   video.addEventListener('playing', onFrame);
   if (!video.paused && video.readyState >= 2) requestAnimationFrame(onFrame);
+  return trackerState;
 }
