@@ -1,6 +1,11 @@
 import { updateProgress } from './splash.js';
 import { formatSigns } from './handUtils.js';
 
+// Prepare global Module for MediaPipe WASM loaders
+if (!window.Module) {
+  window.Module = { arguments_: [] };
+}
+
     // References
     const tourOverlay = document.getElementById('tourOverlay');
     const tourTooltip = document.getElementById('tourTooltip');
@@ -646,12 +651,23 @@ const transcriberP = pipeline('automatic-speech-recognition', 'Xenova/whisper-ti
     const ctxTracker=canvasTracker.getContext('2d',{willReadFrequently:true});
     ctxTracker.lineWidth=2;
     let lastW=0,lastH=0;
-    const hands=new Hands({locateFile:f=>new URL(`../libs/${f}`, import.meta.url).href});
-    hands.setOptions({maxNumHands:2,modelComplexity:1,minDetectionConfidence:0.7,minTrackingConfidence:0.7});
-    const faceMesh=new FaceMesh({locateFile:f=>new URL(`../libs/${f}`, import.meta.url).href});
-    faceMesh.setOptions({maxNumFaces:1,refineLandmarks:true,minDetectionConfidence:0.7,minTrackingConfidence:0.7});
-    const pose=new Pose({locateFile:f=>new URL(`../libs/${f}`, import.meta.url).href});
-    pose.setOptions({modelComplexity:1,enableSegmentation:false,minDetectionConfidence:0.7,minTrackingConfidence:0.7});
+
+    const mpCache = window._mpSolutions || (window._mpSolutions = {});
+    const hands = mpCache.hands || (mpCache.hands = new Hands({locateFile:f=>new URL(`../libs/${f}`, import.meta.url).href}));
+    if (!mpCache.handsInitialized) {
+      hands.setOptions({maxNumHands:2,modelComplexity:1,minDetectionConfidence:0.7,minTrackingConfidence:0.7});
+      mpCache.handsInitialized = true;
+    }
+    const faceMesh = mpCache.faceMesh || (mpCache.faceMesh = new FaceMesh({locateFile:f=>new URL(`../libs/${f}`, import.meta.url).href}));
+    if (!mpCache.faceMeshInitialized) {
+      faceMesh.setOptions({maxNumFaces:1,refineLandmarks:true,minDetectionConfidence:0.7,minTrackingConfidence:0.7});
+      mpCache.faceMeshInitialized = true;
+    }
+    const pose = mpCache.pose || (mpCache.pose = new Pose({locateFile:f=>new URL(`../libs/${f}`, import.meta.url).href}));
+    if (!mpCache.poseInitialized) {
+      pose.setOptions({modelComplexity:1,enableSegmentation:false,minDetectionConfidence:0.7,minTrackingConfidence:0.7});
+      mpCache.poseInitialized = true;
+    }
     let handLandmarks=[],handedness=[],faceLandmarks=null,poseLandmarks=null;
     hands.onResults(r=>{handLandmarks=r.multiHandLandmarks||[];handedness=r.multiHandedness||[];});
     faceMesh.onResults(r=>faceLandmarks=r.multiFaceLandmarks && r.multiFaceLandmarks[0] || null);
