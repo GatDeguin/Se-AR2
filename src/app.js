@@ -185,11 +185,12 @@ Promise.all(tasks).then(() => {
       {el:'#micBtn',text:'Activa voz.'}
     ];
     let idx=0;
+    let highlightEl=null;
     function startTour(){tourOverlay.classList.add('active');show(idx);}
-    function show(i){const t=steps[i],e=document.querySelector(t.el),r=e.getBoundingClientRect();tourTooltip.textContent=t.text;tourTooltip.style.top=`${r.bottom+10}px`;tourTooltip.style.left=`${r.left}px`;}    
+    function show(i){const t=steps[i],e=document.querySelector(t.el);if(highlightEl)highlightEl.classList.remove('tour-highlight');highlightEl=e;e.classList.add('tour-highlight');const r=e.getBoundingClientRect();tourTooltip.textContent=t.text;tourTooltip.style.top=`${r.bottom+10}px`;tourTooltip.style.left=`${r.left}px`;}
     tourNext.onclick=e=>{ripple(e,tourNext);idx++;idx<steps.length?show(idx):endTour();};
     tourClose.onclick=e=>{ripple(e,tourClose);endTour();};
-    function endTour(){tourOverlay.classList.remove('active');localStorage.setItem('tourSeen','true');}
+    function endTour(){if(highlightEl)highlightEl.classList.remove('tour-highlight');tourOverlay.classList.remove('active');localStorage.setItem('tourSeen','true');}
 
     /* ---------- Helper ripple ---------- */
     function ripple(e,el){const r=el.getBoundingClientRect(),s=Math.max(r.width,r.height);let x=e&&e.clientX,y=e&&e.clientY;if(!x&&!y){x=r.left+r.width/2;y=r.top+r.height/2;}x-=r.left+s/2;y-=r.top+s/2;const sp=document.createElement('span');sp.className='ripple';sp.style.width=sp.style.height=s+'px';sp.style.left=x+'px';sp.style.top=y+'px';el.appendChild(sp);sp.onanimationend=()=>sp.remove();}

@@ -103,6 +103,12 @@ body.light {
     #tourClose { background: var(--error); }
     .tour-buttons button:hover { transform: scale(1.1); }
     .tour-buttons button:active { transform: scale(0.9); }
+    .tour-highlight {
+      box-shadow: 0 0 0 4px rgba(var(--accent-rgb),0.9), 0 0 12px 4px rgba(var(--accent-rgb),0.6);
+      border-radius: 50%;
+      position: relative;
+      z-index: 1002;
+    }
     /* Controls Left */
     .controls-left {
       position: absolute; top: 5%; left: 2%;
