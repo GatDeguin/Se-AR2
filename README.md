@@ -14,6 +14,12 @@ transcription directly in the browser.
 * Herramientas para capturar imágenes y alternar cámaras durante la sesión.
 * Reconocimiento de señas estáticas **A–J** sin conexión.
 
+## Architecture
+
+The demo is organized as a single page web application. All scripts are loaded from **index.html** which boots `src/app.js` for gesture recognition and speech transcription. A service worker (`sw.js`) caches core assets so the page works as a PWA. Models downloaded via the settings screen or `npm run prepare-offline` are stored in the `offline-models` cache allowing the app to operate without a network connection.
+
+For a more detailed overview see [docs/architecture.md](docs/architecture.md).
+
 ## Prerequisites
 
 * **HTTPS hosting** – Media device APIs in modern browsers require a secure
