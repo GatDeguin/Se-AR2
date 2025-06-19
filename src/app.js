@@ -311,7 +311,7 @@ Promise.all(tasks).then(() => {
       downloadSttBtn.textContent = '0%';
       downloadSttBtn.disabled = true;
       try {
-        const url = 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.5.2/dist/transformers.min.js';
+        const url = new URL('../libs/transformers.min.js', import.meta.url);
         const res = await fetch(url);
         const reader = res.body.getReader();
         const length = +res.headers.get('content-length') || 0;
@@ -574,7 +574,11 @@ Promise.all(tasks).then(() => {
       });
     })();
 async function ensureLibs() {
-  return import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.5.2/dist/transformers.min.js');
+  try {
+    return await import(new URL('../libs/transformers.min.js', import.meta.url));
+  } catch {
+    return import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.5.2/dist/transformers.min.js');
+  }
 }
 
 const libsPromise = ensureLibs();
