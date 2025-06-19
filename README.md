@@ -46,13 +46,23 @@ Run ESLint to verify code style:
 npm run lint
 ```
 
-## Running Tests
+## Test Setup
 
-Before installing dependencies ensure the recommended Node.js version is active:
+Testing requires **Node.js 20** and the project's devDependencies. Activate the
+runtime and install packages with `npm ci` (or `npm install`):
 
 ```bash
 nvm use
-npm install
+npm ci # or npm install
+```
+
+This installs tools like **Jest** needed by the test suite.
+
+## Running Tests
+
+After the dependencies are installed, execute:
+
+```bash
 npm test
 ```
 
