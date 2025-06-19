@@ -26,8 +26,4 @@ export function detectStaticSign(lm) {
   return null;
 }
 
-// Support CommonJS for tests
-if (typeof module !== 'undefined') {
-  module.exports = { detectStaticSign };
-}
 
