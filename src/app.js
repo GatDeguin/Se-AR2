@@ -142,7 +142,7 @@ Promise.all(tasks).then(() => {
     function endTour(){tourOverlay.classList.remove('active');localStorage.setItem('tourSeen','true');}
 
     /* ---------- Helper ripple ---------- */
-    function ripple(e,el){const r=el.getBoundingClientRect(),s=Math.max(r.width,r.height),x=e.clientX-r.left-s/2,y=e.clientY-r.top-s/2,sp=document.createElement('span');sp.className='ripple';sp.style.width=sp.style.height=s+'px';sp.style.left=x+'px';sp.style.top=y+'px';el.appendChild(sp);sp.onanimationend=()=>sp.remove();}
+    function ripple(e,el){const r=el.getBoundingClientRect(),s=Math.max(r.width,r.height);let x=e&&e.clientX,y=e&&e.clientY;if(!x&&!y){x=r.left+r.width/2;y=r.top+r.height/2;}x-=r.left+s/2;y-=r.top+s/2;const sp=document.createElement('span');sp.className='ripple';sp.style.width=sp.style.height=s+'px';sp.style.left=x+'px';sp.style.top=y+'px';el.appendChild(sp);sp.onanimationend=()=>sp.remove();}
 
     function vibrate(pattern){
       if(hapticsEnabled) navigator.vibrate?.(pattern);
