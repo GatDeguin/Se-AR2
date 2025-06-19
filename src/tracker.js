@@ -62,7 +62,8 @@ export function initTracker({
       ctx.clearRect(0, 0, cw, ch);
       ctx.translate(cw, 0);
       ctx.scale(-1, 1);
-      ctx.drawImage(video, 0, 0, vw, vh, dx, dy, dw, dh);
+      // The HTML video element already displays the camera feed.
+      // Draw only overlays here so the video isn't duplicated.
 
       handLandmarks.forEach(landmarks => {
         ctx.strokeStyle = '#00FF00';
