@@ -17,7 +17,7 @@ beforeAll(() => {
   const themeValue = document.getElementById('themeValue');
   themeToggle.addEventListener('click', () => {
     const isLight = document.body.classList.toggle('light');
-    themeValue.textContent = isLight ? 'Light' : 'Dark';
+    themeValue.textContent = isLight ? 'Claro' : 'Oscuro';
     localStorage.setItem('theme', isLight ? 'light' : 'dark');
   });
 
