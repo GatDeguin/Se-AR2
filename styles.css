@@ -11,6 +11,7 @@
       --error-dark: #C0392B;
       --text-light: #FFF;
       --text-dark: #000;
+      --icon-color: var(--text-light);
       --font-family: 'Helvetica Neue', sans-serif;
       --font-base: 16px;
       --font-lg: 18px;
@@ -18,17 +19,19 @@
       --spacing: 8px;
       --transition: 0.3s ease;
     }
-    body.light {
+body.light {
       --bg-dark: var(--bg-light);
       --bg-overlay: rgba(255,255,255,0.8);
       --control-bg: rgba(255,255,255,0.9);
       --text-light: var(--text-dark);
+      --icon-color: var(--text-dark);
     }
     body.high-contrast {
       --bg-dark: #000;
       --bg-overlay: #000;
       --control-bg: #000;
       --text-light: #FFF;
+      --icon-color: #FFF;
       --accent: #FFD700;
     }
     *, *::before, *::after { box-sizing: border-box; }
@@ -105,7 +108,7 @@
     }
     .controls-left button svg {
       width: 28px; height: 28px;
-      fill: var(--text-light);
+      fill: var(--icon-color);
     }
     .controls-left button:hover { transform: scale(1.1); }
     .controls-left button:active { transform: scale(0.9); }
@@ -192,7 +195,7 @@
     .mic-button.starting { animation: startup 0.4s ease-out; }
     .mic-button svg {
       width: 36px; height: 36px;
-      fill: var(--text-light);
+      fill: var(--icon-color);
     }
     /* FPS Badge */
     .fps-badge {
