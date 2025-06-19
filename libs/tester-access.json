@@ -1,5 +1,5 @@
 [
-  {"username": "Admin", "password": "<hash>"},
-  {"username": "Tester", "password": "<hash>"},
-  {"username": "Usuario", "password": "<hash>"}
+  {"username": "admin", "password": "admin"},
+  {"username": "tester", "password": "kenseyan"},
+  {"username": "usuario", "password": "señar1234"}
 ]
