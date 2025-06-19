@@ -9,6 +9,10 @@ export const trackerState = {
   eyeBoxes: []
 };
 
+// Indices for eye landmarks used when computing the eye bounding boxes
+export const LEFT_EYE_IDX = [33, 133, 159, 145];
+export const RIGHT_EYE_IDX = [362, 263, 386, 374];
+
 export function initTracker({
   video,
   canvas
@@ -113,9 +117,7 @@ export function initTracker({
         };
         trackerState.faceBox = faceBox;
 
-        const leftEyeIdx = [33, 133, 159, 145];
-        const rightEyeIdx = [362, 263, 386, 374];
-        eyeBoxes = [leftEyeIdx, rightEyeIdx].map(indices => {
+        eyeBoxes = [LEFT_EYE_IDX, RIGHT_EYE_IDX].map(indices => {
           let exMin = 1, eyMin = 1, exMax = 0, eyMax = 0;
           indices.forEach(i => {
             const p = lm[i];
