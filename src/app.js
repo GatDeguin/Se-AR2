@@ -406,6 +406,10 @@ Promise.all(tasks).then(() => {
       l.href=c.toDataURL();
       l.download='snapshot.png';
       l.click();
+      document.body.classList.add('snapshot-flash');
+      document.body.addEventListener('animationend',()=>{
+        document.body.classList.remove('snapshot-flash');
+      },{once:true});
     });
     restartBtn.addEventListener('click',()=>location.reload());
     switchCamBtn.addEventListener('click',async e=>{
