@@ -30,6 +30,7 @@ import { detectStaticSign } from './staticSigns.js';
     const snapshotBtn = document.getElementById('snapshotBtn');
     const restartBtn = document.getElementById('restartBtn');
     const switchCamBtn = document.getElementById("switchCamBtn");
+    const cameraList = document.getElementById('cameraList');
     const micBtn = document.getElementById('micBtn');
     const captionContainer = document.getElementById('captionContainer');
     const captionText = document.getElementById('captionText');
@@ -375,20 +376,40 @@ Promise.all(tasks).then(() => {
     switchCamBtn.addEventListener('click',async e=>{
       ripple(e,switchCamBtn);
       vibrate(20);
+      if(cameraList.classList.contains('show')){
+        cameraList.classList.remove('show');
+        return;
+      }
       try{
         const devices=await navigator.mediaDevices.enumerateDevices();
         videoDevices=devices.filter(d=>d.kind==='videoinput');
-        if(videoDevices.length>1){
-          currentDevice=(currentDevice+1)%videoDevices.length;
-          await startStream(videoDevices[currentDevice].deviceId);
-        }else{
-          const facing=currentDevice%2?'user':'environment';
-          currentDevice++;
-          await startStream({facingMode:{exact:facing}});
-        }
+        cameraList.innerHTML='';
+        videoDevices.forEach((d,i)=>{
+          const btn=document.createElement('button');
+          btn.textContent=d.label||`Camera ${i+1}`;
+          btn.onclick=async()=>{
+            try{
+              await startStream(d.deviceId);
+              currentDevice=i;
+              localStorage.setItem('cameraId',d.deviceId);
+            }catch(err){
+              fallbackCam.textContent=`\ud83d\udcf7 ${err.message}`;
+              fallbackCam.classList.add('show');
+            }
+            cameraList.classList.remove('show');
+          };
+          cameraList.appendChild(btn);
+        });
+        if(videoDevices.length>0) cameraList.classList.add('show');
       }catch(err){
         fallbackCam.textContent=`\ud83d\udcf7 ${err.message}`;
         fallbackCam.classList.add('show');
+      }
+    });
+
+    document.addEventListener('click',e=>{
+      if(cameraList.classList.contains('show')&& !cameraList.contains(e.target) && e.target!==switchCamBtn){
+        cameraList.classList.remove('show');
       }
     });
 
