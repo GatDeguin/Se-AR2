@@ -82,4 +82,37 @@ describe('detectStaticSign', () => {
     const shortArray = Array.from({ length: 10 }, () => ({ x: 0, y: 0 }));
     expect(detectStaticSign(shortArray)).toBeNull();
   });
+
+  // Additional tests for F-J using mocked landmark arrays
+  test('recognizes sign F with separate array', () => {
+    const lm = Array.from({ length: 21 }, () => ({ x: 0, y: 0 }));
+    lm[4] = { x: -1, y: -1 };
+    lm[8] = { x: -1, y: -1 };
+    lm[12].y = -1; lm[16].y = -1; lm[20].y = -1;
+    expect(detectStaticSign(lm)).toBe('F');
+  });
+
+  test('recognizes sign G with separate array', () => {
+    const lm = Array.from({ length: 21 }, () => ({ x: 0, y: 0 }));
+    lm[4].x = -1; lm[8].y = -1;
+    expect(detectStaticSign(lm)).toBe('G');
+  });
+
+  test('recognizes sign H with separate array', () => {
+    const lm = Array.from({ length: 21 }, () => ({ x: 0, y: 0 }));
+    lm[4].x = -1; lm[8].y = -1; lm[12].y = -1;
+    expect(detectStaticSign(lm)).toBe('H');
+  });
+
+  test('recognizes sign I with separate array', () => {
+    const lm = Array.from({ length: 21 }, () => ({ x: 0, y: 0 }));
+    lm[20].y = -1;
+    expect(detectStaticSign(lm)).toBe('I');
+  });
+
+  test('recognizes sign J with separate array', () => {
+    const lm = Array.from({ length: 21 }, () => ({ x: 0, y: 0 }));
+    lm[4].x = -1; lm[20].y = -1;
+    expect(detectStaticSign(lm)).toBe('J');
+  });
 });

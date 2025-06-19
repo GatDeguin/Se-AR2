@@ -16,7 +16,6 @@ const ASSETS = [
   '/done.mp3',
 ];
 self.addEventListener('install', evt => {
-  self.skipWaiting();
   evt.waitUntil(
     caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
   );
@@ -32,4 +31,8 @@ self.addEventListener('fetch', evt => {
   evt.respondWith(
     caches.match(evt.request).then(resp => resp || fetch(evt.request))
   );
+});
+
+self.addEventListener('message', evt => {
+  if (evt.data === 'SKIP_WAITING') self.skipWaiting();
 });
