@@ -20,6 +20,7 @@ transcription directly in the browser.
 * **Camera and microphone permissions** – Grant the browser access to your
   camera and microphone when prompted so gesture recognition and speech
   features work correctly.
+* **Node.js 20** – Use `nvm use` to select the recommended runtime before installing dependencies and running tests.
 
 ## Running the App
 
@@ -47,9 +48,11 @@ npm run lint
 
 ## Running Tests
 
-Install Node.js dependencies once using `npm install` and then execute:
+Before installing dependencies ensure the recommended Node.js version is active:
 
 ```bash
+nvm use
+npm install
 npm test
 ```
 
