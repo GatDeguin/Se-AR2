@@ -112,6 +112,49 @@ body.light {
       position: relative;
       z-index: 1002;
     }
+    /* Login Overlay */
+    .login-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--bg-overlay);
+      backdrop-filter: blur(6px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1500;
+      transition: opacity var(--transition);
+    }
+    .login-overlay.hidden { opacity: 0; pointer-events: none; }
+    .login-form {
+      background: var(--control-bg);
+      color: var(--text-light);
+      padding: calc(var(--spacing)*3);
+      border-radius: var(--radius);
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing);
+      width: 280px;
+      animation: fadeIn 0.4s ease-out;
+    }
+    .login-form h1 { text-align: center; margin: 0 0 var(--spacing); }
+    .login-form input {
+      padding: var(--spacing);
+      border-radius: var(--radius);
+      border: none;
+      font-size: var(--font-base);
+    }
+    .login-form button {
+      padding: var(--spacing);
+      border: none;
+      border-radius: var(--radius);
+      background: var(--accent);
+      color: var(--text-light);
+      cursor: pointer;
+      transition: transform 0.2s var(--transition), background var(--transition);
+    }
+    .login-form button:hover { transform: scale(1.05); }
+    .login-form button:active { transform: scale(0.95); }
+    .login-error { min-height: 1em; color: var(--error); text-align: center; }
     /* Controls Left */
     .controls-left {
       position: absolute; top: 5%; left: 2%;
@@ -448,6 +491,10 @@ body.light {
       .mic-button {
         width: 60px;
         height: 60px;
+      }
+
+      .login-form {
+        width: 90%;
       }
 
   .fps-badge {
