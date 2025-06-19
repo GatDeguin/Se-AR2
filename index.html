@@ -242,6 +242,8 @@
         <div class="settings-card">
           <div class="settings-item"><div class="item-label">Theme</div><div class="item-value" id="themeValue">Light</div></div>
           <div class="settings-item"><div class="item-label">Subtitle size</div><div class="item-control"><input type="range" min="12" max="24" value="16" id="subtitleSizeSlider"><div class="item-value" id="subtitleSizeValue">16 pt</div></div></div>
+          <div class="settings-item"><div class="item-label">Subtitle font</div><div class="item-control"><select id="subtitleFontSelect"><option value="sans-serif">Sans</option><option value="serif">Serif</option><option value="monospace">Mono</option></select></div></div>
+          <div class="settings-item"><div class="item-label">Subtitle color</div><div class="item-control"><input type="color" id="subtitleColorInput" value="#ffffff"></div></div>
           <div class="settings-item"><div class="item-label">Haptics</div><label class="toggle-switch"><input type="checkbox" id="hapticsToggle" checked><span class="slider"></span></label></div>
           <div class="settings-item"><div class="item-label">Alto contraste</div><label class="toggle-switch"><input type="checkbox" id="contrastToggle"><span class="slider"></span></label></div>
         </div>
@@ -249,8 +251,8 @@
       <div class="settings-section">
         <div class="group-title">Offline Models</div>
         <div class="settings-card">
-          <div class="settings-item"><div class="item-icon">💬</div><div class="item-info"><div class="item-label">Audio-STT</div><div class="item-sub">30 MB v0.3.2</div></div><button class="settings-button primary">Download</button></div>
-          <div class="settings-item"><div class="item-icon">🤟</div><div class="item-info"><div class="item-label">LSA Translation</div><div class="item-sub">48 MB v0.6.1</div></div><button class="settings-button secondary">Settings</button></div>
+          <div class="settings-item"><div class="item-icon">💬</div><div class="item-info"><div class="item-label">Audio-STT</div><div class="item-sub">30 MB v0.3.2</div></div><button id="downloadSttBtn" class="settings-button primary">Download</button></div>
+          <div class="settings-item"><div class="item-icon">🤟</div><div class="item-info"><div class="item-label">LSA Translation</div><div class="item-sub">48 MB v0.6.1</div></div><button id="lsaSettingsBtn" class="settings-button secondary">Settings</button></div>
         </div>
       </div>
       <div class="settings-section">
@@ -266,6 +268,20 @@
               </select>
             </div>
           </div>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="group-title">Devices</div>
+        <div class="settings-card">
+          <div class="settings-item"><div class="item-label">Camera</div><div class="item-control"><select id="cameraSelect"></select></div></div>
+          <div class="settings-item"><div class="item-label">Microphone</div><div class="item-control"><select id="micSelect"></select></div></div>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="group-title">Advanced</div>
+        <div class="settings-card">
+          <button id="repeatTourBtn" class="settings-button secondary">Repeat tour</button>
+          <button id="resetPrefsBtn" class="settings-button">Reset preferences</button>
         </div>
       </div>
     </div>
