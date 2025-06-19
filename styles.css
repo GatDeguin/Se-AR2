@@ -58,12 +58,19 @@ body.light {
     }
     /* Guided Tour */
     .tour-overlay {
-      position: absolute; inset: 0;
+      position: absolute;
+      inset: 0;
       background: rgba(0,0,0,0.6);
-      z-index: 999; display: none;
+      z-index: 999;
+      display: block;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--transition);
+    }
+    .tour-overlay.active {
+      opacity: 1;
       pointer-events: auto;
     }
-    .tour-overlay.active { display: block; }
     .tour-tooltip {
       position: absolute;
       background: var(--control-bg);
@@ -242,13 +249,22 @@ body.light {
     }
     /* Settings Screen */
     .settings-screen {
-      position: absolute; inset: 0;
+      position: absolute;
+      inset: 0;
       background: var(--bg-light);
       z-index: 2000;
-      display: none;
+      display: flex;
       flex-direction: column;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(20px);
+      transition: opacity var(--transition), transform var(--transition);
     }
-    .settings-screen.show { display: flex; }
+    .settings-screen.show {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
     .settings-header {
       display: flex; align-items: flex-end;
       height: 56px;
