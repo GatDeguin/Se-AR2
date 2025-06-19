@@ -5,6 +5,7 @@ const ASSETS = [
   '/styles.css',
   '/src/app.js',
   '/src/sw-register.js',
+  '/src/splash3d.js',
   '/three.min.js',
   '/drawing_utils.js',
   '/face_mesh.js',
