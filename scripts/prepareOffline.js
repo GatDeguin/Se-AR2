@@ -3,11 +3,37 @@ const fs = require('fs');
 const path = require('path');
 
 const files = {
+  // Core MediaPipe wrappers
   'hands.js': 'https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js',
   'face_mesh.js': 'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js',
   'drawing_utils.js': 'https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js',
   'pose.js': 'https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js',
-  'transformers.min.js': 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.5.2/dist/transformers.min.js'
+  // Whisper integration
+  'transformers.min.js': 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.5.2/dist/transformers.min.js',
+
+  // Additional assets required by the MediaPipe solutions
+  // Hands
+  'hands_solution_packed_assets_loader.js': 'https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands_solution_packed_assets_loader.js',
+  'hands_solution_wasm_bin.js': 'https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands_solution_wasm_bin.js',
+  'hands_solution_simd_wasm_bin.js': 'https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands_solution_simd_wasm_bin.js',
+  'hand_landmark_full.tflite': 'https://cdn.jsdelivr.net/npm/@mediapipe/hands/hand_landmark_full.tflite',
+  'hand_landmark_lite.tflite': 'https://cdn.jsdelivr.net/npm/@mediapipe/hands/hand_landmark_lite.tflite',
+  'hands.binarypb': 'https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.binarypb',
+
+  // Face Mesh
+  'face_mesh_solution_packed_assets_loader.js': 'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh_solution_packed_assets_loader.js',
+  'face_mesh_solution_wasm_bin.js': 'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh_solution_wasm_bin.js',
+  'face_mesh_solution_simd_wasm_bin.js': 'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh_solution_simd_wasm_bin.js',
+  'face_mesh.binarypb': 'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.binarypb',
+
+  // Pose
+  'pose_solution_packed_assets_loader.js': 'https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose_solution_packed_assets_loader.js',
+  'pose_solution_wasm_bin.js': 'https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose_solution_wasm_bin.js',
+  'pose_solution_simd_wasm_bin.js': 'https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose_solution_simd_wasm_bin.js',
+  'pose_landmark_full.tflite': 'https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose_landmark_full.tflite',
+  'pose_landmark_heavy.tflite': 'https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose_landmark_heavy.tflite',
+  'pose_landmark_lite.tflite': 'https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose_landmark_lite.tflite',
+  'pose_web.binarypb': 'https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose_web.binarypb'
 };
 
 function download(opts, dest, onProgress) {
