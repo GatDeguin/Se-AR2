@@ -49,16 +49,16 @@ export function initTracker({
   });
   faceMesh.onResults(r => { faceResults = r; });
 
-  const fingerColors = {
-    thumb: '#FF0000',
-    index: '#00FF00',
-    middle: '#0000FF',
-    ring: '#FFFF00',
-    pinky: '#FF00FF'
-  };
+  function getAppColors() {
+    const styles = getComputedStyle(document.documentElement);
+    const accent = styles.getPropertyValue('--accent').trim() || '#2EB8A3';
+    const icon = styles.getPropertyValue('--icon-color').trim() || '#FFFFFF';
+    return { accent, icon };
+  }
 
   async function onFrame() {
     if (video.readyState >= 2) {
+      const { accent, icon } = getAppColors();
       await hands.send({ image: video });
       await faceMesh.send({ image: video });
 
@@ -74,7 +74,7 @@ export function initTracker({
       // Overlay only, video element remains visible underneath
 
       handLandmarks.forEach(landmarks => {
-        ctx.strokeStyle = '#00FF00';
+        ctx.strokeStyle = accent;
         ctx.lineWidth = 2;
         HAND_CONNECTIONS.forEach(([i, j]) => {
           const p1 = landmarks[i], p2 = landmarks[j];
@@ -85,16 +85,13 @@ export function initTracker({
         });
         landmarks.forEach((lm, i) => {
           const x = dx + lm.x * dw, y = dy + lm.y * dh;
-          let color = '#FFFFFF';
-          if (i >= 1 && i <= 4) color = fingerColors.thumb;
-          if (i >= 5 && i <= 8) color = fingerColors.index;
-          if (i >= 9 && i <= 12) color = fingerColors.middle;
-          if (i >= 13 && i <= 16) color = fingerColors.ring;
-          if (i >= 17 && i <= 20) color = fingerColors.pinky;
           ctx.beginPath();
-          ctx.arc(x, y, 6, 0, Math.PI * 2);
-          ctx.fillStyle = color;
+          ctx.arc(x, y, 4, 0, Math.PI * 2);
+          ctx.fillStyle = icon;
           ctx.fill();
+          ctx.strokeStyle = accent;
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
         });
       });
 
