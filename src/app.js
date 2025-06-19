@@ -367,15 +367,18 @@ Promise.all(tasks).then(() => {
         s.className='caption-text-word';
         captionText.appendChild(s);
       });
-      let j=0;
-      function hl(){
-        j>0&&captionText.children[j-1].classList.remove('highlight');
-        if(j<w.length){
-          captionText.children[j].classList.add('highlight');
-          j++; setTimeout(hl,400);
+      let j=0,last=performance.now();
+      function hl(now){
+        if(now-last>=400){
+          if(j>0) captionText.children[j-1].classList.remove('highlight');
+          if(j<w.length){
+            captionText.children[j].classList.add('highlight');
+            j++; last=now;
+          }
         }
+        if(j<w.length) requestAnimationFrame(hl);
       }
-      hl();
+      requestAnimationFrame(hl);
     }
 
     /* ---------- Playback & snapshot ---------- */
@@ -477,6 +480,7 @@ Promise.all(tasks).then(() => {
 
     (function(){
       let dragging=false, offsetX=0, offsetY=0;
+      let pending=false, dragX=0, dragY=0;
 
       captionContainer.addEventListener('pointerdown', startDrag);
       captionContainer.addEventListener('pointermove', onDrag);
@@ -507,8 +511,17 @@ Promise.all(tasks).then(() => {
 
       function onDrag(e){
         if(!dragging) return;
-        let x=e.clientX-offsetX;
-        let y=e.clientY-offsetY;
+        dragX=e.clientX-offsetX;
+        dragY=e.clientY-offsetY;
+        if(!pending){
+          pending=true;
+          requestAnimationFrame(applyDrag);
+        }
+      }
+
+      function applyDrag(){
+        pending=false;
+        let x=dragX,y=dragY;
 
         /* Mantener dentro de la ventana */
         const maxX=window.innerWidth-captionContainer.offsetWidth-8;
@@ -616,6 +629,8 @@ const transcriberP = pipeline('automatic-speech-recognition', 'Xenova/whisper-ti
     /* Tracker Combinado */
     const canvasTracker=document.getElementById('trackerCanvas')||(()=>{const c=document.createElement('canvas');c.id='trackerCanvas';video.parentNode.insertBefore(c,video.nextSibling);return c;})();
     const ctxTracker=canvasTracker.getContext('2d',{willReadFrequently:true});
+    ctxTracker.lineWidth=2;
+    let lastW=0,lastH=0;
     const hands=new Hands({locateFile:f=>new URL(`../libs/${f}`, import.meta.url).href});
     hands.setOptions({maxNumHands:2,modelComplexity:1,minDetectionConfidence:0.7,minTrackingConfidence:0.7});
     const faceMesh=new FaceMesh({locateFile:f=>new URL(`../libs/${f}`, import.meta.url).href});
@@ -634,9 +649,11 @@ const transcriberP = pipeline('automatic-speech-recognition', 'Xenova/whisper-ti
           pose.send({image:video})
         ]);
         const vw=video.videoWidth,vh=video.videoHeight;
-        canvasTracker.width=vw;canvasTracker.height=vh;
+        if(vw!==lastW||vh!==lastH){
+          lastW=vw;lastH=vh;
+          canvasTracker.width=vw;canvasTracker.height=vh;
+        }
         ctxTracker.clearRect(0,0,vw,vh);
-        ctxTracker.lineWidth=2;
         handLandmarks.forEach(lm=>{
           let minX=1,minY=1,maxX=0,maxY=0;
           lm.forEach(p=>{minX=Math.min(minX,p.x);minY=Math.min(minY,p.y);maxX=Math.max(maxX,p.x);maxY=Math.max(maxY,p.y);});
