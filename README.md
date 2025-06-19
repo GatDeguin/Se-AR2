@@ -109,6 +109,11 @@ Para ejecutar la demo sin conexión:
   4. Reserve alrededor de **80 MB** de espacio libre para los modelos y
      asegúrese de que los archivos se sirvan también mediante **HTTPS**.
 
+Dentro de la pantalla de configuraciones se incluye un botón para descargar el
+modelo de transcripción de audio directamente al caché del navegador. El
+progreso se muestra sobre el botón y, una vez completado, la aplicación puede
+funcionar sin conexión.
+
 ### PWA Installation
 
 Al abrir la aplicación en navegadores compatibles se mostrará un aviso para
@@ -121,12 +126,19 @@ En la sección de configuraciones se incluye la opción **Alto contraste**. Al
 activarla la interfaz usa un esquema de colores con mayor contraste apto para
 lectores de pantalla. La preferencia se guarda en `localStorage`.
 
+También es posible personalizar el tamaño, fuente y color de los subtítulos,
+así como habilitar o deshabilitar la vibración del dispositivo.
+
 ### Dialects
 
 Desde la pantalla de configuraciones ahora es posible elegir el dialecto de
 LSA a utilizar. Las opciones iniciales son **Noroeste**, **Cuyo** y
 **Noreste**. La selección se guarda en `localStorage` y se aplica al iniciar
 la aplicación.
+
+También se pueden seleccionar la cámara y el micrófono preferidos desde la
+sección **Devices** y reiniciar el recorrido guiado o restaurar todas las
+preferencias desde **Advanced**.
 
 ## Recommended Browsers
 

@@ -13,7 +13,15 @@ import { detectStaticSign } from './staticSigns.js';
     const contrastToggle = document.getElementById('contrastToggle');
     const subtitleSizeSlider = document.getElementById('subtitleSizeSlider');
     const subtitleSizeValue = document.getElementById('subtitleSizeValue');
+    const subtitleFontSelect = document.getElementById('subtitleFontSelect');
+    const subtitleColorInput = document.getElementById('subtitleColorInput');
     const dialectSelect = document.getElementById('dialectSelect');
+    const cameraSelect = document.getElementById('cameraSelect');
+    const micSelect = document.getElementById('micSelect');
+    const repeatTourBtn = document.getElementById('repeatTourBtn');
+    const resetPrefsBtn = document.getElementById('resetPrefsBtn');
+    const downloadSttBtn = document.getElementById('downloadSttBtn');
+    const lsaSettingsBtn = document.getElementById('lsaSettingsBtn');
     const hapticsToggle = document.getElementById('hapticsToggle');
     const video = document.getElementById('video');
     const fallbackCam = document.getElementById('fallbackCam');
@@ -52,10 +60,25 @@ let hapticsEnabled = true;
       captionContainer.style.fontSize = savedSize + 'px';
     }
 
+    const savedFont = localStorage.getItem('subtitleFont');
+    if (savedFont && subtitleFontSelect) {
+      subtitleFontSelect.value = savedFont;
+      captionContainer.style.fontFamily = savedFont;
+    }
+
+    const savedColor = localStorage.getItem('subtitleColor');
+    if (savedColor && subtitleColorInput) {
+      subtitleColorInput.value = savedColor;
+      captionContainer.style.color = savedColor;
+    }
+
       const savedDialect = localStorage.getItem('dialect');
       if (savedDialect && dialectSelect) {
         dialectSelect.value = savedDialect;
       }
+
+      const savedCamera = localStorage.getItem('cameraId');
+      const savedMic = localStorage.getItem('micId');
 
       const savedHaptics = localStorage.getItem('haptics');
       if (savedHaptics === 'false') {
@@ -110,11 +133,32 @@ tasks.push(
     .then(devices => {
       // Filtrar sólo inputs de vídeo
       videoDevices = devices.filter(d => d.kind === 'videoinput');
+      const audioInputs = devices.filter(d => d.kind === 'audioinput');
+      if (cameraSelect) {
+        cameraSelect.innerHTML = '';
+        videoDevices.forEach(d => {
+          const opt = document.createElement('option');
+          opt.value = d.deviceId;
+          opt.textContent = d.label || d.deviceId;
+          cameraSelect.appendChild(opt);
+        });
+        if (savedCamera) cameraSelect.value = savedCamera;
+      }
+      if (micSelect) {
+        micSelect.innerHTML = '';
+        audioInputs.forEach(d => {
+          const opt = document.createElement('option');
+          opt.value = d.deviceId;
+          opt.textContent = d.label || d.deviceId;
+          micSelect.appendChild(opt);
+        });
+        if (savedMic) micSelect.value = savedMic;
+      }
       // Intentar elegir cámara "back"/"environment"/"rear" o usar modo environment
-      const backCam = videoDevices.find(d => /back|environment|rear/i.test(d.label));
-      if (backCam) {
-        currentDevice = videoDevices.indexOf(backCam);
-        return startStream(backCam.deviceId);
+      const camToUse = savedCamera ? videoDevices.find(d=>d.deviceId===savedCamera) : videoDevices.find(d => /back|environment|rear/i.test(d.label));
+      if (camToUse) {
+        currentDevice = videoDevices.indexOf(camToUse);
+        return startStream(camToUse.deviceId);
       }
       currentDevice = 0;
       return startStream({facingMode:{ideal:'environment'}});
@@ -185,6 +229,73 @@ Promise.all(tasks).then(() => {
         localStorage.setItem('dialect', dialectSelect.value);
       };
     }
+
+    if (subtitleFontSelect) subtitleFontSelect.onchange = () => {
+      captionContainer.style.fontFamily = subtitleFontSelect.value;
+      localStorage.setItem('subtitleFont', subtitleFontSelect.value);
+    };
+
+    if (subtitleColorInput) subtitleColorInput.oninput = () => {
+      captionContainer.style.color = subtitleColorInput.value;
+      localStorage.setItem('subtitleColor', subtitleColorInput.value);
+    };
+
+    if (cameraSelect) cameraSelect.onchange = () => {
+      localStorage.setItem('cameraId', cameraSelect.value);
+      startStream(cameraSelect.value);
+    };
+
+    if (micSelect) micSelect.onchange = () => {
+      localStorage.setItem('micId', micSelect.value);
+    };
+
+    if (repeatTourBtn) repeatTourBtn.onclick = e => {
+      ripple(e, repeatTourBtn);
+      localStorage.removeItem('tourSeen');
+      settingsScreen.classList.remove('show');
+      startTour();
+    };
+
+    if (resetPrefsBtn) resetPrefsBtn.onclick = e => {
+      ripple(e, resetPrefsBtn);
+      if (confirm('Reset all preferences?')) {
+        localStorage.clear();
+        location.reload();
+      }
+    };
+
+    if (downloadSttBtn) downloadSttBtn.onclick = async e => {
+      ripple(e, downloadSttBtn);
+      downloadSttBtn.textContent = '0%';
+      downloadSttBtn.disabled = true;
+      try {
+        const url = 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.5.2/dist/transformers.min.js';
+        const res = await fetch(url);
+        const reader = res.body.getReader();
+        const length = +res.headers.get('content-length') || 0;
+        let received = 0;
+        const chunks = [];
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          chunks.push(value);
+          received += value.length;
+          if (length) downloadSttBtn.textContent = Math.floor(received / length * 100) + '%';
+        }
+        const blob = new Blob(chunks, { type: res.headers.get('content-type') });
+        const response = new Response(blob);
+        const cache = await caches.open('offline-models');
+        await cache.put(url, response);
+        downloadSttBtn.textContent = 'Downloaded ✓';
+      } catch (err) {
+        downloadSttBtn.textContent = 'Failed';
+      }
+    };
+
+    if (lsaSettingsBtn) lsaSettingsBtn.onclick = e => {
+      ripple(e, lsaSettingsBtn);
+      alert('Coming soon');
+    };
 
     /* ---------- Mic ---------- */
     let recog;
@@ -391,7 +502,8 @@ const transcriberP = pipeline('automatic-speech-recognition', 'Xenova/whisper-ti
         try{
           vibrate(40);
           if(!recorder||recorder.state==='inactive'){
-            const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+            const audioId = micSelect && micSelect.value ? micSelect.value : savedMic;
+            const stream=await navigator.mediaDevices.getUserMedia({audio: audioId ? {deviceId:{exact:audioId}} : true});
             recorder=new MediaRecorder(stream,{mimeType:'audio/webm'});
             chunks=[];
             recorder.ondataavailable=ev=>chunks.push(ev.data);
