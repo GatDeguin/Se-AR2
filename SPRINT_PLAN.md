@@ -73,5 +73,5 @@ En este sprint se refuerzan las funcionalidades introducidas y se optimiza el re
 - [ ] Refactorizar `src/app.js` para reducir cálculos redundantes y usar `requestAnimationFrame` de forma más eficiente.
 - [x] Extender `staticSigns.js` con las letras F–J; queda pendiente el gesto dinámico.
 - [ ] Añadir manejo de errores y reintentos en `prepareOffline.js`.
-- [ ] Crear `docs/architecture.md` documentando los principales módulos y flujos.
+- [x] Crear `docs/architecture.md` documentando los principales módulos y flujos.
 - [ ] Escribir pruebas Jest para la nueva detección y para el flujo de actualización del service worker.

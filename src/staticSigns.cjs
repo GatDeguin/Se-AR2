@@ -14,7 +14,9 @@ function detectStaticSign(lm) {
   if (indexExt && thumbExt && !middleExt && !ringExt && !pinkExt) return 'G';
   if (indexExt && middleExt && thumbExt && !ringExt && !pinkExt) return 'H';
   if (!indexExt && !middleExt && !ringExt && pinkExt && !thumbExt) return 'I';
+
   // J is normally dynamic; assume final pose with thumb and pinky extended
+
   if (!indexExt && !middleExt && !ringExt && pinkExt && thumbExt) return 'J';
 
   if (!indexExt && !middleExt && !ringExt && !pinkExt && thumbExt) return 'A';
@@ -24,5 +26,6 @@ function detectStaticSign(lm) {
   if (!indexExt && !middleExt && !ringExt && !pinkExt && !thumbExt) return 'E';
   return null;
 }
+
 
 module.exports = { detectStaticSign };

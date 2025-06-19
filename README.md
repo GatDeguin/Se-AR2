@@ -76,6 +76,11 @@ npm test
 This runs the Jest test suite which verifies that `index.html` loads and key
 elements such as the video and canvas are present.
 
+## Architecture
+
+For an overview of the core modules and how the service worker caches offline
+resources, see [docs/architecture.md](docs/architecture.md).
+
 ## Dependencias e instalación
 
 La página hace uso de varias bibliotecas externas que se cargan desde
