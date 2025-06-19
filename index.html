@@ -233,7 +233,7 @@
   <!-- Settings Screen -->
   <div class="settings-screen" id="settingsScreen">
     <div class="settings-header">
-      <button id="settingsBack" class="back-btn">←</button>
+      <button id="settingsBack" class="back-btn" aria-label="Back"><svg aria-hidden="true"><use href="icons/arrow-left.svg#icon"/></svg></button>
       <span>Settings</span>
     </div>
     <div class="settings-content">
@@ -249,8 +249,8 @@
       <div class="settings-section">
         <div class="group-title">Offline Models</div>
         <div class="settings-card">
-          <div class="settings-item"><div class="item-icon">💬</div><div class="item-info"><div class="item-label">Audio-STT</div><div class="item-sub">30 MB v0.3.2</div></div><button class="settings-button primary">Download</button></div>
-          <div class="settings-item"><div class="item-icon">🤟</div><div class="item-info"><div class="item-label">LSA Translation</div><div class="item-sub">48 MB v0.6.1</div></div><button class="settings-button secondary">Settings</button></div>
+          <div class="settings-item"><div class="item-icon"><svg aria-hidden="true"><use href="icons/chat.svg#icon"/></svg></div><div class="item-info"><div class="item-label">Audio-STT</div><div class="item-sub">30 MB v0.3.2</div></div><button class="settings-button primary">Download</button></div>
+          <div class="settings-item"><div class="item-icon"><svg aria-hidden="true"><use href="icons/hand.svg#icon"/></svg></div><div class="item-info"><div class="item-label">LSA Translation</div><div class="item-sub">48 MB v0.6.1</div></div><button class="settings-button secondary">Settings</button></div>
         </div>
       </div>
       <div class="settings-section">
@@ -293,8 +293,8 @@
     <div class="controls-bottom"><button id="micBtn" class="mic-button" aria-label="Iniciar reconocimiento de voz"><svg viewBox="0 0 24 24"><path d="M12 14a2 2 0 002-2V6a2 2 0 10-4 0v6a2 2 0 002 2zm5-2a5 5 0 01-10 0H5a7 7 0 0014 0h-2zm-5 8a7 7 0 007-7h-2a5 5 0 01-10 0H5a7 7 0 007 7z"/></svg></button></div>
 
     <div id="fpsBadge" class="fps-badge">0 fps</div>
-    <div id="fallbackCam" class="fallback" role="alert">📷 Cámara no disponible</div>
-    <div id="fallbackSpeech" class="fallback" role="alert">🎤 Voz no soportada</div>
+    <div id="fallbackCam" class="fallback" role="alert"><span class="sr-only">Cámara no disponible</span><svg aria-hidden="true"><use href="icons/camera.svg#icon"/></svg><span aria-hidden="true">Cámara no disponible</span></div>
+    <div id="fallbackSpeech" class="fallback" role="alert"><span class="sr-only">Voz no soportada</span><svg aria-hidden="true"><use href="icons/mic.svg#icon"/></svg><span aria-hidden="true">Voz no soportada</span></div>
   </div>
 
 
