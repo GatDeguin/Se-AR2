@@ -90,24 +90,11 @@ Para ejecutar la demo sin conexión:
    }
    ```
 
-   Para realizar pruebas sin conectar a Internet utilice `DRY_RUN=1 npm run prepare-offline`,
-   lo que genera entradas de progreso sin realizar descargas reales.
-2. Modifique las etiquetas `<script>` de `index.html` para que apunten a los
-   archivos locales, por ejemplo:
-   ```html
-   <script src="libs/hands.js"></script>
-   <script src="libs/face_mesh.js"></script>
-   <script src="libs/drawing_utils.js"></script>
-   <script src="libs/pose.js"></script>
-   ```
-3. En `src/app.js` cambie la importación de Transformers a
-   ```javascript
-   import { pipeline } from './libs/transformers.min.js';
-   ```
-   y actualice las opciones `locateFile` de MediaPipe para que devuelvan
-   `'libs/' + f`.
-  4. Reserve alrededor de **80 MB** de espacio libre para los modelos y
-     asegúrese de que los archivos se sirvan también mediante **HTTPS**.
+2. Si solo desea verificar el proceso sin descargar los archivos reales,
+  ejecute `DRY_RUN=1 npm run prepare-offline`, lo que genera las entradas de
+  `progress.json` sin realizar descargas.
+3. Reserve alrededor de **80 MB** de espacio libre para los modelos y asegúrese
+   de que los archivos se sirvan también mediante **HTTPS**.
 
 Dentro de la pantalla de configuraciones se incluye un botón para descargar el
 modelo de transcripción de audio directamente al caché del navegador. El

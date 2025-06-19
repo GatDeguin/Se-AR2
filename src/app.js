@@ -494,7 +494,7 @@ Promise.all(tasks).then(() => {
         captionContainer.classList.remove('drop');
       });
     })();
-import { pipeline } from 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.5.2/dist/transformers.min.js';
+import { pipeline } from './libs/transformers.min.js';
 const device = navigator.gpu ? 'webgpu' : 'wasm';
 const transcriberP = pipeline('automatic-speech-recognition', 'Xenova/whisper-tiny', { quantized: true, device });
 // Reuse existing element references defined at the top of the file
@@ -545,11 +545,11 @@ const transcriberP = pipeline('automatic-speech-recognition', 'Xenova/whisper-ti
     /* Tracker Combinado */
     const canvasTracker=document.getElementById('trackerCanvas')||(()=>{const c=document.createElement('canvas');c.id='trackerCanvas';video.parentNode.insertBefore(c,video.nextSibling);return c;})();
     const ctxTracker=canvasTracker.getContext('2d',{willReadFrequently:true});
-    const hands=new Hands({locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`});
+    const hands=new Hands({locateFile:f=>`libs/${f}`});
     hands.setOptions({maxNumHands:2,modelComplexity:1,minDetectionConfidence:0.7,minTrackingConfidence:0.7});
-    const faceMesh=new FaceMesh({locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${f}`});
+    const faceMesh=new FaceMesh({locateFile:f=>`libs/${f}`});
     faceMesh.setOptions({maxNumFaces:1,refineLandmarks:true,minDetectionConfidence:0.7,minTrackingConfidence:0.7});
-    const pose=new Pose({locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/pose/${f}`});
+    const pose=new Pose({locateFile:f=>`libs/${f}`});
     pose.setOptions({modelComplexity:1,enableSegmentation:false,minDetectionConfidence:0.7,minTrackingConfidence:0.7});
     let handLandmarks=[],faceLandmarks=null,poseLandmarks=null;
     hands.onResults(r=>handLandmarks=r.multiHandLandmarks||[]);

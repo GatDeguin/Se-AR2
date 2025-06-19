@@ -6,11 +6,12 @@ const ASSETS = [
   '/src/app.js',
   '/src/sw-register.js',
   '/three.min.js',
-  '/drawing_utils.js',
-  '/face_mesh.js',
-  '/hands.js',
-  '/pose.js',
   '/opencv.js',
+  '/libs/drawing_utils.js',
+  '/libs/face_mesh.js',
+  '/libs/hands.js',
+  '/libs/pose.js',
+  '/libs/transformers.min.js',
 ];
 self.addEventListener('install', evt => {
   self.skipWaiting();
