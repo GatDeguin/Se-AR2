@@ -52,17 +52,15 @@ export function initTracker({
       await faceMesh.send({ image: video });
 
       const vw = video.videoWidth, vh = video.videoHeight;
-      const cw = canvasEl.width = window.innerWidth;
-      const ch = canvasEl.height = window.innerHeight;
-      const scale = Math.min(cw / vw, ch / vh);
+      const cw = canvasEl.width = video.clientWidth || window.innerWidth;
+      const ch = canvasEl.height = video.clientHeight || window.innerHeight;
+      const scale = Math.max(cw / vw, ch / vh);
       const dw = vw * scale, dh = vh * scale;
       const dx = (cw - dw) / 2, dy = (ch - dh) / 2;
 
       ctx.save();
       ctx.clearRect(0, 0, cw, ch);
-      ctx.translate(cw, 0);
-      ctx.scale(-1, 1);
-      ctx.drawImage(video, 0, 0, vw, vh, dx, dy, dw, dh);
+      // Overlay only, video element remains visible underneath
 
       handLandmarks.forEach(landmarks => {
         ctx.strokeStyle = '#00FF00';
