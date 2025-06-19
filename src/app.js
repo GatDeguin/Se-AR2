@@ -563,13 +563,14 @@ const device = navigator.gpu ? 'webgpu' : 'wasm';
 const transcriberP = pipeline('automatic-speech-recognition', 'Xenova/whisper-tiny', { quantized: true, device });
 // Reuse existing element references defined at the top of the file
     let recorder,chunks=[],blob;
+    const ac=new AudioContext();
+    let off;
     async function blobToPCM(b,r=16000){
       const buf=await b.arrayBuffer();
-      const ac=new AudioContext();
       const dec=await ac.decodeAudioData(buf);
       if(dec.sampleRate===r)return dec.getChannelData(0);
       const frames=Math.ceil(dec.duration*r);
-      const off=new OfflineAudioContext(1,frames,r);
+      off=new OfflineAudioContext(1,frames,r);
       const src=off.createBufferSource();src.buffer=dec;
       src.connect(off.destination);src.start();
       const res=await off.startRendering();
