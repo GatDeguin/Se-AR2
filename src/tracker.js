@@ -30,7 +30,7 @@ export function updateTrackerColors() {
 // Update colors whenever the theme changes
 window.addEventListener('themechange', updateTrackerColors);
 
-const FRAME_INTERVAL = 1000 / 15;
+const FRAME_INTERVAL = 1000 / 24;
 const CAN_USE_WORKER = typeof OffscreenCanvas !== 'undefined' &&
   typeof Worker !== 'undefined' &&
   typeof createImageBitmap !== 'undefined' &&
