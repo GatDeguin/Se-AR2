@@ -2,6 +2,8 @@ const fs = require('fs');
 const path = require('path');
 jest.mock('../src/splash.js', () => ({ __esModule: true, updateProgress: jest.fn() }));
 const { updateProgress } = require('../src/splash.js');
+const requireEsm = require('esm')(module);
+const { formatSigns } = requireEsm('../src/handUtils.js');
 
 beforeAll(() => {
   const html = fs.readFileSync(path.resolve(__dirname, '../index.html'), 'utf8');
@@ -183,5 +185,23 @@ describe('index.html', () => {
     tasks.forEach(p => p.then(() => updateProgress(++done / total)));
     await Promise.all(tasks);
     expect(updateProgress).toHaveBeenLastCalledWith(1);
+  });
+
+  test('formats detected signs for each hand', () => {
+    function baseHand() {
+      const lm = Array.from({ length: 21 }, () => ({ x: 0, y: 0 }));
+      lm[3].x = 0; lm[4].x = 1; // thumb not extended
+      lm[6].y = 0; lm[8].y = 1; // index not extended
+      lm[10].y = 0; lm[12].y = 1; // middle not extended
+      lm[14].y = 0; lm[16].y = 1; // ring not extended
+      lm[18].y = 0; lm[20].y = 1; // pinky not extended
+      return lm;
+    }
+    const left = baseHand();
+    left[4].x = -1; // sign A
+    const right = baseHand();
+    right[8].y = -1; right[12].y = -1; right[16].y = -1; right[20].y = -1; // sign B
+    const txt = formatSigns([left, right], [{ label: 'Left' }, { label: 'Right' }]);
+    expect(txt).toBe('Left: A / Right: B');
   });
 });

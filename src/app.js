@@ -1,5 +1,6 @@
 import { detectStaticSign } from './staticSigns.js';
 import { updateProgress } from './splash.js';
+import { formatSigns } from './handUtils.js';
 
     // References
     const tourOverlay = document.getElementById('tourOverlay');
@@ -621,8 +622,8 @@ const transcriberP = pipeline('automatic-speech-recognition', 'Xenova/whisper-ti
     faceMesh.setOptions({maxNumFaces:1,refineLandmarks:true,minDetectionConfidence:0.7,minTrackingConfidence:0.7});
     const pose=new Pose({locateFile:f=>new URL(`../libs/${f}`, import.meta.url).href});
     pose.setOptions({modelComplexity:1,enableSegmentation:false,minDetectionConfidence:0.7,minTrackingConfidence:0.7});
-    let handLandmarks=[],faceLandmarks=null,poseLandmarks=null;
-    hands.onResults(r=>handLandmarks=r.multiHandLandmarks||[]);
+    let handLandmarks=[],handedness=[],faceLandmarks=null,poseLandmarks=null;
+    hands.onResults(r=>{handLandmarks=r.multiHandLandmarks||[];handedness=r.multiHandedness||[];});
     faceMesh.onResults(r=>faceLandmarks=r.multiFaceLandmarks && r.multiFaceLandmarks[0] || null);
     pose.onResults(r=>poseLandmarks=r.poseLandmarks||null);
     async function onFrame(){
@@ -657,12 +658,10 @@ const transcriberP = pipeline('automatic-speech-recognition', 'Xenova/whisper-ti
           lm.forEach(p=>{ctxTracker.beginPath();ctxTracker.arc(p.x*vw,p.y*vh,3,0,Math.PI*2);ctxTracker.fill();});
           [0,4,8,12,16,20].forEach(i=>{const p=lm[i];if(p)drawMarker(ctxTracker,p.x*vw,p.y*vh,12);});
         });
-        if (handLandmarks[0]) {
-          const sign = detectStaticSign(handLandmarks[0]);
-          if (sign) {
-            captionContainer.classList.add('show');
-            captionText.textContent = sign;
-          }
+        const signText = formatSigns(handLandmarks, handedness);
+        if (signText) {
+          captionContainer.classList.add('show');
+          captionText.textContent = signText;
         }
         if(faceLandmarks){
           ctxTracker.strokeStyle='#00FFFF';
