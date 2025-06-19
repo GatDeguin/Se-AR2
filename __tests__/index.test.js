@@ -31,6 +31,15 @@ beforeAll(() => {
     localStorage.setItem('haptics', hapticsToggle.checked.toString());
   });
 
+  const helpBtn = document.getElementById('helpBtn');
+  const helpPanel = document.getElementById('helpPanel');
+  function toggleHelp(show) {
+    helpPanel.classList.toggle('show', show);
+    helpBtn.setAttribute('aria-expanded', show.toString());
+    helpPanel.setAttribute('aria-hidden', (!show).toString());
+  }
+  helpBtn.addEventListener('click', () => toggleHelp(!helpPanel.classList.contains('show')));
+
   const micBtn = document.getElementById('micBtn');
   global.micCalls = 0;
   micBtn.addEventListener('click', () => {
@@ -203,5 +212,21 @@ describe('index.html', () => {
     right[8].y = -1; right[12].y = -1; right[16].y = -1; right[20].y = -1; // sign B
     const txt = formatSigns([left, right], [{ label: 'Left' }, { label: 'Right' }]);
     expect(txt).toBe('Left: A / Right: B');
+  });
+
+  test('help button toggles panel visibility', () => {
+    const helpBtn = document.getElementById('helpBtn');
+    const helpPanel = document.getElementById('helpPanel');
+
+    expect(helpPanel.classList.contains('show')).toBe(false);
+    helpPanel.classList.add('show');
+    helpBtn.setAttribute('aria-expanded', 'true');
+    expect(helpPanel.classList.contains('show')).toBe(true);
+    expect(helpBtn.getAttribute('aria-expanded')).toBe('true');
+
+    helpPanel.classList.remove('show');
+    helpBtn.setAttribute('aria-expanded', 'false');
+    expect(helpPanel.classList.contains('show')).toBe(false);
+    expect(helpBtn.getAttribute('aria-expanded')).toBe('false');
   });
 });
