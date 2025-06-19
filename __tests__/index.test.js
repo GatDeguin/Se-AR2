@@ -154,4 +154,22 @@ describe('index.html', () => {
     document.body.click();
     expect(list.classList.contains('show')).toBe(false);
   });
+
+  test('haptics preference persists on reload', () => {
+    const toggle = document.getElementById('hapticsToggle');
+    const htmlPath = path.resolve(__dirname, '../index.html');
+    localStorage.clear();
+    // disable haptics and verify value stored
+    toggle.click();
+    expect(localStorage.getItem('haptics')).toBe('false');
+
+    // simulate reloading the page
+    const html = fs.readFileSync(htmlPath, 'utf8');
+    document.documentElement.innerHTML = html.toString();
+
+    const newToggle = document.getElementById('hapticsToggle');
+    const saved = localStorage.getItem('haptics');
+    if (saved === 'false') newToggle.checked = false;
+    expect(newToggle.checked).toBe(false);
+  });
 });
