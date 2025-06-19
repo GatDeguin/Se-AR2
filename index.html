@@ -12,11 +12,12 @@
     window.Module = window.Module || {};
     if (!('arguments_' in Module)) Module.arguments_ = [];
     if (!('arguments' in Module)) Module.arguments = Module.arguments_;
+    window.USE_CDN = false;
   </script>
-  <script src="libs/hands.js"></script>
-  <script src="libs/face_mesh.js"></script>
-  <script src="libs/drawing_utils.js"></script>
-  <script src="libs/pose.js"></script>
+  <script src="libs/hands.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js';window.USE_CDN=true;"></script>
+  <script src="libs/face_mesh.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js';window.USE_CDN=true;"></script>
+  <script src="libs/drawing_utils.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js';window.USE_CDN=true;"></script>
+  <script src="libs/pose.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js';window.USE_CDN=true;"></script>
 </head>
 <body>
   <!-- Splash Screen -->

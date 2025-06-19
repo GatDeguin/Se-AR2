@@ -21,25 +21,26 @@ export function initTracker({
   let lastW = 0, lastH = 0;
 
   const mpCache = window._mpSolutions || (window._mpSolutions = {});
-  const hands = mpCache.hands || (mpCache.hands = new Hands({
-    locateFile: f => new URL(`../libs/${f}`, import.meta.url).href
-  }));
+  const useCDN = window.USE_CDN;
+  const hands = mpCache.hands || (mpCache.hands = new Hands(
+    useCDN ? {} : { locateFile: f => new URL(`../libs/${f}`, import.meta.url).href }
+  ));
   if (!mpCache.handsInitialized) {
     hands.setOptions({ maxNumHands: 2, modelComplexity: 1,
       minDetectionConfidence: 0.7, minTrackingConfidence: 0.7 });
     mpCache.handsInitialized = true;
   }
-  const faceMesh = mpCache.faceMesh || (mpCache.faceMesh = new FaceMesh({
-    locateFile: f => new URL(`../libs/${f}`, import.meta.url).href
-  }));
+  const faceMesh = mpCache.faceMesh || (mpCache.faceMesh = new FaceMesh(
+    useCDN ? {} : { locateFile: f => new URL(`../libs/${f}`, import.meta.url).href }
+  ));
   if (!mpCache.faceMeshInitialized) {
     faceMesh.setOptions({ maxNumFaces: 1, refineLandmarks: true,
       minDetectionConfidence: 0.7, minTrackingConfidence: 0.7 });
     mpCache.faceMeshInitialized = true;
   }
-  const pose = mpCache.pose || (mpCache.pose = new Pose({
-    locateFile: f => new URL(`../libs/${f}`, import.meta.url).href
-  }));
+  const pose = mpCache.pose || (mpCache.pose = new Pose(
+    useCDN ? {} : { locateFile: f => new URL(`../libs/${f}`, import.meta.url).href }
+  ));
   if (!mpCache.poseInitialized) {
     pose.setOptions({ modelComplexity: 1, enableSegmentation: false,
       minDetectionConfidence: 0.7, minTrackingConfidence: 0.7 });
