@@ -10,11 +10,12 @@ const files = {
   'transformers.min.js': 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.5.2/dist/transformers.min.js'
 };
 
-function download(url, dest, onProgress) {
+function download(opts, dest, onProgress) {
+  const { url, headers = {} } = typeof opts === 'string' ? { url: opts } : opts;
   return new Promise((resolve, reject) => {
-    const file = fs.createWriteStream(dest);
-    https.get(url, response => {
-      if (response.statusCode !== 200) {
+    const file = fs.createWriteStream(dest, { flags: headers.Range ? 'a' : 'w' });
+    https.get(url, { headers }, response => {
+      if (![200, 206].includes(response.statusCode)) {
         reject(new Error(`Request Failed. Status Code: ${response.statusCode}`));
         return;
       }
@@ -36,13 +37,20 @@ async function main() {
   const dir = path.join(__dirname, '..', 'libs');
   fs.mkdirSync(dir, { recursive: true });
   const progressPath = path.join(dir, 'progress.json');
-  const progress = {};
+  let progress = {};
+  if (fs.existsSync(progressPath)) {
+    try {
+      progress = JSON.parse(fs.readFileSync(progressPath, 'utf8'));
+    } catch {
+      progress = {};
+    }
+  }
   const writeProgress = () => {
     fs.writeFileSync(progressPath, JSON.stringify(progress, null, 2));
   };
   for (const [name, url] of Object.entries(files)) {
     const dest = path.join(dir, name);
-    progress[name] = { downloaded: 0, total: 0 };
+    if (!progress[name]) progress[name] = { downloaded: 0, total: 0 };
     writeProgress();
     if (process.env.DRY_RUN === '1') {
       progress[name] = { downloaded: 1, total: 1 };
@@ -50,13 +58,19 @@ async function main() {
       console.log(`Saved ${dest}`);
       continue;
     }
+    const headers = {};
+    let start = 0;
+    if (fs.existsSync(dest)) {
+      start = fs.statSync(dest).size;
+      if (start > 0) headers.Range = `bytes=${start}-`;
+    }
     console.log(`Downloading ${name}...`);
     try {
-      await download(url, dest, (dl, total) => {
-        progress[name] = { downloaded: dl, total };
+      await download({ url, headers }, dest, (dl, total) => {
+        progress[name] = { downloaded: start + dl, total: start + total };
         writeProgress();
         if (total) {
-          const pct = ((dl / total) * 100).toFixed(0);
+          const pct = (((start + dl) / (start + total)) * 100).toFixed(0);
           process.stdout.write(`\r${name}: ${pct}%   `);
         }
       });

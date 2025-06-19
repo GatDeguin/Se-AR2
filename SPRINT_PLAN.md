@@ -33,10 +33,45 @@ A continuación se detalla la planificación exhaustiva para el próximo sprint 
    - Actualizar `README.md` con pasos para instalación y accesibilidad.
 
 ## Tareas
-- [ ] Desarrollar service worker con estrategias de caché y pantalla de actualización.
-- [ ] Persistir progreso de descargas en `libs/progress.json` y reanudar en `prepareOffline.js`.
-- [ ] Implementar selector "Alto contraste" y ajustar `styles.css`.
-- [ ] Crear módulo simple de reconocimiento de señas A-E.
-- [ ] Escribir pruebas Jest para service worker y descargas.
-- [ ] Revisar labels ARIA y secuencia de tabulación en `index.html`.
-- [ ] Documentar instalación PWA y opciones de accesibilidad en `README.md`.
+- [x] Desarrollar service worker con estrategias de caché y pantalla de actualización.
+- [x] Persistir progreso de descargas en `libs/progress.json` y reanudar en `prepareOffline.js`.
+- [x] Implementar selector "Alto contraste" y ajustar `styles.css`.
+- [x] Crear módulo simple de reconocimiento de señas A-E.
+- [x] Escribir pruebas Jest para service worker y descargas.
+- [x] Revisar labels ARIA y secuencia de tabulación en `index.html`.
+- [x] Documentar instalación PWA y opciones de accesibilidad en `README.md`.
+
+# Sprint 14 - Plan
+
+En este sprint se refuerzan las funcionalidades introducidas y se optimiza el rendimiento general de la aplicación. Se ampliará el vocabulario de gestos, se mejorará la experiencia offline y se documentará la arquitectura.
+
+## Objetivos generales
+- Gestionar actualizaciones de la PWA mostrando un mensaje cuando haya nueva versión.
+- Reducir el tiempo de carga y consumo de CPU durante la detección de señas.
+- Aumentar el vocabulario soportado con nuevas letras y gestos dinámicos simples.
+- Robustecer el manejo de errores durante las descargas y en el flujo principal de la app.
+- Consolidar la documentación técnica para desarrolladores.
+
+## Historias de usuario
+1. **Como usuario quiero recibir una notificación cuando exista una actualización de la aplicación.**
+   - Mostrar un diálogo para recargar cuando el service worker detecte nueva versión.
+
+2. **Como persona usuaria deseo que la detección de señas funcione con mejor rendimiento en dispositivos móviles.**
+   - Optimizar ciclos de renderizado y el uso de WebGL para subir los fps.
+
+3. **Como usuaria quiero utilizar más letras del alfabeto sin conexión.**
+   - Añadir detección de las letras F–J y dos gestos dinámicos básicos.
+
+4. **Como usuaria quiero que la aplicación maneje mejor los cortes de red.**
+   - Implementar una página offline y reintentos automáticos en descargas interrumpidas.
+
+5. **Como desarrolladora necesito documentación clara sobre la arquitectura y cómo extender los módulos.**
+   - Elaborar una guía técnica en `docs/architecture.md` con diagramas básicos.
+
+## Tareas
+- [ ] Mejorar el service worker para detectar actualizaciones y mostrar aviso de recarga.
+- [ ] Refactorizar `src/app.js` para reducir cálculos redundantes y usar `requestAnimationFrame` de forma más eficiente.
+- [ ] Extender `staticSigns.js` con las letras F–J y un ejemplo de gesto dinámico.
+- [ ] Añadir manejo de errores y reintentos en `prepareOffline.js`.
+- [ ] Crear `docs/architecture.md` documentando los principales módulos y flujos.
+- [ ] Escribir pruebas Jest para la nueva detección y para el flujo de actualización del service worker.
