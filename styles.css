@@ -135,6 +135,13 @@ body.light {
       width: 28px; height: 28px;
       fill: var(--icon-color);
     }
+    /* Theme toggle icons */
+    #themeToggle .icon-sun,
+    #themeToggle .icon-moon {
+      display: none;
+    }
+    body.light #themeToggle .icon-sun { display: block; }
+    body:not(.light) #themeToggle .icon-moon { display: block; }
     .controls-left button:hover { transform: scale(1.1); }
     .controls-left button:active { transform: scale(0.9); }
     .controls-left button:focus-visible {
