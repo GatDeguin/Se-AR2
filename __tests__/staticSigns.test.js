@@ -41,6 +41,41 @@ describe('detectStaticSign', () => {
     expect(detectStaticSign(lm)).toBe('E');
   });
 
+  test('detects sign F', () => {
+    const lm = baseHand();
+    lm[4].x = -1; lm[4].y = -1; // thumb extended
+    lm[8].x = -1; lm[8].y = -1; // index extended touching thumb
+    lm[12].y = -1; lm[16].y = -1; lm[20].y = -1; // other fingers extended
+    expect(detectStaticSign(lm)).toBe('F');
+  });
+
+  test('detects sign G', () => {
+    const lm = baseHand();
+    lm[4].x = -1; // thumb extended
+    lm[8].y = -1; // index extended
+    expect(detectStaticSign(lm)).toBe('G');
+  });
+
+  test('detects sign H', () => {
+    const lm = baseHand();
+    lm[4].x = -1; // thumb extended
+    lm[8].y = -1; lm[12].y = -1; // index and middle extended
+    expect(detectStaticSign(lm)).toBe('H');
+  });
+
+  test('detects sign I', () => {
+    const lm = baseHand();
+    lm[20].y = -1; // pinky extended
+    expect(detectStaticSign(lm)).toBe('I');
+  });
+
+  test('detects sign J', () => {
+    const lm = baseHand();
+    lm[4].x = -1; // thumb extended
+    lm[20].y = -1; // pinky extended
+    expect(detectStaticSign(lm)).toBe('J');
+  });
+
   test('returns null for malformed input', () => {
     expect(detectStaticSign(null)).toBeNull();
     expect(detectStaticSign([])).toBeNull();
