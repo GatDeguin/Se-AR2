@@ -1,5 +1,4 @@
 import { updateProgress } from './splash.js';
-import { formatSigns } from './handUtils.js';
 
 // Prepare global Module for MediaPipe WASM loaders
 if (!window.Module) {
@@ -633,98 +632,14 @@ const transcriberP = pipeline('automatic-speech-recognition', 'Xenova/whisper-ti
     micBtn.addEventListener('click', speechHandler);
     micBtn.addEventListener('click', recordHandler);
 
-    /* Tracker Combinado */
-    const canvasTracker=document.getElementById('trackerCanvas')||(()=>{const c=document.createElement('canvas');c.id='trackerCanvas';video.parentNode.insertBefore(c,video.nextSibling);return c;})();
-    const ctxTracker=canvasTracker.getContext('2d',{willReadFrequently:true});
-    ctxTracker.lineWidth=2;
-    let lastW=0,lastH=0;
-
-    const mpCache = window._mpSolutions || (window._mpSolutions = {});
-    const hands = mpCache.hands || (mpCache.hands = new Hands({locateFile:f=>new URL(`../libs/${f}`, import.meta.url).href}));
-    if (!mpCache.handsInitialized) {
-      hands.setOptions({maxNumHands:2,modelComplexity:1,minDetectionConfidence:0.7,minTrackingConfidence:0.7});
-      mpCache.handsInitialized = true;
-    }
-    const faceMesh = mpCache.faceMesh || (mpCache.faceMesh = new FaceMesh({locateFile:f=>new URL(`../libs/${f}`, import.meta.url).href}));
-    if (!mpCache.faceMeshInitialized) {
-      faceMesh.setOptions({maxNumFaces:1,refineLandmarks:true,minDetectionConfidence:0.7,minTrackingConfidence:0.7});
-      mpCache.faceMeshInitialized = true;
-    }
-    const pose = mpCache.pose || (mpCache.pose = new Pose({locateFile:f=>new URL(`../libs/${f}`, import.meta.url).href}));
-    if (!mpCache.poseInitialized) {
-      pose.setOptions({modelComplexity:1,enableSegmentation:false,minDetectionConfidence:0.7,minTrackingConfidence:0.7});
-      mpCache.poseInitialized = true;
-    }
-    let handLandmarks=[],handedness=[],faceLandmarks=null,poseLandmarks=null;
-    hands.onResults(r=>{handLandmarks=r.multiHandLandmarks||[];handedness=r.multiHandedness||[];});
-    faceMesh.onResults(r=>faceLandmarks=r.multiFaceLandmarks && r.multiFaceLandmarks[0] || null);
-    pose.onResults(r=>poseLandmarks=r.poseLandmarks||null);
-    async function onFrame(){
-      if(video.readyState>=2){
-        await Promise.all([
-          hands.send({image:video}),
-          faceMesh.send({image:video}),
-          pose.send({image:video})
-        ]);
-        const vw=video.videoWidth,vh=video.videoHeight;
-        if(vw!==lastW||vh!==lastH){
-          lastW=vw;lastH=vh;
-          canvasTracker.width=vw;canvasTracker.height=vh;
-        }
-        ctxTracker.clearRect(0,0,vw,vh);
-        handLandmarks.forEach(lm=>{
-          let minX=1,minY=1,maxX=0,maxY=0;
-          lm.forEach(p=>{minX=Math.min(minX,p.x);minY=Math.min(minY,p.y);maxX=Math.max(maxX,p.x);maxY=Math.max(maxY,p.y);});
-          const pad=0.02;
-          const x=Math.max(0,minX-pad),y=Math.max(0,minY-pad);
-          const w=Math.min(1,maxX+pad)-x,h=Math.min(1,maxY+pad)-y;
-          ctxTracker.fillStyle=`rgba(${accentRGB},0.15)`;
-          ctxTracker.fillRect(x*vw,y*vh,w*vw,h*vh);
-
-          ctxTracker.strokeStyle=accent;
-          HAND_CONNECTIONS.forEach(([i,j])=>{
-            const p1=lm[i],p2=lm[j];
-            ctxTracker.beginPath();
-            ctxTracker.moveTo(p1.x*vw,p1.y*vh);
-            ctxTracker.lineTo(p2.x*vw,p2.y*vh);
-            ctxTracker.stroke();
-          });
-          ctxTracker.fillStyle=accent;
-          lm.forEach(p=>{ctxTracker.beginPath();ctxTracker.arc(p.x*vw,p.y*vh,3,0,Math.PI*2);ctxTracker.fill();});
-          [0,4,8,12,16,20].forEach(i=>{const p=lm[i];if(p)drawMarker(ctxTracker,p.x*vw,p.y*vh,12);});
-        });
-        const signText = formatSigns(handLandmarks, handedness);
-        if (signText) {
-          captionContainer.classList.add('show');
-          captionText.textContent = signText;
-        }
-        if(faceLandmarks){
-          ctxTracker.strokeStyle='#00FFFF';
-          let minX=1,minY=1,maxX=0,maxY=0;
-          faceLandmarks.forEach(p=>{minX=Math.min(minX,p.x);minY=Math.min(minY,p.y);maxX=Math.max(maxX,p.x);maxY=Math.max(maxY,p.y);});
-          ctxTracker.strokeRect(minX*vw,minY*vh,(maxX-minX)*vw,(maxY-minY)*vh);
-
-          // bounding boxes for eyes
-          const leftEyeIdx=[33,133,159,145];
-          const rightEyeIdx=[362,263,386,374];
-          [leftEyeIdx,rightEyeIdx].forEach(idxArr=>{
-            let exMin=1,eyMin=1,exMax=0,eyMax=0;
-            idxArr.forEach(i=>{const p=faceLandmarks[i];exMin=Math.min(exMin,p.x);eyMin=Math.min(eyMin,p.y);exMax=Math.max(exMax,p.x);eyMax=Math.max(eyMax,p.y);});
-            ctxTracker.strokeStyle='#FF0000';
-            ctxTracker.strokeRect(exMin*vw,eyMin*vh,(exMax-exMin)*vw,(eyMax-eyMin)*vh);
-          });
-
-          drawConnectors(ctxTracker,faceLandmarks,FACEMESH_LEFT_EYE,{color:'#FFD700',lineWidth:2});
-          drawConnectors(ctxTracker,faceLandmarks,FACEMESH_RIGHT_EYE,{color:'#FFD700',lineWidth:2});
-          drawConnectors(ctxTracker,faceLandmarks,FACEMESH_LIPS,{color:'#FF69B4',lineWidth:2});
-        }
-        if(poseLandmarks){
-          drawConnectors(ctxTracker, poseLandmarks, POSE_CONNECTIONS, {color:'#ADFF2F', lineWidth:2});
-          poseLandmarks.forEach(p=>{ctxTracker.fillStyle='#0000FF';ctxTracker.beginPath();ctxTracker.arc(p.x*vw,p.y*vh,3,0,Math.PI*2);ctxTracker.fill();});
-        }
-      }
-      requestAnimationFrame(onFrame);
-    }
-    video.addEventListener('playing',onFrame);
-    if (!video.paused && video.readyState >= 2) requestAnimationFrame(onFrame);
+    const { initTracker } = await import('./tracker.js');
+    initTracker({
+      video,
+      canvas: document.getElementById('trackerCanvas'),
+      captionContainer,
+      captionText,
+      accent,
+      accentRGB,
+      drawMarker
+    });
 })();
