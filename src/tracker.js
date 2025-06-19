@@ -31,7 +31,10 @@ export function updateTrackerColors() {
 window.addEventListener('themechange', updateTrackerColors);
 
 const FRAME_INTERVAL = 1000 / 15;
-const CAN_USE_WORKER = typeof OffscreenCanvas !== 'undefined' && typeof Worker !== 'undefined' && typeof createImageBitmap !== 'undefined';
+const CAN_USE_WORKER = typeof OffscreenCanvas !== 'undefined' &&
+  typeof Worker !== 'undefined' &&
+  typeof createImageBitmap !== 'undefined' &&
+  window.crossOriginIsolated === true;
 
 export async function initTracker({
   video,
