@@ -545,8 +545,12 @@ body.light {
   .help-btn {
       bottom: 8%;
       right: 2%;
-      width: 32px;
-      height: 32px;
+      width: 44px;
+      height: 44px;
+    }
+  .help-btn svg {
+      width: 28px;
+      height: 28px;
     }
   .help-panel {
       bottom: 20%;
