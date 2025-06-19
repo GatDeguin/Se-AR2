@@ -69,9 +69,34 @@ En este sprint se refuerzan las funcionalidades introducidas y se optimiza el re
    - Elaborar una guía técnica en `docs/architecture.md` con diagramas básicos.
 
 ## Tareas
-- [ ] Mejorar el service worker para detectar actualizaciones y mostrar aviso de recarga.
+- [x] Mejorar el service worker para detectar actualizaciones y mostrar aviso de recarga.
 - [ ] Refactorizar `src/app.js` para reducir cálculos redundantes y usar `requestAnimationFrame` de forma más eficiente.
 - [x] Extender `staticSigns.js` con las letras F–J; queda pendiente el gesto dinámico.
 - [ ] Añadir manejo de errores y reintentos en `prepareOffline.js`.
 - [x] Crear `docs/architecture.md` documentando los principales módulos y flujos.
-- [ ] Escribir pruebas Jest para la nueva detección y para el flujo de actualización del service worker.
+- [x] Escribir pruebas Jest para la nueva detección y para el flujo de actualización del service worker.
+
+# Sprint 15 - Plan
+
+En este sprint se completarán los pendientes arrastrados y se seguirá
+expandiendo la experiencia sin conexión.
+
+## Objetivos generales
+- Incorporar gestos dinámicos básicos para ampliar la comunicación.
+- Mejorar la resiliencia ante fallas de red y la experiencia offline.
+- Optimizar el ciclo principal de renderizado para reducir consumo de CPU.
+
+## Historias de usuario
+1. **Como usuaria quiero que la app reconozca gestos en movimiento además de las letras.**
+   - Implementar dos gestos dinámicos simples y documentarlos.
+2. **Como usuaria quiero seguir utilizando la aplicación aun cuando la conexión se interrumpe.**
+   - Añadir una página offline y reintentos automáticos de descarga.
+3. **Como persona usuaria deseo que la aplicación sea más fluida en dispositivos móviles.**
+   - Refactorizar `src/app.js` para evitar cálculos redundantes y coordinar `requestAnimationFrame`.
+
+## Tareas
+- [ ] Implementar detección de dos gestos dinámicos en un nuevo módulo.
+- [ ] Crear `offline.html` e integrar su entrega desde `sw.js`.
+- [ ] Añadir reintentos con espera exponencial en `prepareOffline.js`.
+- [ ] Reorganizar el bucle principal de `src/app.js` optimizando `requestAnimationFrame`.
+- [ ] Actualizar la documentación y las pruebas de acuerdo con los cambios.
