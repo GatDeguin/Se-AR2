@@ -1,0 +1,22 @@
+{
+  "hands.js": {
+    "downloaded": 45581,
+    "total": 45581
+  },
+  "face_mesh.js": {
+    "downloaded": 64913,
+    "total": 64913
+  },
+  "drawing_utils.js": {
+    "downloaded": 3767,
+    "total": 3767
+  },
+  "pose.js": {
+    "downloaded": 47089,
+    "total": 47089
+  },
+  "transformers.min.js": {
+    "downloaded": 849533,
+    "total": 849533
+  }
+}
