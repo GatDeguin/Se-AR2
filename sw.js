@@ -12,6 +12,8 @@ const ASSETS = [
   '/libs/hands.js',
   '/libs/pose.js',
   '/libs/transformers.min.js',
+  '/enter.mp3',
+  '/done.mp3',
 ];
 self.addEventListener('install', evt => {
   self.skipWaiting();
