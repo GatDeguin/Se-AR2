@@ -1,8 +1,12 @@
 import { ripple } from './utils.js';
 
 export let hapticsEnabled = true;
+export let autoTranslateEnabled = true;
 export function getHapticsEnabled(){
   return hapticsEnabled;
+}
+export function getAutoTranslateEnabled(){
+  return autoTranslateEnabled;
 }
 
 export function initSettings(refs){
@@ -13,7 +17,7 @@ export function initSettings(refs){
     subtitleFontSelect, subtitleColorInput,
     dialectSelect, cameraSelect, micSelect,
     repeatTourBtn, resetPrefsBtn, downloadSttBtn,
-    lsaSettingsBtn, hapticsToggle, captionContainer,
+    lsaSettingsBtn, hapticsToggle, autoTranslateToggle, captionContainer,
     startTour, startStream
   } = refs;
 
@@ -62,6 +66,12 @@ export function initSettings(refs){
     if (hapticsToggle) hapticsToggle.checked = false;
   }
 
+  const savedAuto = localStorage.getItem('autoTranslate');
+  if (savedAuto === 'false') {
+    autoTranslateEnabled = false;
+    if (autoTranslateToggle) autoTranslateToggle.checked = false;
+  }
+
   settingsBtn.onclick = e => {
     ripple(e, settingsBtn);
     settingsScreen.classList.add('show');
@@ -91,6 +101,13 @@ export function initSettings(refs){
     ripple(e, hapticsToggle);
     hapticsEnabled = hapticsToggle.checked;
     localStorage.setItem('haptics', hapticsEnabled);
+  };
+
+  if (autoTranslateToggle) autoTranslateToggle.onclick = e => {
+    ripple(e, autoTranslateToggle);
+    autoTranslateEnabled = autoTranslateToggle.checked;
+    localStorage.setItem('autoTranslate', autoTranslateEnabled);
+    window.dispatchEvent(new Event('autotranslatechange'));
   };
 
   subtitleSizeSlider.oninput = () => {
