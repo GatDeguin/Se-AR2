@@ -1,9 +1,14 @@
 beforeEach(() => {
   jest.resetModules();
+  jest.useFakeTimers();
+});
+afterEach(() => {
+  jest.clearAllTimers();
 });
 
+
 test('service worker registers', () => {
-  const register = jest.fn().mockResolvedValue({ addEventListener: jest.fn() });
+  const register = jest.fn().mockResolvedValue({ addEventListener: jest.fn(), update: jest.fn() });
   Object.defineProperty(window, 'navigator', {
     value: { serviceWorker: { register, addEventListener: jest.fn() } },
     configurable: true
@@ -15,7 +20,7 @@ test('service worker registers', () => {
 
 test('prompts when waiting worker present', async () => {
   const postMessage = jest.fn();
-  const register = jest.fn().mockResolvedValue({ waiting: { postMessage }, addEventListener: jest.fn() });
+  const register = jest.fn().mockResolvedValue({ waiting: { postMessage }, addEventListener: jest.fn(), update: jest.fn() });
   Object.defineProperty(window, 'navigator', {
     value: { serviceWorker: { register, addEventListener: jest.fn() } },
     configurable: true
@@ -30,7 +35,7 @@ test('prompts when waiting worker present', async () => {
 
 test('user accepts update posts message and reloads', async () => {
   const postMessage = jest.fn();
-  const register = jest.fn().mockResolvedValue({ waiting: { postMessage }, addEventListener: jest.fn() });
+  const register = jest.fn().mockResolvedValue({ waiting: { postMessage }, addEventListener: jest.fn(), update: jest.fn() });
   let controllerHandler;
   const addEventListener = jest.fn((e, cb) => { if (e === 'controllerchange') controllerHandler = cb; });
   Object.defineProperty(window, 'navigator', {
