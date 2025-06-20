@@ -216,3 +216,8 @@ Para revisarlas y fusionarlas:
 1. Revisar la descripción de la PR y los *changelogs* enlazados.
 2. Ejecutar localmente `npm ci` y `npm test` para asegurarse de que la actualización no rompe la aplicación.
 3. Si todo funciona correctamente, usar **Squash and merge** y eliminar la rama de Dependabot.
+
+## Política de Privacidad
+
+La aplicación procesa video y audio localmente en su navegador. No se envían datos de cámara ni micrófono a servidores externos. Para más detalles consulte [docs/privacy.md](docs/privacy.md).
+
