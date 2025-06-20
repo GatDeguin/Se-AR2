@@ -13,8 +13,9 @@ transcription directly in the browser.
 * Las preferencias de tema y tamaño de subtítulos se guardan en el navegador.
 * Herramientas para capturar imágenes y alternar cámaras durante la sesión.
 * Reconocimiento de señas estáticas sin conexión: **A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, U, V, W y Y**.
-  Algunas señas dinámicas como **"J"** o **"Z"** todavía no se soportan o se detectan de forma parcial.
-  [Ver `src/staticSigns.js`](src/staticSigns.js) como referencia técnica.
+  Las letras dinámicas **"J"** y **"Z"** ahora se detectan rastreando la trayectoria del meñique.
+  [Ver `src/staticSigns.js`](src/staticSigns.js) y `src/dynamicSigns.js` como referencia técnica.
+* Traducción automática de las letras reconocidas en pantalla mediante el módulo `lsaTranslate.js`.
 
 ## Architecture
 
