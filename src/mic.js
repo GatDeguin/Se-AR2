@@ -22,9 +22,13 @@ export function initMic({ SR, micBtn, captionContainer, captionText, micSelect, 
     let j=0,last=performance.now();
     function hl(now){
       if(now - last >= 400){
-        if(j>0) captionText.children[j-1].classList.remove('highlight');
-        if(j<w.length){
+        if(j>0 && captionText.children[j-1]){
+          captionText.children[j-1].classList.remove('highlight');
+        }
+        if(j<w.length && captionText.children[j]){
           captionText.children[j].classList.add('highlight');
+          j++; last=now;
+        }else if(j<w.length){
           j++; last=now;
         }
       }
