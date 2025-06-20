@@ -195,7 +195,7 @@ docker run -p 80:80 -p 443:443 senar
 
 ### Actualizar el service worker
 
-Cuando se modifique `sw.js` o cambien los archivos estáticos, incremente la constante `CACHE_NAME` y despliegue nuevamente. Al cargar la página, el registro en `src/sw-register.js` mostrará un aviso para recargar y activar la versión nueva.
+Cuando se modifique `sw.js` o cambien los archivos estáticos, incremente la constante `CACHE_VERSION` y despliegue nuevamente. Al cargar la página, el registro en `src/sw-register.js` mostrará un aviso para recargar y activar la versión nueva.
 
 ### Renovar los modelos offline
 
