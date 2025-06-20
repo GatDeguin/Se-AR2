@@ -175,6 +175,7 @@ minor differences.
 ## Deployment
 
 Para un entorno de producción se recomienda servir la aplicación a través de **HTTPS**. Cualquier servidor estático es suficiente; por ejemplo:
+Para instrucciones sobre empaquetar la PWA para las tiendas móviles consulte [docs/deployment.md](docs/deployment.md).
 
 ```bash
 npx http-server . -p 443 --ssl --cert path/to/cert.pem --key path/to/key.pem
