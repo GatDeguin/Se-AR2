@@ -139,33 +139,56 @@ export function initSettings(refs){
     }
   };
 
-  if (downloadSttBtn) downloadSttBtn.onclick = async e => {
-    ripple(e, downloadSttBtn);
-    downloadSttBtn.textContent = '0%';
-    downloadSttBtn.disabled = true;
-    try {
-      const url = new URL('../libs/transformers.min.js', import.meta.url);
-      const res = await fetch(url);
-      const reader = res.body.getReader();
-      const length = +res.headers.get('content-length') || 0;
-      let received = 0;
-      const chunks = [];
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        chunks.push(value);
-        received += value.length;
-        if (length) downloadSttBtn.textContent = Math.floor(received / length * 100) + '%';
+  if (downloadSttBtn) {
+    const sttUrl = new URL('../libs/transformers.min.js', import.meta.url).toString();
+    downloadSttBtn.setAttribute('aria-live', 'polite');
+    downloadSttBtn.setAttribute('aria-atomic', 'true');
+
+    const removeSttBtn = document.createElement('button');
+    removeSttBtn.id = 'removeSttBtn';
+    removeSttBtn.className = 'settings-button secondary';
+    removeSttBtn.textContent = 'Eliminar';
+    downloadSttBtn.after(removeSttBtn);
+
+    removeSttBtn.onclick = async e => {
+      ripple(e, removeSttBtn);
+      if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({ type: 'DELETE_MODEL', url: sttUrl });
       }
-      const blob = new Blob(chunks, { type: res.headers.get('content-type') });
-      const response = new Response(blob);
       const cache = await caches.open('offline-models');
-      await cache.put(url, response);
-      downloadSttBtn.textContent = 'Descargado ✓';
-    } catch (err) {
-      downloadSttBtn.textContent = 'Error';
-    }
-  };
+      await cache.delete(sttUrl);
+      removeSttBtn.textContent = 'Eliminado ✓';
+      downloadSttBtn.textContent = 'Descargar';
+      downloadSttBtn.disabled = false;
+    };
+
+    downloadSttBtn.onclick = async e => {
+      ripple(e, downloadSttBtn);
+      downloadSttBtn.textContent = '0%';
+      downloadSttBtn.disabled = true;
+      try {
+        const res = await fetch(sttUrl);
+        const reader = res.body.getReader();
+        const length = +res.headers.get('content-length') || 0;
+        let received = 0;
+        const chunks = [];
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          chunks.push(value);
+          received += value.length;
+          if (length) downloadSttBtn.textContent = Math.floor(received / length * 100) + '%';
+        }
+        const blob = new Blob(chunks, { type: res.headers.get('content-type') });
+        const response = new Response(blob);
+        const cache = await caches.open('offline-models');
+        await cache.put(sttUrl, response);
+        downloadSttBtn.textContent = 'Descargado ✓';
+      } catch (err) {
+        downloadSttBtn.textContent = 'Error';
+      }
+    };
+  }
 
   if (lsaSettingsBtn) lsaSettingsBtn.onclick = e => {
     ripple(e, lsaSettingsBtn);

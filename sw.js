@@ -68,7 +68,15 @@ self.addEventListener('fetch', evt => {
 });
 
 self.addEventListener('message', evt => {
-  if (evt.data === 'SKIP_WAITING') self.skipWaiting();
+  if (evt.data === 'SKIP_WAITING') {
+    self.skipWaiting();
+    return;
+  }
+  if (evt.data && evt.data.type === 'DELETE_MODEL' && evt.data.url) {
+    evt.waitUntil(
+      caches.open(MODEL_CACHE).then(cache => cache.delete(evt.data.url))
+    );
+  }
 });
 
 async function cacheFirst(request) {
