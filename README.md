@@ -222,6 +222,10 @@ Para revisarlas y fusionarlas:
 
 Los planes para la siguiente iteración se describen en [docs/next-sprint.md](docs/next-sprint.md). Este objetivo ambicioso busca ampliar el vocabulario de señas y mejorar la experiencia sin conexión.
 
+## Licenses
+
+For information on external libraries such as **MediaPipe** and **HuggingFace Transformers**, see [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md).
+
 ## Política de Privacidad
 
 La aplicación procesa video y audio localmente en su navegador. No se envían datos de cámara ni micrófono a servidores externos. Para más detalles consulte [docs/privacy.md](docs/privacy.md).
