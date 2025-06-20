@@ -12,7 +12,7 @@ transcription directly in the browser.
 * Interfaz con subtítulos arrastrables, cambio de tema y recorrido guiado.
 * Las preferencias de tema y tamaño de subtítulos se guardan en el navegador.
 * Herramientas para capturar imágenes y alternar cámaras durante la sesión.
-* Reconocimiento de señas estáticas **A–J** sin conexión.
+* Reconocimiento de señas estáticas **A–Z** sin conexión.
 
 ## Architecture
 

@@ -148,4 +148,54 @@ describe('detectStaticSign', () => {
     lm[4].x = -1; lm[20].x = 2; lm[20].y = -1;
     expect(detectStaticSign(lm)).toBe('Y');
   });
+
+  test('recognizes sign P with downward index and middle', () => {
+    const lm = baseHand();
+    lm[4].x = -1; lm[4].y = 1; // thumb
+    lm[12].x = -1; lm[12].y = 1;
+    expect(detectStaticSign(lm)).toBe('P');
+  });
+
+  test('recognizes sign Q like downward G', () => {
+    const lm = baseHand();
+    lm[4].x = -1; lm[4].y = 1; // thumb
+    lm[8].x = -1; lm[8].y = 1;
+    expect(detectStaticSign(lm)).toBe('Q');
+  });
+
+  test('recognizes sign R with crossed fingers', () => {
+    const lm = baseHand();
+    lm[8].y = -1; lm[12].y = -1;
+    lm[8].x = 0; lm[12].x = 0;
+    lm[4].x = 0.1; lm[4].y = -1;
+    expect(detectStaticSign(lm)).toBe('R');
+  });
+
+  test('recognizes sign S with fist and thumb over fingers', () => {
+    const lm = baseHand();
+    lm[4].x = 0; lm[4].y = 1;
+    lm[12].x = 0.5;
+    expect(detectStaticSign(lm)).toBe('S');
+  });
+
+  test('recognizes sign T with thumb between index and middle', () => {
+    const lm = baseHand();
+    lm[4].x = 0; lm[4].y = 1;
+    lm[8].x = 0; lm[8].y = 1;
+    lm[12].x = 0; lm[12].y = 1;
+    expect(detectStaticSign(lm)).toBe('T');
+  });
+
+  test('recognizes sign X with hooked index', () => {
+    const lm = baseHand();
+    lm[4].x = 1; // thumb not extended
+    lm[8].y = 0.05;
+    expect(detectStaticSign(lm)).toBe('X');
+  });
+
+  test('recognizes sign Z with horizontal index', () => {
+    const lm = baseHand();
+    lm[8].y = -1; lm[8].x = 2;
+    expect(detectStaticSign(lm)).toBe('Z');
+  });
 });
