@@ -8,6 +8,9 @@ import { initCamera, startStream } from './camera.js';
 import { initCaptionDrag } from './drag.js';
 import { initMic } from './mic.js';
 import { initTour } from './tour.js';
+import { detectStaticSign } from './staticSigns.js';
+import { updateTrails, detectDynamicSigns } from './dynamicSigns.js';
+import { trackerState } from './tracker.js';
 
 if (!window.Module) window.Module = {};
 if (!('arguments_' in window.Module)) window.Module.arguments_ = [];
@@ -199,4 +202,13 @@ Promise.all(tasks).then(() => {
     video,
     canvas: document.getElementById('trackerCanvas')
   });
+  function detectLoop(){
+    const hands = trackerState.handLandmarks || [];
+    updateTrails(hands);
+    const dyn = detectDynamicSigns();
+    const out = hands.map((lm, i) => dyn[i] || detectStaticSign(lm));
+    if (out.some(Boolean)) console.log('Signs:', out.filter(Boolean).join(' '));
+    requestAnimationFrame(detectLoop);
+  }
+  requestAnimationFrame(detectLoop);
 })();
