@@ -222,6 +222,10 @@ Para revisarlas y fusionarlas:
 2. Ejecutar localmente `npm ci` y `npm test` para asegurarse de que la actualización no rompe la aplicación.
 3. Si todo funciona correctamente, usar **Squash and merge** y eliminar la rama de Dependabot.
 
+## Próximo Sprint
+
+Los planes para la siguiente iteración se describen en [docs/next-sprint.md](docs/next-sprint.md). Este objetivo ambicioso busca ampliar el vocabulario de señas y mejorar la experiencia sin conexión.
+
 ## Política de Privacidad
 
 La aplicación procesa video y audio localmente en su navegador. No se envían datos de cámara ni micrófono a servidores externos. Para más detalles consulte [docs/privacy.md](docs/privacy.md).
