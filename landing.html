@@ -271,7 +271,9 @@
 const qs=s=>document.querySelector(s),qsa=s=>document.querySelectorAll(s);
 
 /* Pre‑loader */
-window.addEventListener('load',()=>document.body.classList.add('loaded'));
+function hidePreloader(){document.body.classList.add('loaded');}
+window.addEventListener('DOMContentLoaded',hidePreloader);
+window.addEventListener('load',hidePreloader);
 
 /* Burger */
 qs('#burger').addEventListener('click',()=>qs('#nav-links').classList.toggle('open'));
