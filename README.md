@@ -16,7 +16,7 @@ transcription directly in the browser.
 
 ## Architecture
 
-The demo is organized as a single page web application. All scripts are loaded from **index.html** which boots `src/app.js` for gesture recognition and speech transcription. A service worker (`sw.js`) caches core assets so the page works as a PWA. Models downloaded via the settings screen or `npm run prepare-offline` are stored in the `offline-models` cache allowing the app to operate without a network connection.
+The demo is organized as a single page web application. All scripts are loaded from **index.html** which boots `src/app.js` for gesture recognition and speech transcription. A service worker (`sw.js`) cachés core assets so the page works as a PWA. Models downloaded via the settings screen or `npm run prepare-offline` are stored in the `offline-models` cache allowing the app to operate without a network connection.
 
 For a more detailed overview see [docs/architecture.md](docs/architecture.md).
 
@@ -78,7 +78,7 @@ elements such as the video and canvas are present.
 
 ## Architecture
 
-For an overview of the core modules and how the service worker caches offline
+For an overview of the core modules and how the service worker cachés offline
 resources, see [docs/architecture.md](docs/architecture.md).
 
 ## Dependencias e instalación
@@ -162,7 +162,7 @@ preferencias desde **Advanced**.
 
 ## Recommended Browsers
 
-The app is tested with recent versions of **Chrome** and **Firefox**. Other
+The app is tested with recent versións of **Chrome** and **Firefox**. Other
 browsers supporting WebGL and MediaStream APIs should also work, but may have
 minor differences.
 
@@ -171,3 +171,38 @@ minor differences.
 * Requires a fast network connection to load external model scripts.
 * Mobile Safari has limited support for some APIs and may behave unexpectedly.
 
+## Deployment
+
+Para un entorno de producción se recomienda servir la aplicación a través de **HTTPS**. Cualquier servidor estático es suficiente; por ejemplo:
+
+```bash
+npx http-server . -p 443 --ssl --cert path/to/cert.pem --key path/to/key.pem
+```
+
+También es posible contenerizar el proyecto. Un `Dockerfile` muy básico podría usar **Nginx** para servir los archivos:
+
+```Dockerfile
+FROM nginx:alpine
+COPY . /usr/share/nginx/html
+```
+
+Luego ejecute:
+
+```bash
+docker build -t senar .
+docker run -p 80:80 -p 443:443 senar
+```
+
+### Actualizar el service worker
+
+Cuando se modifique `sw.js` o cambien los archivos estáticos, incremente la constante `CACHE_NAME` y despliegue nuevamente. Al cargar la página, el registro en `src/sw-register.js` mostrará un aviso para recargar y activar la versión nueva.
+
+### Renovar los modelos offline
+
+Si alguna biblioteca de `libs/` se actualiza, vuelva a ejecutar:
+
+```bash
+npm run prepare-offline
+```
+
+Esto descargará los modelos actualizados y sobrescribirá la carpeta `libs/`. Tras el despliegue, puede limpiar la caché `offline-models` desde las herramientas de desarrollo o esperar a que el nuevo service worker la renueve.
