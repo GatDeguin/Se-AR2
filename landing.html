@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SeñAR – Comunicación sin Barreras en LSA</title>
+  <style>
+    /* ================================ */
+    /* Variables de Color y Tipografía */
+    /* ================================ */
+    :root {
+      --primary: #0052cc;
+      --accent: #ffdd00;
+      --bg: #f9f9f9;
+      --text: #333;
+      --white: #fff;
+      --font-sans: "Inter", sans-serif;
+      --radius: 6px;
+      --transition: 0.3s;
+    }
+    /* Reset y Base */
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    .container { width: 90%; max-width: 1200px; margin: 0 auto; }
+    a { text-decoration: none; color: inherit; }
+    img, video { display: block; max-width: 100%; }
+
+    /* ================================ */
+    /* Navbar */
+    /* ================================ */
+    .navbar {
+      background: var(--white);
+      padding: 1rem 0;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    .navbar .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--primary);
+      transition: color var(--transition);
+    }
+    .logo:hover { color: var(--accent); }
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+    }
+    .nav-links a,
+    .nav-links button {
+      font-size: 1rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.5rem;
+      border-radius: var(--radius);
+      transition: background var(--transition);
+    }
+    .nav-links a:hover,
+    .nav-links button:hover {
+      background: rgba(0,82,204,0.1);
+    }
+    .burger {
+      display: none;
+      font-size: 1.5rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text);
+    }
+
+    /* ================================ */
+    /* Hero */
+    /* ================================ */
+    .hero {
+      padding: 6rem 0;
+      background: var(--white);
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      align-items: center;
+    }
+    .hero-text h1 {
+      font-size: 2.75rem;
+      color: var(--primary);
+      margin-bottom: 1rem;
+    }
+    .hero-text p {
+      font-size: 1.125rem;
+      margin-bottom: 1.5rem;
+    }
+    .btn {
+      display: inline-block;
+      padding: 0.75rem 1.75rem;
+      background: var(--primary);
+      color: var(--white);
+      border-radius: var(--radius);
+      font-weight: 600;
+      transition: background var(--transition);
+    }
+    .btn:hover { background: var(--accent); }
+
+    /* ================================ */
+    /* Secciones */
+    /* ================================ */
+    section { padding: 4rem 0; }
+    h2 {
+      text-align: center;
+      font-size: 2.25rem;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+    h2::after {
+      content: '';
+      width: 60px;
+      height: 4px;
+      background: var(--accent);
+      display: block;
+      margin: 0.5rem auto 0;
+      border-radius: var(--radius);
+    }
+
+    /* Features */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 2rem;
+    }
+    .feature {
+      background: var(--white);
+      padding: 2rem;
+      text-align: center;
+      border-radius: var(--radius);
+      transition: transform var(--transition), box-shadow var(--transition);
+    }
+    .feature:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .feature img { margin-bottom: 1rem; }
+    .feature h3 { margin-bottom: 0.75rem; color: var(--primary); }
+
+    /* Audience */
+    .audience-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+    }
+    .card {
+      background: var(--white);
+      padding: 1.5rem;
+      border-radius: var(--radius);
+      text-align: center;
+      transition: box-shadow var(--transition);
+    }
+    .card:hover {
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
+    .card img { margin-bottom: 1rem; }
+    .card h4 {
+      font-size: 1.125rem;
+      margin-bottom: 0.5rem;
+      color: var(--primary);
+    }
+
+    /* Footer */
+    .footer {
+      background: var(--white);
+      padding: 3rem 0;
+      margin-top: 3rem;
+      box-shadow: 0 -2px 6px rgba(0,0,0,0.05);
+    }
+    .footer .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      font-size: 0.9rem;
+    }
+    .footer-nav { display: flex; gap: 1rem; }
+    .footer-nav a:hover {
+      color: var(--primary);
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .hero-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        flex-direction: column;
+        background: var(--white);
+        padding: 1rem 0;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      }
+      .nav-links.open { display: flex; }
+      .burger { display: block; }
+    }
+
+    /* LSA ON/OFF */
+    body.lsa-active {
+      outline: 4px solid var(--accent);
+    }
+  </style>
+</head>
+<body>
+  <header class="navbar">
+    <div class="container">
+      <a href="#" class="logo" aria-label="Inicio - SeñAR">SeñAR</a>
+      <nav class="nav-links" id="nav-links" aria-label="Menú principal">
+        <a href="#como-funciona">Cómo funciona</a>
+        <a href="#publicos">Para quién</a>
+        <a href="#precios">Precios</a>
+        <button id="lsa-toggle" aria-pressed="false">🖐 LSA OFF</button>
+      </nav>
+      <button class="burger" id="burger" aria-label="Abrir menú">☰</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero -->
+    <section id="hero" class="hero" aria-labelledby="hero-title">
+      <div class="container hero-grid">
+        <div class="hero-text">
+          <h1 id="hero-title">Comunícate sin barreras con SeñAR</h1>
+          <p>Traduce Lengua de Señas Argentina a texto y voz en tiempo real.</p>
+          <a href="#registro" class="btn">Probar gratis</a>
+        </div>
+        <div class="hero-video">
+          <video id="demo-video" src="https://www.w3schools.com/html/mov_bbb.mp4" controls muted
+                 aria-label="Demostración de la aplicación SeñAR" preload="none"></video>
+        </div>
+      </div>
+    </section>
+
+    <!-- Cómo funciona -->
+    <section id="como-funciona" class="features" aria-labelledby="funciona-title">
+      <div class="container">
+        <h2 id="funciona-title">Cómo funciona</h2>
+        <div class="feature-grid">
+          <div class="feature" role="group" aria-labelledby="f1-title">
+            <img src="https://via.placeholder.com/64" alt="Icono cámara" />
+            <h3 id="f1-title">1. Señala</h3>
+            <p>Usa la cámara para captar tus señas.</p>
+          </div>
+          <div class="feature" role="group" aria-labelledby="f2-title">
+            <img src="https://via.placeholder.com/64" alt="Icono IA" />
+            <h3 id="f2-title">2. Traduce</h3>
+            <p>IA convierte tus señas a español.</p>
+          </div>
+          <div class="feature" role="group" aria-labelledby="f3-title">
+            <img src="https://via.placeholder.com/64" alt="Icono conversación" />
+            <h3 id="f3-title">3. Conversa</h3>
+            <p>Lee o escucha la respuesta al instante.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Para quién -->
+    <section id="publicos" class="audience" aria-labelledby="publicos-title">
+      <div class="container">
+        <h2 id="publicos-title">¿Para quién?</h2>
+        <div class="audience-grid">
+          <div class="card" role="article">
+            <img src="https://via.placeholder.com/80" alt="Persona sorda usando app" />
+            <h4>Personas Sordas</h4>
+            <p>Comunicación autónoma en LSA.</p>
+          </div>
+          <div class="card" role="article">
+            <img src="https://via.placeholder.com/80" alt="Persona oyente usando app" />
+            <h4>Personas Oyentes</h4>
+            <p>Habla en español, recibe texto y audio.</p>
+          </div>
+          <div class="card" role="article">
+            <img src="https://via.placeholder.com/80" alt="Docente en aula inclusiva" />
+            <h4>Educadores</h4>
+            <p>Clases bilingües LSA–Español más inclusivas.</p>
+          </div>
+          <div class="card" role="article">
+            <img src="https://via.placeholder.com/80" alt="Kiosco institucional con app" />
+            <h4>Instituciones</h4>
+            <p>API, kioscos accesibles y AR en eventos.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer" aria-labelledby="footer-title">
+    <div class="container">
+      <h2 id="footer-title" class="sr-only">Pie de página</h2>
+      <p>© 2025 SeñAR. Todos los derechos reservados.</p>
+      <nav class="footer-nav" aria-label="Enlaces de pie de página">
+        <a href="#soporte">Soporte</a>
+        <a href="#faq">FAQ</a>
+        <a href="#blog">Blog</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script>
+    // Burger menú móvil
+    const burger = document.getElementById('burger');
+    const navLinks = document.getElementById('nav-links');
+    burger.addEventListener('click', () => navLinks.classList.toggle('open'));
+
+    // Toggle LSA ON/OFF
+    const lsaToggle = document.getElementById('lsa-toggle');
+    lsaToggle.addEventListener('click', () => {
+      const on = document.body.classList.toggle('lsa-active');
+      lsaToggle.textContent = on ? '🖐 LSA ON' : '🖐 LSA OFF';
+      lsaToggle.setAttribute('aria-pressed', on);
+    });
+
+    // Autoplay video hero en viewport
+    const demoVideo = document.getElementById('demo-video');
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => e.isIntersecting ? demoVideo.play() : demoVideo.pause());
+    }, { threshold: 0.5 });
+    obs.observe(demoVideo);
+  </script>
+</body>
+</html>
