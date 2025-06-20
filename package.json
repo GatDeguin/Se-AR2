@@ -7,7 +7,8 @@
     "test": "jest",
     "start": "npx http-server . -p 8000",
     "lint": "eslint -c .eslintrc.cjs \"src/**/*.js\" \"__tests__/**/*.js\"",
-    "prepare-offline": "node scripts/prepareOffline.js"
+    "prepare-offline": "node scripts/prepareOffline.js",
+    "prepare-offline:dry": "DRY_RUN=1 node scripts/prepareOffline.js"
   },
   "keywords": [],
   "author": "",
