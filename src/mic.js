@@ -120,7 +120,7 @@ export function initMic({ SR, micBtn, captionContainer, captionText, micSelect, 
       setProgress(progress,35);
       if(worker){
         const p=new Promise(r=>{worker.onmessage=e=>r(e.data);});
-        worker.postMessage(pcm.buffer,[pcm.buffer]);
+        worker.postMessage(pcm,[pcm.buffer]);
         const text=await p;
         captionText.textContent=text;
         setProgress(progress,100);
