@@ -58,14 +58,15 @@ function download(opts, dest, onProgress) {
         reject(new Error(`Request Failed. Status Code: ${response.statusCode}`));
         return;
       }
-      const total = parseInt(response.headers['content-length'], 10) || 0;
+      const headerLen = parseInt(response.headers['content-length'], 10);
+      let total = Number.isNaN(headerLen) ? 0 : headerLen;
       let downloaded = 0;
       response.on('data', chunk => {
         downloaded += chunk.length;
         onProgress(downloaded, total);
       });
       response.pipe(file);
-      file.on('finish', () => file.close(resolve));
+      file.on('finish', () => file.close(() => resolve({ downloaded, total: total || downloaded })));
     }).on('error', err => {
       fs.unlink(dest, () => reject(err));
     });
@@ -87,6 +88,7 @@ async function main() {
   const writeProgress = () => {
     fs.writeFileSync(progressPath, JSON.stringify(progress, null, 2));
   };
+  const incomplete = [];
   for (const [name, url] of Object.entries(files)) {
     const dest = path.join(dir, name);
     if (!progress[name]) progress[name] = { downloaded: 0, total: 0 };
@@ -105,18 +107,30 @@ async function main() {
     }
     console.log(`Downloading ${name}...`);
     try {
-      await download({ url, headers }, dest, (dl, total) => {
-        progress[name] = { downloaded: start + dl, total: start + total };
+      const result = await download({ url, headers }, dest, (dl, total) => {
+        progress[name] = { downloaded: start + dl, total: start + (total || 0) };
         writeProgress();
         if (total) {
           const pct = (((start + dl) / (start + total)) * 100).toFixed(0);
           process.stdout.write(`\r${name}: ${pct}%   `);
         }
       });
+      progress[name].downloaded = start + result.downloaded;
+      if (progress[name].total <= start) {
+        progress[name].total = start + result.total;
+      }
+      writeProgress();
       console.log(`\nSaved ${dest}`);
     } catch (err) {
       console.error(`Failed to download ${url}:`, err.message);
     }
+    if (progress[name].downloaded < progress[name].total) {
+      console.warn(`Incomplete download for ${name}`);
+      incomplete.push(name);
+    }
+  }
+  if (incomplete.length) {
+    console.warn('Files not fully downloaded:', incomplete.join(', '));
   }
 }
 

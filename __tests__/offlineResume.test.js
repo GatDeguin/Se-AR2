@@ -79,7 +79,8 @@ test('downloads resume and update progress file', async () => {
     const range = req.headers.range;
     const start = range ? parseInt(range.replace(/bytes=(\d+)-/, '$1'), 10) : 0;
     const chunk = fileData.slice(start);
-    res.writeHead(range ? 206 : 200, { 'Content-Length': chunk.length });
+    // Deliberately omit Content-Length to test fallback logic
+    res.writeHead(range ? 206 : 200);
     res.end(chunk);
   });
   await new Promise(resolve => server.listen(0, resolve));
