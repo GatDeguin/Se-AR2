@@ -3,18 +3,19 @@ importScripts(new URL('../libs/face_mesh.js', import.meta.url).href);
 importScripts(new URL('../libs/drawing_utils.js', import.meta.url).href);
 
 let hands, faceMesh, processCanvas, processCtx, drawCanvas, drawCtx;
+let useCpuInference = false;
 
 async function ensureModels(width, height) {
   if (!hands) {
     const useCDN = self.USE_CDN;
     hands = new self.Hands(useCDN ? {} : { locateFile: f => new URL('../libs/' + f, import.meta.url).href });
-    hands.setOptions({ maxNumHands: 2, modelComplexity: 1, minDetectionConfidence: 0.7, minTrackingConfidence: 0.7 });
+    hands.setOptions({ maxNumHands: 2, modelComplexity: 1, minDetectionConfidence: 0.7, minTrackingConfidence: 0.7, useCpuInference });
     await hands.initialize();
   }
   if (!faceMesh) {
     const useCDN = self.USE_CDN;
     faceMesh = new self.FaceMesh(useCDN ? {} : { locateFile: f => new URL('../libs/' + f, import.meta.url).href });
-    faceMesh.setOptions({ maxNumFaces: 1, refineLandmarks: true, minDetectionConfidence: 0.7, minTrackingConfidence: 0.7 });
+    faceMesh.setOptions({ maxNumFaces: 1, refineLandmarks: true, minDetectionConfidence: 0.7, minTrackingConfidence: 0.7, useCpuInference });
     await faceMesh.initialize();
   }
   if (!processCanvas || processCanvas.width !== width || processCanvas.height !== height) {
@@ -27,6 +28,7 @@ self.onmessage = async e => {
   if (e.data.canvas) {
     drawCanvas = e.data.canvas;
     drawCtx = drawCanvas.getContext('2d');
+    useCpuInference = !!e.data.useCpuInference;
     return;
   }
   const { frame, width, height, accent = '#2EB8A3', icon = '#FFFFFF' } = e.data;

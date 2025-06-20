@@ -7,6 +7,10 @@ if ('serviceWorker' in navigator) {
         }
       };
 
+      // Check for updates on load and periodically
+      reg.update();
+      setInterval(() => reg.update(), 60 * 60 * 1000);
+
       if (reg.waiting) {
         promptUpdate(reg.waiting);
       }

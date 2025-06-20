@@ -22,6 +22,8 @@ transcription directly in the browser.
 The demo is organized as a single page web application. All scripts are loaded from **index.html** which boots `src/app.js` for gesture recognition and speech transcription. A service worker (`sw.js`) cachés core assets so the page works as a PWA. Models downloaded via the settings screen or `npm run prepare-offline` are stored in the `offline-models` cache allowing the app to operate without a network connection.
 
 For a more detailed overview see [docs/architecture.md](docs/architecture.md).
+Performance measurements for GPU vs CPU inference are documented in
+[docs/performance.md](docs/performance.md).
 
 ## Prerequisites
 
@@ -175,6 +177,7 @@ minor differences.
 ## Deployment
 
 Para un entorno de producción se recomienda servir la aplicación a través de **HTTPS**. Cualquier servidor estático es suficiente; por ejemplo:
+Para instrucciones sobre empaquetar la PWA para las tiendas móviles consulte [docs/deployment.md](docs/deployment.md).
 
 ```bash
 npx http-server . -p 443 --ssl --cert path/to/cert.pem --key path/to/key.pem
@@ -221,6 +224,10 @@ Para revisarlas y fusionarlas:
 ## Próximo Sprint
 
 Los planes para la siguiente iteración se describen en [docs/next-sprint.md](docs/next-sprint.md). Este objetivo ambicioso busca ampliar el vocabulario de señas y mejorar la experiencia sin conexión.
+
+## Licenses
+
+For information on external libraries such as **MediaPipe** and **HuggingFace Transformers**, see [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md).
 
 ## Política de Privacidad
 
