@@ -113,8 +113,9 @@ Para ejecutar la demo sin conexión:
    ```
 
 2. Si solo desea verificar el proceso sin descargar los archivos reales,
-  ejecute `DRY_RUN=1 npm run prepare-offline`, lo que genera las entradas de
-  `progress.json` sin realizar descargas.
+   ejecute `npm run prepare-offline:dry` (equivalente a
+   `DRY_RUN=1 npm run prepare-offline`). Este modo genera las entradas de
+   `progress.json` sin realizar descargas.
 3. Reserve alrededor de **80 MB** de espacio libre para los modelos y asegúrese
    de que los archivos se sirvan también mediante **HTTPS**.
 4. El script también descarga archivos `.wasm` y `.data` necesarios para las
