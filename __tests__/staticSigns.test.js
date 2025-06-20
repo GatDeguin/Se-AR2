@@ -114,4 +114,38 @@ describe('detectStaticSign', () => {
     lm[4].x = -1; lm[20].y = -1;
     expect(detectStaticSign(lm)).toBe('J');
   });
+
+  test('recognizes sign K with spread fingers', () => {
+    const lm = baseHand();
+    lm[4].x = -1; // thumb
+    lm[8].y = -1; lm[12].y = -1; // index and middle
+    lm[8].x = -0.5; lm[12].x = 0.5; // separated
+    expect(detectStaticSign(lm)).toBe('K');
+  });
+
+  test('recognizes sign L with right angle', () => {
+    const lm = baseHand();
+    lm[4].x = -1; lm[4].y = -1; // thumb
+    lm[8].y = -1; lm[8].x = 1; // index far from thumb
+    expect(detectStaticSign(lm)).toBe('L');
+  });
+
+  test('recognizes sign M with three fingers and thumb', () => {
+    const lm = baseHand();
+    lm[4].x = -1;
+    lm[8].y = -1; lm[12].y = -1; lm[16].y = -1; // index middle ring
+    expect(detectStaticSign(lm)).toBe('M');
+  });
+
+  test('recognizes sign W with three extended fingers', () => {
+    const lm = baseHand();
+    lm[8].y = -1; lm[12].y = -1; lm[16].y = -1; // index middle ring
+    expect(detectStaticSign(lm)).toBe('W');
+  });
+
+  test('recognizes sign Y with thumb and pinky', () => {
+    const lm = baseHand();
+    lm[4].x = -1; lm[20].x = 2; lm[20].y = -1;
+    expect(detectStaticSign(lm)).toBe('Y');
+  });
 });
