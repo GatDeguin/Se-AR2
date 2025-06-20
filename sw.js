@@ -12,6 +12,12 @@ const ASSETS = [
   '/libs/face_mesh.js',
   '/libs/drawing_utils.js',
   '/libs/transformers.min.js',
+  '/libs/hands_solution_wasm_bin.wasm',
+  '/libs/hands_solution_simd_wasm_bin.wasm',
+  '/libs/face_mesh_solution_wasm_bin.wasm',
+  '/libs/face_mesh_solution_simd_wasm_bin.wasm',
+  '/libs/pose_solution_wasm_bin.wasm',
+  '/libs/pose_solution_simd_wasm_bin.wasm',
 ];
 self.addEventListener('install', evt => {
   evt.waitUntil(
