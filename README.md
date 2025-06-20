@@ -12,7 +12,9 @@ transcription directly in the browser.
 * Interfaz con subtítulos arrastrables, cambio de tema y recorrido guiado.
 * Las preferencias de tema y tamaño de subtítulos se guardan en el navegador.
 * Herramientas para capturar imágenes y alternar cámaras durante la sesión.
-* Reconocimiento de señas estáticas **A–J** sin conexión.
+* Reconocimiento de señas estáticas sin conexión: **A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, U, V, W y Y**.
+  Algunas señas dinámicas como **"J"** o **"Z"** todavía no se soportan o se detectan de forma parcial.
+  [Ver `src/staticSigns.js`](src/staticSigns.js) como referencia técnica.
 
 ## Architecture
 

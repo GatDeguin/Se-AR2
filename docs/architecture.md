@@ -10,8 +10,11 @@ interact with each other.
   captions. It consumes helpers from `handUtils.js` and `staticSigns.js` to
   display recognized letters.
 - **`src/staticSigns.js`** – Contains the hand landmark based detection logic for
-  static letters A–J. Exported function `detectStaticSign` is used both by
-  `handUtils.js` and the main app.
+  static letters **A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, U, V, W and Y**.
+  Some dynamic gestures such as **"J"** or **"Z"** are not fully supported or only
+  partially recognized.
+  See [`src/staticSigns.js`](../src/staticSigns.js) for details. Exported function
+  `detectStaticSign` is used both by `handUtils.js` and the main app.
 - **`src/handUtils.js`** – Formats the output of `detectStaticSign` for display.
 - **`src/sw-register.js`** – Registers the service worker on page load and shows
   an update prompt when a new worker is available.
