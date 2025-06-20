@@ -38,7 +38,8 @@ const CAN_USE_WORKER = typeof OffscreenCanvas !== 'undefined' &&
 
 export async function initTracker({
   video,
-  canvas
+  canvas,
+  useCpuInference = false
 }) {
   if (!video) return;
   const canvasEl = canvas || (() => {
@@ -66,7 +67,8 @@ export async function initTracker({
     ));
     if (!mpCache.handsInitialized) {
       hands.setOptions({ maxNumHands: 2, modelComplexity: 1,
-        minDetectionConfidence: 0.7, minTrackingConfidence: 0.7 });
+        minDetectionConfidence: 0.7, minTrackingConfidence: 0.7,
+        useCpuInference });
       await hands.initialize();
       mpCache.handsInitialized = true;
     }
@@ -75,7 +77,8 @@ export async function initTracker({
     ));
     if (!mpCache.faceMeshInitialized) {
       faceMesh.setOptions({ maxNumFaces: 1, refineLandmarks: true,
-        minDetectionConfidence: 0.7, minTrackingConfidence: 0.7 });
+        minDetectionConfidence: 0.7, minTrackingConfidence: 0.7,
+        useCpuInference });
       await faceMesh.initialize();
       mpCache.faceMeshInitialized = true;
     }
@@ -87,7 +90,7 @@ export async function initTracker({
   } else {
     const off = canvasEl.transferControlToOffscreen();
     worker = new Worker(new URL('./trackerWorker.js', import.meta.url), { type: 'module' });
-    worker.postMessage({ canvas: off }, [off]);
+    worker.postMessage({ canvas: off, useCpuInference }, [off]);
     worker.onmessage = e => {
       handLandmarks = e.data.handLandmarks;
       faceResults = e.data.faceLandmarks ? { multiFaceLandmarks: [e.data.faceLandmarks] } : null;

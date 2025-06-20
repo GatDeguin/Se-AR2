@@ -1,10 +1,15 @@
 {
   "name": "SeñAR Web App",
   "short_name": "SeñAR",
+  "id": "com.senar.pwa",
+  "description": "Prototype sign language translator using AR techniques.",
   "start_url": "/index.html",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#ffffff",
   "theme_color": "#ffffff",
+  "categories": ["education", "utilities"],
   "icons": [
     {
       "src": "favicon.ico",
