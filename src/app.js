@@ -58,6 +58,10 @@ const helpPanel = document.getElementById('helpPanel');
 const helpClose = document.getElementById('helpClose');
 
 const startTour = initTour({ tourOverlay, tourTooltip, tourNext, tourClose });
+
+// Feature flag to force CPU inference instead of GPU/WebGL
+const params = new URLSearchParams(location.search);
+const useCpuInference = params.get('cpu') === '1';
 const { savedCamera, savedMic } = initSettings({
   settingsScreen, settingsBtn, settingsBack,
   themeToggle, themeValue, contrastToggle,
@@ -201,7 +205,8 @@ Promise.all(tasks).then(() => {
   const { initTracker } = await import('./tracker.js');
   await initTracker({
     video,
-    canvas: document.getElementById('trackerCanvas')
+    canvas: document.getElementById('trackerCanvas'),
+    useCpuInference
   });
   const { initLsaTranslate } = await import('./lsaTranslate.js');
   initLsaTranslate({ captionText });

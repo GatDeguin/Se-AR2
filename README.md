@@ -22,6 +22,8 @@ transcription directly in the browser.
 The demo is organized as a single page web application. All scripts are loaded from **index.html** which boots `src/app.js` for gesture recognition and speech transcription. A service worker (`sw.js`) cachés core assets so the page works as a PWA. Models downloaded via the settings screen or `npm run prepare-offline` are stored in the `offline-models` cache allowing the app to operate without a network connection.
 
 For a more detailed overview see [docs/architecture.md](docs/architecture.md).
+Performance measurements for GPU vs CPU inference are documented in
+[docs/performance.md](docs/performance.md).
 
 ## Prerequisites
 
