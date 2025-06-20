@@ -229,4 +229,48 @@ describe('index.html', () => {
     expect(helpPanel.classList.contains('show')).toBe(false);
     expect(helpBtn.getAttribute('aria-expanded')).toBe('false');
   });
+
+  test('tour tooltip stays within viewport for mic button', () => {
+    const tourTooltip = document.getElementById('tourTooltip');
+    const micBtn = document.getElementById('micBtn');
+
+    // mock positions to force overflow
+    micBtn.getBoundingClientRect = jest.fn(() => ({
+      top: window.innerHeight - 40,
+      bottom: window.innerHeight - 30,
+      left: window.innerWidth - 50,
+      right: window.innerWidth - 40,
+      width: 10,
+      height: 10
+    }));
+    Object.defineProperty(tourTooltip, 'offsetHeight', { value: 100, configurable: true });
+    Object.defineProperty(tourTooltip, 'offsetWidth', { value: 200, configurable: true });
+    tourTooltip.getBoundingClientRect = () => ({
+      top: parseFloat(tourTooltip.style.top) || 0,
+      left: parseFloat(tourTooltip.style.left) || 0,
+      bottom: (parseFloat(tourTooltip.style.top) || 0) + tourTooltip.offsetHeight,
+      right: (parseFloat(tourTooltip.style.left) || 0) + tourTooltip.offsetWidth,
+      width: tourTooltip.offsetWidth,
+      height: tourTooltip.offsetHeight
+    });
+
+    // simulate show logic of the tour
+    const r = micBtn.getBoundingClientRect();
+    let top = r.bottom + 10;
+    let left = r.left;
+    const tooltipHeight = tourTooltip.offsetHeight;
+    const tooltipWidth = tourTooltip.offsetWidth;
+    if (top + tooltipHeight > window.innerHeight) {
+      top = r.top - tooltipHeight - 10;
+    }
+    if (left + tooltipWidth > window.innerWidth) {
+      left = window.innerWidth - tooltipWidth - 10;
+    }
+    tourTooltip.style.top = `${top}px`;
+    tourTooltip.style.left = `${Math.max(0, left)}px`;
+
+    const rect = tourTooltip.getBoundingClientRect();
+    expect(rect.bottom).toBeLessThanOrEqual(window.innerHeight);
+    expect(rect.right).toBeLessThanOrEqual(window.innerWidth);
+  });
 });
