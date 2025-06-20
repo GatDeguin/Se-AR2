@@ -133,7 +133,8 @@ Para ejecutar la demo sin conexión:
 Dentro de la pantalla de configuraciones se incluye un botón para descargar el
 modelo de transcripción de audio directamente al caché del navegador. El
 progreso se muestra sobre el botón y, una vez completado, la aplicación puede
-funcionar sin conexión.
+funcionar sin conexión. Si desea liberar espacio, utilice el botón **Eliminar**
+para borrar estos modelos del caché.
 
 ### PWA Installation
 
@@ -207,6 +208,7 @@ npm run prepare-offline
 ```
 
 Esto descargará los modelos actualizados y sobrescribirá la carpeta `libs/`. Tras el despliegue, puede limpiar la caché `offline-models` desde las herramientas de desarrollo o esperar a que el nuevo service worker la renueve.
+También es posible eliminar manualmente los modelos descargados desde la pantalla de configuraciones usando el botón **Eliminar**.
 
 ### Actualizaciones automáticas con Dependabot
 
