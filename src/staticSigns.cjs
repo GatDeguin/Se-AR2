@@ -11,19 +11,34 @@ function detectStaticSign(lm) {
   // New letters F-J
   if (indexExt && middleExt && ringExt && pinkExt && thumbExt &&
       dist(lm[4], lm[8]) < 0.1) return 'F';
+  if (indexExt && thumbExt && !middleExt && !ringExt && !pinkExt &&
+      dist(lm[4], lm[8]) > 0.2 && (lm[8].x - lm[4].x) > 1) return 'L';
   if (indexExt && thumbExt && !middleExt && !ringExt && !pinkExt) return 'G';
-  if (indexExt && middleExt && thumbExt && !ringExt && !pinkExt) return 'H';
+  const sepIM = dist(lm[8], lm[12]);
+  if (indexExt && middleExt && thumbExt && !ringExt && !pinkExt && sepIM <= 0.1) return 'H';
+  if (indexExt && middleExt && thumbExt && !ringExt && !pinkExt && sepIM > 0.1) return 'K';
   if (!indexExt && !middleExt && !ringExt && pinkExt && !thumbExt) return 'I';
 
   // J is normally dynamic; assume final pose with thumb and pinky extended
 
-  if (!indexExt && !middleExt && !ringExt && pinkExt && thumbExt) return 'J';
-
+  if (!indexExt && !middleExt && !ringExt && pinkExt && thumbExt &&
+      dist(lm[4], lm[20]) <= 1.5) return 'J';
   if (!indexExt && !middleExt && !ringExt && !pinkExt && thumbExt) return 'A';
   if (indexExt && middleExt && ringExt && pinkExt && !thumbExt) return 'B';
   if (indexExt && middleExt && !ringExt && !pinkExt) return 'C';
   if (indexExt && !middleExt && !ringExt && !pinkExt) return 'D';
   if (!indexExt && !middleExt && !ringExt && !pinkExt && !thumbExt) return 'E';
+
+  if (indexExt && thumbExt && !middleExt && !ringExt && !pinkExt &&
+      dist(lm[4], lm[8]) > 0.2 && (lm[8].x - lm[4].x) > 1) return 'L';
+  if (indexExt && middleExt && ringExt && thumbExt && !pinkExt) return 'M';
+  if (indexExt && middleExt && thumbExt && !ringExt && !pinkExt) return 'N';
+  if (indexExt && middleExt && ringExt && pinkExt && thumbExt && dist(lm[4], lm[8]) >= 0.15) return 'O';
+  if (indexExt && middleExt && !ringExt && !pinkExt && !thumbExt && sepIM <= 0.05) return 'U';
+  if (indexExt && middleExt && !ringExt && !pinkExt && !thumbExt && sepIM > 0.05) return 'V';
+  if (indexExt && middleExt && ringExt && !thumbExt && !pinkExt) return 'W';
+  if (thumbExt && !indexExt && !middleExt && !ringExt && pinkExt &&
+      dist(lm[4], lm[20]) > 1.5) return 'Y';
   return null;
 }
 
