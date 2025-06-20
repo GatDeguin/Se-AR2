@@ -1,4 +1,5 @@
-const { detectStaticSign } = require('../src/staticSigns.cjs');
+const requireEsm = require('esm')(module);
+const { detectStaticSign } = requireEsm('../src/staticSignsCore.js');
 
 function baseHand() {
   const lm = Array.from({ length: 21 }, () => ({ x: 0, y: 0 }));

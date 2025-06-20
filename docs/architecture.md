@@ -6,12 +6,14 @@ interact with each other.
 ## Core modules
 
 - **`src/app.js`** – Main entry point executed from `index.html`. Sets up the UI,
-  initializes MediaPipe trackers and the Whisper speech components, and updates
-  captions. It consumes helpers from `handUtils.js` and `staticSigns.js` to
-  display recognized letters.
-- **`src/staticSigns.js`** – Contains the hand landmark based detection logic for
-  static letters A–J. Exported function `detectStaticSign` is used both by
-  `handUtils.js` and the main app.
+-  initializes MediaPipe trackers and the Whisper speech components, and updates
+-  captions. It consumes helpers from `handUtils.js` and `staticSigns.js` to
+-  display recognized letters.
+- **`src/staticSignsCore.js`** – Implements the hand landmark based detection
+  logic for static letters A–J. Its `detectStaticSign` function is re-exported
+  by `staticSigns.js` and `staticSigns.cjs` for browser and Node usage.
+- **`src/staticSigns.js`** – ES module wrapper re-exporting `detectStaticSign`.
+- **`src/staticSigns.cjs`** – CommonJS wrapper used in tests and Node scripts.
 - **`src/handUtils.js`** – Formats the output of `detectStaticSign` for display.
 - **`src/sw-register.js`** – Registers the service worker on page load and shows
   an update prompt when a new worker is available.
