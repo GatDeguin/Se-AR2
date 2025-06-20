@@ -20,8 +20,19 @@ export function initTour({ tourOverlay, tourTooltip, tourNext, tourClose }){
     e.classList.add('tour-highlight');
     const r=e.getBoundingClientRect();
     tourTooltip.textContent=t.text;
-    tourTooltip.style.top=`${r.bottom+10}px`;
-    tourTooltip.style.left=`${r.left}px`;
+
+    let top=r.bottom+10;
+    let left=r.left;
+    const tooltipHeight=tourTooltip.offsetHeight;
+    const tooltipWidth=tourTooltip.offsetWidth;
+    if(top+tooltipHeight>window.innerHeight){
+      top=r.top-tooltipHeight-10;
+    }
+    if(left+tooltipWidth>window.innerWidth){
+      left=window.innerWidth-tooltipWidth-10;
+    }
+    tourTooltip.style.top=`${top}px`;
+    tourTooltip.style.left=`${Math.max(0,left)}px`;
   }
   function startTour(){
     tourOverlay.classList.add('active');
