@@ -206,3 +206,12 @@ npm run prepare-offline
 ```
 
 Esto descargará los modelos actualizados y sobrescribirá la carpeta `libs/`. Tras el despliegue, puede limpiar la caché `offline-models` desde las herramientas de desarrollo o esperar a que el nuevo service worker la renueve.
+
+### Actualizaciones automáticas con Dependabot
+
+Este repositorio usa **GitHub Dependabot** para mantener al día las dependencias de `package.json`. Cada semana se abrirán PR automáticas con las nuevas versiones.
+
+Para revisarlas y fusionarlas:
+1. Revisar la descripción de la PR y los *changelogs* enlazados.
+2. Ejecutar localmente `npm ci` y `npm test` para asegurarse de que la actualización no rompe la aplicación.
+3. Si todo funciona correctamente, usar **Squash and merge** y eliminar la rama de Dependabot.
