@@ -28,8 +28,6 @@ export function detectStaticSign(lm) {
   if (indexExt && !middleExt && !ringExt && !pinkExt) return 'D';
   if (!indexExt && !middleExt && !ringExt && !pinkExt && !thumbExt) return 'E';
 
-  if (indexExt && thumbExt && !middleExt && !ringExt && !pinkExt &&
-      dist(lm[4], lm[8]) > 0.2 && (lm[8].x - lm[4].x) > 1) return 'L';
   if (indexExt && middleExt && ringExt && thumbExt && !pinkExt) return 'M';
   if (indexExt && middleExt && thumbExt && !ringExt && !pinkExt) return 'N';
   if (indexExt && middleExt && ringExt && pinkExt && thumbExt && dist(lm[4], lm[8]) >= 0.15) return 'O';
