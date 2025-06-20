@@ -2,7 +2,7 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 
-const files = {
+const defaultFiles = {
   // Core MediaPipe wrappers
   'hands.js': 'https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js',
   'face_mesh.js': 'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js',
@@ -45,6 +45,10 @@ const files = {
   'pose_web.binarypb': 'https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose_web.binarypb'
 };
 
+const files = process.env.FILES_OVERRIDE
+  ? JSON.parse(process.env.FILES_OVERRIDE)
+  : defaultFiles;
+
 function download(opts, dest, onProgress) {
   const { url, headers = {} } = typeof opts === 'string' ? { url: opts } : opts;
   return new Promise((resolve, reject) => {
@@ -69,7 +73,7 @@ function download(opts, dest, onProgress) {
 }
 
 async function main() {
-  const dir = path.join(__dirname, '..', 'libs');
+  const dir = process.env.LIBS_DIR || path.join(__dirname, '..', 'libs');
   fs.mkdirSync(dir, { recursive: true });
   const progressPath = path.join(dir, 'progress.json');
   let progress = {};
