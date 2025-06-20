@@ -31,6 +31,11 @@ beforeAll(() => {
     localStorage.setItem('haptics', hapticsToggle.checked.toString());
   });
 
+  const autoToggle = document.getElementById('autoTranslateToggle');
+  autoToggle.addEventListener('click', () => {
+    localStorage.setItem('autoTranslate', autoToggle.checked.toString());
+  });
+
   const helpBtn = document.getElementById('helpBtn');
   const helpPanel = document.getElementById('helpPanel');
   function toggleHelp(show) {
@@ -138,6 +143,15 @@ describe('index.html', () => {
     expect(localStorage.getItem('haptics')).toBe('false');
     toggle.click();
     expect(localStorage.getItem('haptics')).toBe('true');
+  });
+
+  test('auto translate toggle saves preference', () => {
+    const toggle = document.getElementById('autoTranslateToggle');
+    localStorage.clear();
+    toggle.click();
+    expect(localStorage.getItem('autoTranslate')).toBe('false');
+    toggle.click();
+    expect(localStorage.getItem('autoTranslate')).toBe('true');
   });
 
   test('camera menu lists available cameras', async () => {

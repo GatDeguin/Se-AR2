@@ -36,6 +36,7 @@ const resetPrefsBtn = document.getElementById('resetPrefsBtn');
 const downloadSttBtn = document.getElementById('downloadSttBtn');
 const lsaSettingsBtn = document.getElementById('lsaSettingsBtn');
 const hapticsToggle = document.getElementById('hapticsToggle');
+const autoTranslateToggle = document.getElementById('autoTranslateToggle');
 const video = document.getElementById('video');
 const fallbackCam = document.getElementById('fallbackCam');
 const fallbackSpeech = document.getElementById('fallbackSpeech');
@@ -61,7 +62,7 @@ const { savedCamera, savedMic } = initSettings({
   subtitleFontSelect, subtitleColorInput,
   dialectSelect, cameraSelect, micSelect,
   repeatTourBtn, resetPrefsBtn, downloadSttBtn,
-  lsaSettingsBtn, hapticsToggle, captionContainer,
+  lsaSettingsBtn, hapticsToggle, autoTranslateToggle, captionContainer,
   startTour, startStream
 });
 
@@ -199,4 +200,6 @@ Promise.all(tasks).then(() => {
     video,
     canvas: document.getElementById('trackerCanvas')
   });
+  const { initLsaTranslate } = await import('./lsaTranslate.js');
+  initLsaTranslate({ captionText });
 })();
