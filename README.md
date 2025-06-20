@@ -12,7 +12,9 @@ transcription directly in the browser.
 * Interfaz con subtítulos arrastrables, cambio de tema y recorrido guiado.
 * Las preferencias de tema y tamaño de subtítulos se guardan en el navegador.
 * Herramientas para capturar imágenes y alternar cámaras durante la sesión.
-* Reconocimiento de señas estáticas **A–J** sin conexión.
+* Reconocimiento de señas estáticas sin conexión: **A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, U, V, W y Y**.
+  Algunas señas dinámicas como **"J"** o **"Z"** todavía no se soportan o se detectan de forma parcial.
+  [Ver `src/staticSigns.js`](src/staticSigns.js) como referencia técnica.
 
 ## Architecture
 
@@ -133,7 +135,8 @@ Para ejecutar la demo sin conexión:
 Dentro de la pantalla de configuraciones se incluye un botón para descargar el
 modelo de transcripción de audio directamente al caché del navegador. El
 progreso se muestra sobre el botón y, una vez completado, la aplicación puede
-funcionar sin conexión.
+funcionar sin conexión. Si desea liberar espacio, utilice el botón **Eliminar**
+para borrar estos modelos del caché.
 
 ### PWA Installation
 
@@ -207,6 +210,7 @@ npm run prepare-offline
 ```
 
 Esto descargará los modelos actualizados y sobrescribirá la carpeta `libs/`. Tras el despliegue, puede limpiar la caché `offline-models` desde las herramientas de desarrollo o esperar a que el nuevo service worker la renueve.
+También es posible eliminar manualmente los modelos descargados desde la pantalla de configuraciones usando el botón **Eliminar**.
 
 ### Actualizaciones automáticas con Dependabot
 

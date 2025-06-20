@@ -38,6 +38,13 @@ export function detectStaticSign(lm) {
   if (indexExt && middleExt && ringExt && !thumbExt && !pinkExt) return 'W';
   if (thumbExt && !indexExt && !middleExt && !ringExt && pinkExt &&
       dist(lm[4], lm[20]) > 1.5) return 'Y';
+  if (indexExt && ringExt && thumbExt && !middleExt && !pinkExt) return 'P';
+  if (indexExt && pinkExt && thumbExt && !middleExt && !ringExt) return 'Q';
+  if (indexExt && middleExt && pinkExt && !ringExt && !thumbExt) return 'R';
+  if (!indexExt && !middleExt && ringExt && pinkExt && thumbExt) return 'S';
+  if (!indexExt && middleExt && !ringExt && pinkExt && thumbExt) return 'T';
+  if (indexExt && ringExt && !middleExt && !pinkExt && !thumbExt) return 'X';
+  if (indexExt && ringExt && pinkExt && !middleExt && !thumbExt) return 'Z';
   return null;
 }
 

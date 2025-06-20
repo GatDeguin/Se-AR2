@@ -8,6 +8,9 @@ import { initCamera, startStream } from './camera.js';
 import { initCaptionDrag } from './drag.js';
 import { initMic } from './mic.js';
 import { initTour } from './tour.js';
+import { detectStaticSign } from './staticSigns.js';
+import { updateTrails, detectDynamicSigns } from './dynamicSigns.js';
+import { trackerState } from './tracker.js';
 
 if (!window.Module) window.Module = {};
 if (!('arguments_' in window.Module)) window.Module.arguments_ = [];
@@ -202,4 +205,5 @@ Promise.all(tasks).then(() => {
   });
   const { initLsaTranslate } = await import('./lsaTranslate.js');
   initLsaTranslate({ captionText });
+
 })();
