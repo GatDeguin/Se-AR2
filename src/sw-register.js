@@ -1,10 +1,22 @@
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('sw.js').then(reg => {
+      let banner;
+      let waitingWorker;
       const promptUpdate = worker => {
-        if (window.confirm('Update available. Reload?')) {
-          worker.postMessage('SKIP_WAITING');
+        waitingWorker = worker;
+        if (!banner) {
+          banner = document.createElement('div');
+          banner.id = 'updateBanner';
+          banner.className = 'update-banner';
+          banner.innerHTML = '<span>Actualización disponible</span> <button id="updateButton">Actualizar</button>';
+          banner.querySelector('#updateButton').addEventListener('click', () => {
+            if (waitingWorker) waitingWorker.postMessage('SKIP_WAITING');
+            banner.remove();
+          });
+          document.body.appendChild(banner);
         }
+        banner.classList.add('show');
       };
 
       // Check for updates on load and periodically
