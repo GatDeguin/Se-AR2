@@ -1,4 +1,5 @@
 const canvas = document.getElementById('world');
+const info = document.getElementById('info');
 const ctx = canvas.getContext('2d');
 
 let width = canvas.width = window.innerWidth;
@@ -60,13 +61,34 @@ const bodies = [
 let gx = 0, gy = 0;
 const G = 0.2;
 const DEG2RAD = Math.PI / 180;
+let behind = false;
+
+function setInfo() {
+  if (info) {
+    info.textContent = behind ? 'Behind view - gravity inverted' : 'Tilt your device';
+  }
+}
 
 function handleOrientation(e) {
-  gy = G * Math.sin((e.beta || 0) * DEG2RAD);
-  gx = G * Math.sin((e.gamma || 0) * DEG2RAD);
+  const beta = e.beta || 0;
+  const gamma = e.gamma || 0;
+  behind = Math.abs(beta) > 90;
+  gy = G * Math.sin(beta * DEG2RAD) * (behind ? -1 : 1);
+  gx = G * Math.sin(gamma * DEG2RAD);
+  setInfo();
 }
 
 window.addEventListener('deviceorientation', handleOrientation);
+
+canvas.addEventListener('pointermove', e => {
+  const rect = canvas.getBoundingClientRect();
+  const x = (e.clientX - rect.left) / rect.width - 0.5;
+  const y = (e.clientY - rect.top) / rect.height - 0.5;
+  gx = G * x * 2;
+  gy = G * y * 2;
+  behind = false;
+  setInfo();
+});
 
 function loop() {
   ctx.clearRect(0, 0, width, height);
