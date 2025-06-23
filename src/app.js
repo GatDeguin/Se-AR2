@@ -38,6 +38,7 @@ const repeatTourBtn = document.getElementById('repeatTourBtn');
 const resetPrefsBtn = document.getElementById('resetPrefsBtn');
 const downloadSttBtn = document.getElementById('downloadSttBtn');
 const lsaSettingsBtn = document.getElementById('lsaSettingsBtn');
+const refreshModelsBtn = document.getElementById('refreshModelsBtn');
 const hapticsToggle = document.getElementById('hapticsToggle');
 const autoTranslateToggle = document.getElementById('autoTranslateToggle');
 const video = document.getElementById('video');
@@ -69,7 +70,7 @@ const { savedCamera, savedMic } = initSettings({
   subtitleFontSelect, subtitleColorInput,
   dialectSelect, cameraSelect, micSelect,
   repeatTourBtn, resetPrefsBtn, downloadSttBtn,
-  lsaSettingsBtn, hapticsToggle, autoTranslateToggle, captionContainer,
+  lsaSettingsBtn, refreshModelsBtn, hapticsToggle, autoTranslateToggle, captionContainer,
   startTour, startStream
 });
 
