@@ -1,6 +1,7 @@
 const CACHE_VERSION = 'v2';
 const CACHE_NAME = `sear-cache-${CACHE_VERSION}`;
 const MODEL_CACHE = 'offline-models';
+const MODEL_VERSION_URL = '/libs/model-version.json';
 const OFFLINE_URL = '/offline.html';
 const ASSETS = [
   '/',
@@ -23,19 +24,25 @@ const ASSETS = [
   '/libs/pose_solution_wasm_bin.wasm',
   '/libs/pose_solution_simd_wasm_bin.wasm',
 ];
+const LIB_ASSETS = ASSETS.filter(a => a.startsWith('/libs/')).concat(MODEL_VERSION_URL);
 self.addEventListener('install', evt => {
   evt.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
+    Promise.all([
+      caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)),
+      caches.open(MODEL_CACHE).then(cache => cache.addAll(LIB_ASSETS))
+    ])
   );
   self.skipWaiting();
 });
 self.addEventListener('activate', evt => {
-  evt.waitUntil(
-    caches.keys().then(keys => Promise.all(
+  evt.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(
       keys.filter(k => k !== CACHE_NAME && k !== MODEL_CACHE)
         .map(k => caches.delete(k))
-    ))
-  );
+    );
+    await checkModelVersion();
+  })());
   self.clients.claim();
 });
 self.addEventListener('fetch', evt => {
@@ -77,6 +84,9 @@ self.addEventListener('message', evt => {
       caches.open(MODEL_CACHE).then(cache => cache.delete(evt.data.url))
     );
   }
+  if (evt.data === 'REFRESH_MODELS') {
+    evt.waitUntil(checkModelVersion());
+  }
 });
 
 async function cacheFirst(request) {
@@ -107,5 +117,35 @@ async function networkFirst(request) {
     const cached = await caches.match(request);
     if (cached) return cached;
     return caches.match(OFFLINE_URL);
+  }
+}
+
+async function notifyClients(msg) {
+  const clients = await self.clients.matchAll();
+  for (const client of clients) client.postMessage(msg);
+}
+
+async function downloadModels() {
+  const cache = await caches.open(MODEL_CACHE);
+  await cache.addAll(LIB_ASSETS);
+}
+
+async function checkModelVersion() {
+  try {
+    const cache = await caches.open(MODEL_CACHE);
+    const [net, oldRes] = await Promise.all([
+      fetch(MODEL_VERSION_URL, { cache: 'no-store' }),
+      cache.match(MODEL_VERSION_URL)
+    ]);
+    if (!net.ok) return;
+    const newText = await net.clone().text();
+    const oldText = oldRes ? await oldRes.text() : null;
+    await cache.put(MODEL_VERSION_URL, net.clone());
+    if (oldText && oldText !== newText) {
+      await downloadModels();
+      notifyClients({ type: 'MODEL_UPDATE_AVAILABLE', version: newText });
+    }
+  } catch (err) {
+    // ignore errors
   }
 }

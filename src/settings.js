@@ -16,7 +16,7 @@ export function initSettings(refs){
     subtitleSizeSlider, subtitleSizeValue,
     subtitleFontSelect, subtitleColorInput,
     dialectSelect, cameraSelect, micSelect,
-    repeatTourBtn, resetPrefsBtn, downloadSttBtn,
+    repeatTourBtn, resetPrefsBtn, downloadSttBtn, refreshModelsBtn,
     lsaSettingsBtn, hapticsToggle, autoTranslateToggle, captionContainer,
     startTour, startStream
   } = refs;
@@ -205,6 +205,25 @@ export function initSettings(refs){
         downloadSttBtn.textContent = 'Error';
       }
     };
+  }
+
+  if (refreshModelsBtn) refreshModelsBtn.onclick = e => {
+    ripple(e, refreshModelsBtn);
+    refreshModelsBtn.textContent = 'Actualizando...';
+    refreshModelsBtn.disabled = true;
+    if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage('REFRESH_MODELS');
+    }
+  };
+
+  if (navigator.serviceWorker) {
+    navigator.serviceWorker.addEventListener('message', ev => {
+      if (ev.data && ev.data.type === 'MODEL_UPDATE_AVAILABLE') {
+        refreshModelsBtn.textContent = 'Actualizar modelos';
+        refreshModelsBtn.disabled = false;
+        alert('Hay nuevos modelos disponibles');
+      }
+    });
   }
 
   if (lsaSettingsBtn) lsaSettingsBtn.onclick = e => {
